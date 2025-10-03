@@ -1,0 +1,60 @@
+{{!-- Course card template --}}
+<div class="card course-card h-100">
+    <img src="{{this.thumbnailUrl}}" class="card-img-top" alt="{{this.title}}" style="height: 200px; object-fit: cover;">
+    <div class="card-body">
+        <h5 class="card-title text-truncate" title="{{this.title}}">{{this.title}}</h5>
+        <p class="card-text mb-1">
+            <small class="text-muted">
+                <i class="fas fa-graduation-cap"></i> {{this.category}}
+            </small>
+        </p>
+        <p class="card-text mb-1">
+            <small class="text-muted">
+                <i class="fas fa-chalkboard-teacher"></i> {{this.instructor}}
+            </small>
+        </p>
+        <div class="d-flex align-items-center mb-2">
+            <div class="ratings">
+                <i class="fas fa-star text-warning"></i>
+                <span class="rating-value">{{this.rating}}</span>
+                <small class="text-muted">({{this.reviewCount}} đánh giá)</small>
+            </div>
+        </div>
+        <div class="price-section">
+            {{#if this.discountPrice}}
+            <span class="text-decoration-line-through text-muted">{{format_currency this.originalPrice}}</span>
+            <span class="text-primary fw-bold ms-2">{{format_currency this.discountPrice}}</span>
+            {{else}}
+            <span class="text-primary fw-bold">{{format_currency this.originalPrice}}</span>
+            {{/if}}
+        </div>
+    </div>
+    <div class="card-footer bg-transparent border-top-0">
+        <a href="/courses/{{this.id}}" class="btn btn-outline-primary w-100">Xem chi tiết</a>
+    </div>
+</div>
+
+{{!-- Add this CSS to your existing style section --}}
+<style>
+.course-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.course-card .card-title {
+    font-size: 1.1rem;
+    line-height: 1.4;
+}
+
+.ratings {
+    font-size: 0.9rem;
+}
+
+.price-section {
+    font-size: 1.1rem;
+}
+</style>
