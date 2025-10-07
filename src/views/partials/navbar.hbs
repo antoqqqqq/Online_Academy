@@ -1,62 +1,77 @@
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container">
-                <a class="navbar-brand" href="/">Online Academy</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/">Trang Chủ</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                Khóa Học
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/courses/programming">Lập Trình</a></li>
-                                <li><a class="dropdown-item" href="/courses/design">Thiết Kế</a></li>
-                                <li><a class="dropdown-item" href="/courses/business">Kinh Doanh</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/courses">Tất Cả Khóa Học</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                Danh Mục
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/categories/new">Mới Nhất</a></li>
-                                <li><a class="dropdown-item" href="/categories/popular">Phổ Biến</a></li>
-                                <li><a class="dropdown-item" href="/categories/free">Miễn Phí</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/about">Giới Thiệu</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/contact">Liên Hệ</a>
-                        </li>
-                        {{#if user}}
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle user-profile" href="#" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-user"></i> {{user.name}}
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-black fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">Online Academy</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link item" href="/">Trang Chủ</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Khóa Học
+                        </a>
+                        <ul class="dropdown-menu">
+                            {{#each categories}}
+                            <li class="dropdown-submenu">
+                                <a class="dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                    {{this.name}}
                                 </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="/profile">Hồ Sơ</a></li>
-                                    <li><a class="dropdown-item" href="/my-courses">Khóa Học Của Tôi</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="/logout">Đăng Xuất</a></li>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    {{#each this.subCategories}}
+                                    <li><a class="dropdown-item"
+                                            href="/courses/category/{{this.slug}}">{{this.name}}</a></li>
+                                    {{/each}}
                                 </ul>
                             </li>
-                        {{else}}
-                            <li class="nav-item">
-                                <a class="nav-link login-btn" href="/login">Đăng Nhập</a>
+                            {{/each}}
+                            <li>
+                                <hr class="dropdown-divider">
                             </li>
-                        {{/if}}
-                    </ul>
-                </div>
+                            <li><a class="dropdown-item" href="/courses">Tất Cả Khóa Học</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Danh Mục
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/categories/new">Mới Nhất</a></li>
+                            <li><a class="dropdown-item" href="/categories/popular">Phổ Biến</a></li>
+                            <li><a class="dropdown-item" href="/categories/free">Miễn Phí</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">Giới Thiệu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Liên Hệ</a>
+                    </li>
+                    {{#if user}}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle user-profile" href="#" role="button"
+                            data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i> {{user.name}}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/profile">Hồ Sơ</a></li>
+                            <li><a class="dropdown-item" href="/my-courses">Khóa Học Của Tôi</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/logout">Đăng Xuất</a></li>
+                        </ul>
+                    </li>
+                    {{else}}
+                    <li class="nav-item">
+                        <a class="nav-link login-btn" href="/login">Đăng Nhập</a>
+                    </li>
+                    {{/if}}
+                </ul>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
+</header>

@@ -1,0 +1,14 @@
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h1 class="display-1">{{status}}</h1>
+            <h2 class="mb-4">{{message}}</h2>
+            {{#if error}}
+                <div class="alert alert-danger">
+                    <pre class="mb-0">{{error.stack}}</pre>
+                </div>
+            {{/if}}
+            <a href="/" class="btn btn-primary">Về trang chủ</a>
+        </div>
+    </div>
+</div>

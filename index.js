@@ -1,54 +1,103 @@
-import db from './src/utils/db.js';
-import dotenv from "dotenv";
-import path from "path";
+// ==========================
+// 🌐 IMPORT MODULES
+// ==========================
 import express from "express";
 import exphbs from "express-handlebars";
 import session from "express-session";
 import bodyParser from "body-parser";
-import homeRoute from "./src/routes/home.route.js";
+import path, { dirname } from "path";
 import { fileURLToPath } from "url";
-import { dirname } from "path";
+import dotenv from "dotenv";
+
+import db from "./src/utils/db.js";
 import helpers from "./src/helper/curency.helper.js";
-const app = express();
+import { loadCategories } from "./src/middlewares/category.mdw.js";
+import homeRoute from "./src/routes/home.route.js";
+import courseRoute from "./src/routes/course.route.js";
+
+// ==========================
+// ⚙️ CONFIGURATION
+// ==========================
 dotenv.config();
-// Handlebars
-app.engine("hbs", exphbs.engine({ 
-  extname: ".hbs",
-  helpers: helpers }));
+const app = express();
+
+// Lấy đường dẫn tuyệt đối hiện tại (dùng nếu cần path chính xác)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// ==========================
+// 🧱 TEMPLATE ENGINE (Handlebars)
+// ==========================
+app.engine(
+  "hbs",
+  exphbs.engine({
+    extname: ".hbs",
+    helpers: helpers,
+  })
+);
 app.set("view engine", "hbs");
 app.set("views", "./src/views");
+
+// ==========================
+// 📂 STATIC FILES
+// ==========================
 app.use(express.static(path.join(process.cwd(), "public")));
-// Middleware
+
+// ==========================
+// 🧩 MIDDLEWARES
+// ==========================
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(express.static("public"));
+
+// Load categories cho mọi trang
+app.use(loadCategories);
+
+// 🧱 Session
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "your_secret_key",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+// ==========================
+// 🚦 ROUTES
+// ==========================
+app.use("/", homeRoute);
+app.use("/courses", courseRoute);
+
+// ==========================
+// ❌ GLOBAL ERROR HANDLER
+// ==========================
 app.use((err, req, res, next) => {
-  console.error('Global error handler:', err);
-  res.status(500).render('error', {
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err : {}
+  console.error("Global error handler:", err);
+  res.status(500).render("error", {
+    message: "Something went wrong!",
+    error: process.env.NODE_ENV === "development" ? err : {},
   });
 });
-// Session
-app.use(session({
-  secret: "your_secret_key",
-  resave: false,
-  saveUninitialized: true,
-}));
-app.use("/", homeRoute);
 
+// ==========================
+// 🚀 SERVER START
+// ==========================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
+  console.log(`✅ Server is running at http://localhost:${PORT}`);
 });
-export default app;
+
+// ==========================
+// 🧠 DATABASE CONNECTION TEST
+// ==========================
 async function testConnection() {
   try {
-    const result = await db.raw('SELECT 1+1 AS solution');
-    console.log('Kết nối OK, 1+1 =', result[0][0].solution);
+    const result = await db.raw("SELECT 1+1 AS solution");
+    console.log("📦 Kết nối OK, 1+1 =", result.rows[0].solution);
   } catch (err) {
-    console.error('Lỗi kết nối:', err);
+    console.error("❌ Lỗi kết nối DB:", err);
   }
 }
 
 testConnection();
+
+export default app;

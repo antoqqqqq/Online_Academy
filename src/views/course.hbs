@@ -1,0 +1,70 @@
+<div class="container py-4">
+    <!-- Category Filter -->
+    <div class="row mb-4">
+        <div class="col">
+            <select class="form-select" onchange="window.location.href=this.value">
+                <option value="/courses">Tất cả lĩnh vực</option>
+                {{#each categories}}
+                <option value="/courses?category={{this._id}}" {{#if (eq ../categoryId this._id)}}selected{{/if}}>
+                    {{this.name}}
+                </option>
+                {{/each}}
+            </select>
+        </div>
+    </div>
+
+    <!-- Course Grid -->
+    <div class="row g-4">
+        {{#each courses}}
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            {{> course_card}}
+        </div>
+        {{else}}
+        <div class="col-12 text-center">
+            <p>Không tìm thấy khóa học nào.</p>
+        </div>
+        {{/each}}
+    </div>
+
+    <!-- Pagination -->
+    {{#if pagination}}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {{#if pagination.hasPrev}}
+            <li class="page-item">
+                <a class="page-link" href="?page={{subtract pagination.currentPage 1}}{{#if categoryId}}&category={{categoryId}}{{/if}}">
+                    Trước
+                </a>
+            </li>
+            {{/if}}
+
+            {{#times pagination.totalPages}}
+            <li class="page-item {{#if (eq this ../pagination.currentPage)}}active{{/if}}">
+                <a class="page-link" href="?page={{this}}{{#if ../categoryId}}&category={{../categoryId}}{{/if}}">
+                    {{this}}
+                </a>
+            </li>
+            {{/times}}
+
+            {{#if pagination.hasNext}}
+            <li class="page-item">
+                <a class="page-link" href="?page={{add pagination.currentPage 1}}{{#if categoryId}}&category={{categoryId}}{{/if}}">
+                    Tiếp
+                </a>
+            </li>
+            {{/if}}
+        </ul>
+    </nav>
+    {{/if}}
+</div>
+
+<style>
+.pagination .page-link {
+    color: #333;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #333;
+    border-color: #333;
+}
+</style>
