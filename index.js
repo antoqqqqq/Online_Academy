@@ -4,6 +4,7 @@
 import express from "express";
 import exphbs from "express-handlebars";
 import session from "express-session";
+import hsb_sections from 'express-handlebars-sections';
 import bodyParser from "body-parser";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -14,6 +15,7 @@ import helpers from "./src/helper/curency.helper.js";
 import { loadCategories } from "./src/middlewares/category.mdw.js";
 import homeRoute from "./src/routes/home.route.js";
 import courseRoute from "./src/routes/course.route.js";
+import accountRoute from "./src/routes/account.route.js";
 
 // ==========================
 // ⚙️ CONFIGURATION
@@ -32,7 +34,12 @@ app.engine(
   "hbs",
   exphbs.engine({
     extname: ".hbs",
-    helpers: helpers,
+    layoutsDir: path.join(__dirname, "src/views/layouts"),
+    partialsDir: path.join(__dirname, "src/views/partials"),
+    helpers: {
+      section: hsb_sections(),
+      ...helpers,
+    },
   })
 );
 app.set("view engine", "hbs");
@@ -41,14 +48,14 @@ app.set("views", "./src/views");
 // ==========================
 // 📂 STATIC FILES
 // ==========================
-app.use(express.static(path.join(process.cwd(), "public")));
+app.use(express.static(path.join(process.cwd(), "src/public")));
 
 // ==========================
 // 🧩 MIDDLEWARES
 // ==========================
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 // Load categories cho mọi trang
 app.use(loadCategories);
 
@@ -66,6 +73,7 @@ app.use(
 // ==========================
 app.use("/", homeRoute);
 app.use("/courses", courseRoute);
+app.use("/account", accountRoute);
 
 // ==========================
 // ❌ GLOBAL ERROR HANDLER

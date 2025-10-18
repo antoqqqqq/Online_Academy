@@ -1,0 +1,253 @@
+<link rel="stylesheet" href="/css/verify-otp.css">
+<div class="otp-container">
+    <a href="/" class="btn btn-outline-secondary btn-sm mb-3">
+        <span>←</span> Quay lại
+    </a>
+    <h2 class="otp-title">Xác Thực OTP</h2>
+    <p class="otp-subtitle">Nhập mã OTP gồm 6 chữ số đã được gửi đến</p>
+
+    <div class="email-display">
+        <span id="emailDisplay">{{email}}</span>
+    </div>
+
+    <form id="otpForm">
+        <div class="otp-inputs">
+            <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="0">
+            <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="1">
+            <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="2">
+            <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="3">
+            <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="4">
+            <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" data-index="5">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-verify w-100" id="verifyBtn">Xác Nhận</button>
+    </form>
+
+    <div class="resend-section">
+        <p class="mb-2">Không nhận được mã?</p>
+        <a class="resend-link" id="resendLink" onclick="resendOTP()">
+            Gửi lại mã OTP <span class="timer" id="timer"></span>
+        </a>
+    </div>
+</div>
+{{#section 'js'}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Lưu email từ query string hoặc session
+    /*const urlParams = new URLSearchParams(window.location.search);
+    const userEmail = urlParams.get('email') || 'example@gmail.com';
+    document.getElementById('emailDisplay').textContent = userEmail;*/
+
+    // OTP Input handling
+    const inputs = document.querySelectorAll('.otp-input');
+
+    inputs.forEach((input, index) => {
+        // Auto focus next input
+        input.addEventListener('input', (e) => {
+            const value = e.target.value;
+
+            // Chỉ cho phép số
+            if (!/^\d*$/.test(value)) {
+                e.target.value = '';
+                return;
+            }
+
+            if (value && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+                e.target.classList.add('filled');
+            }
+
+            // Auto submit khi đủ 6 số
+            if (index === inputs.length - 1 && value) {
+                e.target.classList.add('filled');
+                checkAllFilled();
+            }
+        });
+
+        // Handle backspace
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                inputs[index - 1].focus();
+                inputs[index - 1].value = '';
+                inputs[index - 1].classList.remove('filled');
+            }
+        });
+
+        // Handle paste
+        input.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pastedData = e.clipboardData.getData('text').trim();
+
+            if (/^\d{6}$/.test(pastedData)) {
+                pastedData.split('').forEach((char, i) => {
+                    if (inputs[i]) {
+                        inputs[i].value = char;
+                        inputs[i].classList.add('filled');
+                    }
+                });
+                inputs[5].focus();
+                checkAllFilled();
+            }
+        });
+    });
+
+    function checkAllFilled() {
+        const allFilled = Array.from(inputs).every(input => input.value !== '');
+        if (allFilled) {
+            // Auto submit hoặc enable button
+            document.getElementById('verifyBtn').disabled = false;
+        }
+    }
+
+    // Form submission
+    document.getElementById('otpForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        // Lấy OTP
+        const otp = Array.from(inputs).map(input => input.value).join('');
+
+        if (otp.length !== 6) {
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Vui lòng nhập đầy đủ 6 chữ số!',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        // Disable button
+        const verifyBtn = document.getElementById('verifyBtn');
+        verifyBtn.disabled = true;
+        verifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xác thực...';
+
+        try {
+            // Gửi request verify OTP
+            const response = await fetch('/account/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: "{{email}}",
+                    otp: otp
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                Swal.fire({
+                    title: 'Thành công!',
+                    text: 'Xác thực thành công!',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#667eea'
+                }).then(() => {
+                    // Redirect đến trang reset password hoặc home
+                    window.location.href = result.redirectUrl || '/';
+                });
+            } else {
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: result.message || 'Mã OTP không đúng hoặc đã hết hạn!',
+                    icon: 'error',
+                    confirmButtonText: 'Thử lại'
+                });
+
+                // Clear inputs
+                inputs.forEach(input => {
+                    input.value = '';
+                    input.classList.remove('filled');
+                });
+                inputs[0].focus();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Đã xảy ra lỗi. Vui lòng thử lại!',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        } finally {
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = 'Xác Nhận';
+        }
+    });
+
+    // Resend OTP timer
+    let countdown = 60;
+    let timerInterval;
+
+    function startTimer() {
+        const resendLink = document.getElementById('resendLink');
+        const timerSpan = document.getElementById('timer');
+
+        resendLink.classList.add('disabled');
+        countdown = 60;
+
+        timerInterval = setInterval(() => {
+            countdown--;
+            timerSpan.textContent = `(${countdown}s)`;
+
+            if (countdown <= 0) {
+                clearInterval(timerInterval);
+                timerSpan.textContent = '';
+                resendLink.classList.remove('disabled');
+            }
+        }, 1000);
+    }
+
+    async function resendOTP() {
+        try {
+            const response = await fetch('/account/resend-otp', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                Swal.fire({
+                    title: 'Thành công!',
+                    text: 'Mã OTP mới đã được gửi đến email của bạn!',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    timer: 2000
+                });
+                // Start countdown
+                startTimer();
+
+                // Clear inputs
+                inputs.forEach(input => {
+                    input.value = '';
+                    input.classList.remove('filled');
+                });
+                inputs[0].focus();
+            } else {
+                Swal.fire({
+                    title: 'Lỗi!',
+                    text: result.message || 'Không thể gửi lại mã OTP!',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Lỗi!',
+                text: 'Đã xảy ra lỗi. Vui lòng thử lại!',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+
+    // Start timer on page load
+    startTimer();
+
+    // Focus first input
+    inputs[0].focus();
+</script>
+{{/section}}

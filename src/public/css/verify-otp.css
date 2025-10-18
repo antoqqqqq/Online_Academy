@@ -1,0 +1,116 @@
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.otp-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    padding: 40px;
+    max-width: 500px;
+    width: 100%;
+}
+
+.otp-title {
+    color: #667eea;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.otp-subtitle {
+    color: #666;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.otp-inputs {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.otp-input {
+    width: 50px;
+    height: 60px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+.otp-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    outline: none;
+}
+
+.otp-input.filled {
+    border-color: #667eea;
+    background-color: #f8f9ff;
+}
+
+.btn-verify {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 12px;
+    font-weight: 600;
+    transition: transform 0.2s;
+}
+
+.btn-verify:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-verify:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.resend-section {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+}
+
+.resend-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.resend-link:hover {
+    text-decoration: underline;
+}
+
+.resend-link.disabled {
+    color: #999;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.timer {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.email-display {
+    background-color: #f8f9ff;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #667eea;
+    font-weight: 600;
+}
