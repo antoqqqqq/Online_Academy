@@ -71,6 +71,16 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 // ==========================
+// CATEGORIES LOAD
+// ==========================
+import categoryModel from "./src/models/category.model.js";
+app.use(async function (req, res, next) {
+  const list = await categoryModel.getCategoriesL2_L1();
+  res.locals.globalCategories = list;
+
+  next();
+});
+// ==========================
 // 🚦 ROUTES
 // ==========================
 app.use((req, res, next) => {
