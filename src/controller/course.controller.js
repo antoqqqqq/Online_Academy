@@ -1,69 +1,71 @@
+import courseModel from "../models/course.model.js";
+import instructorModel from "../models/instructor.model.js";
+
 const courseController = {
     list: async (req, res, next) => {
         try {
             const page = parseInt(req.query.page) || 1;
             const limit = 12;
-            const categoryId = req.query.category;
-
-            // Mock categories data
-            const categories = [
-                { id: 1, name: 'IT & Phần mềm' },
-                { id: 2, name: 'Kinh doanh' },
-                { id: 3, name: 'Thiết kế' },
-                { id: 4, name: 'Marketing' }
-            ];
-
-            // Mock courses data
-            const mockCourses = [
-                {
-                    id: 1,
-                    title: 'Khóa học JavaScript Cơ bản',
-                    thumbnail: 'https://picsum.photos/300/200',
-                    instructor: 'John Doe',
-                    category: 'IT & Phần mềm',
-                    rating: 4.5,
-                    reviewCount: 120,
-                    price: 1200000,
-                    discountPrice: 899000
-                },
-                {
-                    id: 2,
-                    title: 'Digital Marketing từ A-Z',
-                    thumbnail: 'https://picsum.photos/300/200',
-                    instructor: 'Jane Smith',
-                    category: 'Marketing',
-                    rating: 4.8,
-                    reviewCount: 250,
-                    price: 1500000,
-                    discountPrice: null
-                },
-                {
-                    id: 3,
-                    title: 'UI/UX Design Master',
-                    thumbnail: 'https://picsum.photos/300/200',
-                    instructor: 'David Wilson',
-                    category: 'Thiết kế',
-                    rating: 4.7,
-                    reviewCount: 180,
-                    price: 2000000,
-                    discountPrice: 1599000
-                },
-                {
-                    id: 4,
-                    title: 'Python cho người mới bắt đầu',
-                    thumbnail: 'https://picsum.photos/300/200',
-                    instructor: 'Sarah Johnson',
-                    category: 'IT & Phần mềm',
-                    rating: 4.6,
-                    reviewCount: 300,
-                    price: 1800000,
-                    discountPrice: 1299000
-                }
-            ];
-
-
-        } catch (error) {
+            const offset = (page - 1) * limit;
+            const courses = await courseModel.findAll({ limit, offset });
+            res.render("course", { courses });
+        }
+        catch (error) {
             next(error);
+        }
+    },
+
+    // GET form to create a new course (instructors only)
+    createForm: async (req, res, next) => {
+        try {
+            res.render("admin/create_course", { layout: "main" });
+        }
+        catch (error) {
+            next(error);
+        }
+    },
+
+    // POST handler to create a course (instructors only)
+    create: async (req, res, next) => {
+        try {
+            const account = req.user;
+            if (!account) return res.redirect("/account/signin");
+            const instructor = await instructorModel.findByAccountId(account.id);
+            if (!instructor) {
+                return res.status(403).render("error", { message: "You are not an instructor." });
+                const {
+                    title,
+                    description,
+                    image_url,
+                    level,
+                    current_price,
+                    original_price,
+                    category_id
+                } = req.body;
+                const newCourse = {
+                    title,
+                    description,
+                    image_url: image_url || null,
+                    instructor_id: instructor.instructor_id,
+                    rating: 0,
+                    total_reviews: 0,
+                    total_hours: 0,
+                    total_lectures: 0,
+                    level: level || "Beginner",
+                    current_price: current_price || 0,
+                    original_price: original_price || 0,
+                    is_complete: false,
+                    category_id :category_id || null,
+                    total_enrollment: 0,
+                    is_onsale: false
+                };
+                const result = await courseModel.create(newCourse);
+                const created = Array.isArray(result) ? result[0] : result;
+                res.redirect(`/courses/${created.course_id}`);
+            }
+        }
+        catch (error) {
+                next(error);
         }
     }
 };
