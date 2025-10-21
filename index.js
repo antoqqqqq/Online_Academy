@@ -17,7 +17,8 @@ import { loadCategories } from "./src/middlewares/category.mdw.js";
 import homeRoute from "./src/routes/home.route.js";
 import courseRoute from "./src/routes/course.route.js";
 import accountRoute from "./src/routes/account.route.js";
-
+// Import admin route
+import adminRoute from "./src/routes/admin.route.js";
 
 
 // ==========================
@@ -33,18 +34,17 @@ const __dirname = dirname(__filename);
 // ==========================
 // 🧱 TEMPLATE ENGINE (Handlebars)
 // ==========================
-app.engine(
-  "hbs",
-  exphbs.engine({
+const hbs = exphbs.create({
     extname: ".hbs",
     layoutsDir: path.join(__dirname, "src/views/layouts"),
     partialsDir: path.join(__dirname, "src/views/partials"),
     helpers: {
-      section: hsb_sections(),
-      ...helpers,
+        section: hsb_sections(),
+        ...helpers,
     },
-  })
-);
+});
+
+app.engine("hbs", hbs.engine);
 app.set("view engine", "hbs");
 app.set("views", "./src/views");
 
@@ -59,8 +59,7 @@ app.use(express.static(path.join(process.cwd(), "src/public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-// Load categories cho mọi trang
-app.use(loadCategories);
+
 
 // 🧱 Session
 app.use(
@@ -72,6 +71,10 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Load categories cho mọi trang
+app.use(loadCategories);
+
 // ==========================
 // 🚦 ROUTES
 // ==========================
@@ -79,9 +82,13 @@ app.use((req, res, next) => {
   res.locals.user = req.user; // Gửi user sang view
   next();
 });
+
 app.use("/", homeRoute);
 app.use("/courses", courseRoute);
 app.use("/account", accountRoute);
+// Use admin route
+app.use("/admin", adminRoute);
+
 
 // ==========================
 // ❌ GLOBAL ERROR HANDLER
