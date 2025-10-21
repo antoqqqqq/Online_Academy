@@ -106,9 +106,8 @@ router.post("/signin", async (req, res) => {
         });
     }
     req.session.isAuthenticated = true;
-    req.session.authUser = user
-    console.log(req.session.authUser.permision);
-    const url = req.query.retUrl || "/";
+    req.session.authUser = user;
+    const url = "/";
     res.redirect(url);
 });
 // router.post('/signin', (req, res, next) => {
@@ -145,6 +144,8 @@ router.get('/google/callback',
     (req, res) => {
         // Successful authentication, redirect home.
         console.log('✅ Đăng nhập Google thành công:', req.user);
+        req.session.isAuthenticated = true;
+        req.session.authUser = req.user;
         if (req.user.password == null) {
             res.redirect('/account/addpassword');
         } else { res.redirect('/'); }

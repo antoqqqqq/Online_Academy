@@ -14,7 +14,7 @@ const courseController = {
             ];
 
             // Mock courses data
-            const mockCourses = [
+            const subCategories = [
                 {
                     id: 1,
                     title: 'Khóa học JavaScript Cơ bản',
