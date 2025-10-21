@@ -8,6 +8,17 @@
     <link rel="stylesheet" href="/css/navbar.css">
     <script src="/js/navbar.js" defer></script>
     <link rel="stylesheet" href="/css/footer.css">
+    <!-- TinyMCE -->
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    {{#if useTinyMCE}}
+    <script>
+        tinymce.init({
+            selector: '#description, #full_description',
+            plugins: 'lists link image table code help wordcount',
+            toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | indent outdent | bullist numlist | code | table'
+        });
+    </script>
+    {{/if}}
 </head>
 <body>
     <!-- Header -->

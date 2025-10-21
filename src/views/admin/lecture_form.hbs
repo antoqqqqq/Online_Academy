@@ -1,0 +1,60 @@
+<div class="container py-4">
+    <h2 class="mb-4">Add New Lecture</h2>
+    <form action="/courses/{{course.course_id}}/lectures" method="post" class="needs-validation" novalidate enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Lecture Title</label>
+                    <input type="text" class="form-control" id="title" name="title" required>
+                    <div class="invalid-feedback">Please provide a lecture title.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Short Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="2" required></textarea>
+                    <div class="invalid-feedback">Please provide a short description.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="full_description" class="form-label">Full Description</label>
+                    <textarea class="form-control" id="full_description" name="full_description" rows="5"></textarea>
+                    <div class="form-text">Optional detailed description of the lecture content.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="video" class="form-label">Video File</label>
+                    <input type="file" class="form-control" id="video" name="video" accept="video/*" required>
+                    <div class="invalid-feedback">Please upload a video file.</div>
+                    <div class="form-text">Maximum file size: 500MB. Supported formats: MP4, WebM.</div>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="is_preview" name="is_preview">
+                        <label class="form-check-label" for="is_preview">
+                            Make this lecture available for preview
+                        </label>
+                        <div class="form-text">Preview lectures can be watched by anyone before enrolling.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between">
+            <a href="/courses/{{course.course_id}}/lectures" class="btn btn-secondary">Back to Lectures</a>
+            <button type="submit" class="btn btn-primary">Add Lecture</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Form validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>
