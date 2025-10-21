@@ -44,3 +44,4 @@ Thumbs.db
 # MySQL dumps
 *.sql
 *.sql.gz
+abc.js
