@@ -13,7 +13,6 @@ import dotenv from "dotenv";
 import passport from "passport";
 import db from "./src/utils/db.js";
 import helpers from "./src/helper/curency.helper.js";
-import { loadCategories } from "./src/middlewares/category.mdw.js";
 import homeRoute from "./src/routes/home.route.js";
 import courseRoute from "./src/routes/course.route.js";
 import accountRoute from "./src/routes/account.route.js";
@@ -59,7 +58,7 @@ app.use(express.static(path.join(process.cwd(), "src/public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+// Load categories cho mọi trang
 
 // 🧱 Session
 app.use(
@@ -76,10 +75,20 @@ app.use(passport.session());
 app.use(loadCategories);
 
 // ==========================
+// CATEGORIES LOAD
+// ==========================
+import categoryModel from "./src/models/category.model.js";
+app.use(async function (req, res, next) {
+  const list = await categoryModel.getCategoriesL2_L1();
+  res.locals.globalCategories = list;
+
+  next();
+});
+// ==========================
 // 🚦 ROUTES
 // ==========================
 app.use((req, res, next) => {
-  res.locals.user = req.user; // Gửi user sang view
+  res.locals.user = req.session.authUser; // Gửi user sang view
   next();
 });
 

@@ -1,13 +1,18 @@
+/* =======================
+   NAVBAR BASE STYLE
+======================= */
 .navbar {
     transition: all 0.3s ease;
     padding: 1rem 0;
     background: linear-gradient(to right, #1a1a1a, #333333) !important;
 }
+
 .navbar.scrolled {
     padding: 0.5rem 0;
     background: rgba(26, 26, 26, 0.95) !important;
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
 }
+
 .navbar-brand {
     font-size: 1.5rem;
     font-weight: bold;
@@ -15,6 +20,9 @@
     letter-spacing: 1px;
 }
 
+/* =======================
+   NAV LINKS
+======================= */
 .nav-link {
     font-weight: 500;
     padding: 0.5rem 1.2rem !important;
@@ -39,108 +47,161 @@
     width: 80%;
 }
 
-.dropdown-menu {
-    position: absolute;
-    width: 200px;
-    background-color: #fff;
-    box-shadow: 0 20px 45px rgba(180, 180, 182, 0.2);
-    margin-top: -20px;
-    opacity: 0;
-    visibility: hidden;
-    z-index: -999;
-    transition: all 0.3s ease-in-out;
-}
-.dropdown:hover > .dropdown-menu {
-    opacity: 1;
-    visibility: visible;
-    z-index: 99;
-    margin-top: 2px;
-}
-.dropdown-submenu > .dropdown-menu {
-    top: 0;
-    left: 100%;
-    margin-top: 0;
-    margin-left: -20px;
-    opacity: 0;
-    visibility: hidden;
-    z-index: -999;
-    transition: all 0.3s ease-in-out;
-}
-
-.dropdown-submenu:hover > .dropdown-menu {
-    opacity: 1;
-    visibility: visible;
-    z-index: 99;
-    margin-left: 0;
-}
-
-/* Enhanced shadow effects */
+/* =======================
+   DROPDOWN MENU (LEVEL 1)
+======================= */
 .dropdown-menu {
     border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     border-radius: 8px;
-    box-shadow: 
-        0 10px 15px -3px rgba(0, 0, 0, 0.1),
-        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    margin-top: 0.5rem;
+    min-width: 220px;
+    padding: 0.5rem 0;
+    animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Smooth hover transitions for items */
 .dropdown-item {
-    transition: all 0.2s ease;
-    padding: 8px 20px;
+    padding: 0.6rem 1.5rem;
+    transition: all 0.3s ease;
+    color: #212529;
 }
 
 .dropdown-item:hover {
-    transform: translateX(5px);
-    color: #007aff;
-    background-color: rgba(0, 122, 255, 0.05);
+    background-color: #f8f9fa;
+    color: #000;
+    padding-left: 1.8rem;
 }
 
-
-.dropdown-divider {
-    border-color: #404040;
+.dropdown-item.active,
+.dropdown-item:active {
+    background-color: #343a40;
+    color: #fff;
 }
 
+/* =======================
+   DROPDOWN SUBMENU (LEVEL 2)
+======================= */
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu > .dropdown-item::after {
+    font-weight: 900;
+    float: right;
+    margin-left: 1rem;
+    font-size: 0.8rem;
+}
+
+/* Submenu hidden by default */
+.dropdown-submenu .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -0.5rem;
+    margin-left: 0.1rem;
+    display: none;
+    border-radius: 8px;
+}
+
+/* Show submenu on hover */
+.dropdown-submenu:hover > .dropdown-menu {
+    display: block;
+    animation: fadeSlide 0.5s ease-in-out;
+}
+
+/* =======================
+   LOGIN & USER PROFILE BUTTONS
+======================= */
 .login-btn {
     background: #ffc107;
     color: #000 !important;
     border-radius: 20px;
     padding: 0.5rem 1.5rem !important;
+    border: 2px solid transparent;
+    margin-left: 0.5rem;
+    transition: all 0.3s ease;
 }
 
 .login-btn:hover {
     background: #ffca2c;
     transform: translateY(-2px);
-    transition: all 0.3s ease;
 }
 
 .user-profile {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 20px;
+    padding: 0.4rem 1.2rem !important;
+    margin-left: 0.5rem;
+    border: 2px solid #28a745;
+    transition: all 0.3s ease;
 }
 
 .user-profile:hover {
     background: rgba(255, 255, 255, 0.2);
+    color: #fff !important;
 }
 
+/* =======================
+   RESPONSIVE ADJUSTMENTS
+======================= */
 @media (max-width: 991.98px) {
     .dropdown-submenu > .dropdown-menu {
-        margin-left: 1rem;
-        margin-top: 0;
         position: static;
+        margin-left: 1rem;
+        margin-right: 2.5rem;
+        margin-top: 0;
         box-shadow: none;
+        border-left: 2px solid #dee2e6;
     }
-    
+
     .dropdown-item:hover {
         transform: none;
+        padding-left: 1.5rem;
+    }
+
+    /* Arrow changes direction */
+    .dropdown-submenu > .dropdown-item::after {
+        transform: rotate(0deg);
+    }
+
+    .dropdown-submenu.show > .dropdown-item::after {
+        transform: rotate(180deg);
     }
 }
-/* Adjust body padding for fixed navbar */
+
+/* =======================
+   BODY PADDING FOR FIXED NAVBAR
+======================= */
 body {
-    padding-top: 76px; /* Height of navbar */
+    padding-top: 76px;
 }
 
 @media (max-width: 991.98px) {
     body {
         padding-top: 62px;
+    }
+}
+
+/* =======================
+   ANIMATIONS
+======================= */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeSlide {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }

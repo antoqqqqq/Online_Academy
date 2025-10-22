@@ -100,7 +100,7 @@ const homeController = {
                     }
                 ]
             };
-            console.log('Data prepared, rendering view...');
+            console.log(data);
 
             return res.render('home', data);
         } catch (error) {

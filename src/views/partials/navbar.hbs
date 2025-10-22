@@ -17,13 +17,13 @@
                         <ul class="dropdown-menu">
                             {{#each categories}}
                             <li class="dropdown-submenu">
-                                <a class="dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                <a class="dropdown-item " href="/category/{{this.slug}}" data-bs-toggle="">
                                     {{this.name}}
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
+                                <ul class="dropdown-menu ">
                                     {{#each this.subCategories}}
                                     <li><a class="dropdown-item"
-                                            href="/courses/category/{{this.slug}}">{{this.name}}</a></li>
+                                            href="/category/{{../slug}}/{{this.slug}}">{{this.category_name}}</a></li>
                                     {{/each}}
                                 </ul>
                             </li>
