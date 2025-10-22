@@ -3,19 +3,33 @@ import adminController from '../controller/admin.controller.js';
 
 const router = express.Router();
 
-// Middleware to check for admin privileges
+// Middleware kiểm tra quyền admin
 const isAdmin = (req, res, next) => {
-    if (req.isAuthenticated() && req.user.permission === 'admin') {
+    const user = req.session && req.session.authUser;
+    if (user && Number(user.permission) === 1) {
         return next();
     }
-    res.redirect('/'); // Or redirect to a login page
+    return res.redirect('/');
 };
 
-// Use the isAdmin middleware for all routes in this file
 router.use(isAdmin);
 
-// Admin Dashboard
+// --- Dashboard ---
 router.get('/', adminController.dashboard);
 
+// --- User Management ---
+router.get('/users', adminController.viewUsers);
+
+// --- Category Management (Đã thêm từ trước) ---
+router.get('/categories', adminController.viewCategories);
+router.post('/categories/add', adminController.addCategory);
+router.post('/categories/update', adminController.updateCategory);
+router.post('/categories/delete', adminController.deleteCategory);
+
+// --- Course Management (YÊU CẦU 4.2) ---
+// THÊM CÁC ROUTE MỚI DƯỚI ĐÂY:
+router.get('/courses', adminController.viewCourses); // Xem danh sách khóa học
+router.post('/courses/delete', adminController.deleteCourse); // Gỡ bỏ khóa học
 
 export default router;
+

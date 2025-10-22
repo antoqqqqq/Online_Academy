@@ -58,5 +58,54 @@ export default {
             throw error;
         }
     },
+
+    
+    async findAllAdmin() {
+        const catL1 = await db('categoryL1').select('*');
+        const catL2 = await db('categoryL2').join('categoryL1', 'categoryL2.categoryL1_id', 'categoryL1.id')
+                                         .select('categoryL2.*', 'categoryL1.category_name as parent_name');
+        return { catL1, catL2 };
+    },
+
+    // Lấy tất cả L1 (dùng cho form)
+    async findAllL1() {
+        return await db('categoryL1').select('*');
+    },
+
+    // Đếm số khóa học trong 1 lĩnh vực (để kiểm tra xóa)
+    // *** ĐÃ SỬA: Đếm trong bảng 'courses' ***
+    async countCoursesInCategory(id) {
+        // category_id trong bảng 'courses' là ID của categoryL2
+        const res = await db('courses').where('category_id', id).count();
+        return res[0].count;
+    },
+
+    // Thêm lĩnh vực
+    async add(category) {
+        // Nếu có categoryL1_id, thì đây là L2
+        if (category.categoryL1_id) {
+            return db('categoryL2').insert(category);
+        }
+        // Nếu không, đây là L1 (xóa key rỗng đi)
+        delete category.categoryL1_id; 
+        return db('categoryL1').insert(category);
+    },
+
+    // Cập nhật lĩnh vực
+    async update(id, data, level) {
+        if (level === 'L1') {
+            return db('categoryL1').where('id', id).update(data);
+        }
+        return db('categoryL2').where('id', id).update(data);
+    },
+
+    // Xóa lĩnh vực
+    async delete(id, level) {
+         if (level === 'L1') {
+            // (Bạn cần thêm logic kiểm tra L1 có L2 con không trước khi xóa)
+            return db('categoryL1').where('id', id).del();
+        }
+        return db('categoryL2').where('id', id).del();
+    }
 }
 

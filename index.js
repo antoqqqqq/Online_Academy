@@ -16,8 +16,8 @@ import helpers from "./src/helper/curency.helper.js";
 import homeRoute from "./src/routes/home.route.js";
 import courseRoute from "./src/routes/course.route.js";
 import accountRoute from "./src/routes/account.route.js";
-// Import admin route
 import adminRoute from "./src/routes/admin.route.js";
+import { loadCategories } from "./src/middlewares/category.mdw.js";
 
 
 // ==========================

@@ -42,6 +42,10 @@ export default {
         .where("id", id)
         .update({ password: hashedPassword });
         return result;
-    }
+    },
+    
+    async findAll() {
+        return db('account').select('*');
+    },
 
 }
