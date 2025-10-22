@@ -1,3 +1,5 @@
+import categoryModel from "../models/category.model.js";
+
 const courseController = {
     list: async (req, res, next) => {
         try {
@@ -6,13 +8,7 @@ const courseController = {
             const categoryId = req.query.category;
 
             // Mock categories data
-            const categories = [
-                { id: 1, name: 'IT & Phần mềm' },
-                { id: 2, name: 'Kinh doanh' },
-                { id: 3, name: 'Thiết kế' },
-                { id: 4, name: 'Marketing' }
-            ];
-
+            const categories = await categoryModel.index();
             // Mock courses data
             const subCategories = [
                 {

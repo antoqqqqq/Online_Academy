@@ -200,12 +200,12 @@
 
     async function resendOTP() {
         try {
+            const userEmail = document.getElementById('emailDisplay').textContent;
             const response = await fetch('/account/resend-otp', {
-                method: 'GET',
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: userEmail })
             });
-
             const result = await response.json();
 
             if (result.success) {

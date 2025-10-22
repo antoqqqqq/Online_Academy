@@ -38,7 +38,6 @@ export const loadCategories = async (req, res, next) => {
             ]
         }
     ];
-    console.log('Loaded categories middleware:', categories);
     res.locals.categories = categories;
     next();
 };

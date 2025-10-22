@@ -31,9 +31,9 @@ router.post("/signup", async (req, res) => {
         res.redirect("/account/verify-otp");
     }
 });
-router.get("/resend-otp", async (req, res) => {
+router.post("/resend-otp", async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const email = req.session.otpStore.email;
+    const email = req.body.email;
     req.session.otpStore.otp = otp;
     req.session.otpStore.otpCreatedAt = Date.now();
     const sendotp = await mailer.sendOTP(email, otp);
@@ -157,17 +157,65 @@ router.get("/addpassword", (req, res) => {
 });
 router.post("/addpassword", async (req, res) => {
     const newPassword = req.body.newPassword;
-    console.log(req.user);
     const hash = await bcrypt.hash(newPassword, 10);
     const result = await accountModel.updatePassword(req.user.id, hash);
-    console.log(result);
     if (result) {
         res.redirect("/");
-    } 
+    }
 });
 router.get("/signout", (req, res) => {
     req.logout(() => {
         res.redirect("/");
     });
+});
+router.get("/profile", (req, res) => {
+    if (!req.session.isAuthenticated) {
+        return res.redirect("/account/signin");
+    } else { res.render("vwaccount/profile", { layout: "account" }); }
+
+});
+// router.post("/profile", async (req, res) => {
+//     const message = req.body.err_message;
+//     console.log(message);
+//     // Handle avatar update logic here
+//     res.render("vwaccount/profile", { layout: "account", err_message: message });
+// });
+router.post("/profile/changeprofile", async (req, res) => {
+    const userId = req.session.authUser.id;
+    const name = req.body.name;
+    const email = req.body.email;
+    console.log(req.body);
+    if (email !== req.session.authUser.email || name !== req.session.authUser.name) {
+        const isAvailable = await accountModel.isEmailAvailable(email);
+        if (!isAvailable && email !== req.session.authUser.email) {
+            return res.json({ success: false, err_message: "Email is already in use." });
+        } else {
+            const result = await accountModel.updateProfile(userId, name, email);
+            if (result) {
+                console.log("Profile updated successfully.");
+                req.session.authUser.name = name;
+                req.session.authUser.email = email;
+                res.json({ success: true, err_message: "Profile updated successfully." });
+            }
+        }
+
+    } else {
+        res.json({ success: false, err_message: "No changes made to profile." });
+    }
+});
+router.post("/profile/changepassword", async (req, res) => {
+    const userId = req.session.authUser.id;
+    const currentPassword = req.body.currentPassword;
+    const newPassword = req.body.newPassword;
+    const user = await accountModel.findById(userId);
+    const isMatch = await bcrypt.compareSync(currentPassword, user.password);
+    if (!isMatch) {
+        return res.json({ success: false, err_message: "Current password is incorrect." });
+    }
+    const hash = await bcrypt.hash(newPassword, 10);
+    const result = await accountModel.updatePassword(userId, hash);
+    if (result) {
+        res.json({ success: true, err_message: "Password changed successfully." });
+    }
 });
 export default router;
