@@ -35,7 +35,6 @@
                             {{/if}}
                         </td>
                         <td class="text-end">
-                            <!-- Nút Gỡ bỏ (Yêu cầu 4.2) -->
                             <form action="/admin/courses/delete" method="POST" style="display: inline-block;" onsubmit="return confirm('Bạn có chắc chắn muốn gỡ bỏ khóa học này? Mọi dữ liệu liên quan (bài giảng, feedback,...) cũng sẽ bị xóa vĩnh viễn.');">
                                 <input type="hidden" name="id" value="{{this.id}}">
                                 <button type="submit" class="btn btn-sm btn-outline-danger">

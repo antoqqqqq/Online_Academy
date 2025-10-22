@@ -106,6 +106,11 @@ export default {
             return db('categoryL1').where('id', id).del();
         }
         return db('categoryL2').where('id', id).del();
-    }
+    },
+    async countAll() {
+        const l1 = await db('categoryL1').count('id as total');
+        const l2 = await db('categoryL2').count('id as total');
+        return Number(l1[0].total) + Number(l2[0].total);
+    },
 }
 

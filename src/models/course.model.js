@@ -62,6 +62,11 @@ export default {
             console.error("Lỗi khi xóa khóa học:", error);
             return false; // Trả về false nếu thất bại
         }
-    }
+    },
+    async countAll() {
+        const result = await db('courses').count('course_id as total');
+        return result[0].total;
+    },
+
 }
 

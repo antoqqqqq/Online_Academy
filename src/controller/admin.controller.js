@@ -4,8 +4,26 @@ import courseModel from '../models/course.model.js'; // THÊM IMPORT MỚI
 
 const adminController = {
     // --- Dashboard ---
-    dashboard: (req, res) => {
-        res.render('vwAdmin/dashboard', { layout: 'admin' });
+    dashboard: async (req, res) => {
+        try {
+            
+            const totalUsers = await accountModel.countAll();
+            const totalCourses = await courseModel.countAll();
+            const totalCategories = await categoryModel.countAll();
+
+     
+            res.render('vwAdmin/dashboard', {
+                layout: 'admin',
+                stats: {
+                    users: totalUsers,
+                    courses: totalCourses,
+                    categories: totalCategories
+                }
+            });
+        } catch (error) {
+            console.error("Lỗi khi tải dashboard:", error);
+            res.redirect('/');
+        }
     },
 
     // --- User Management ---
@@ -121,6 +139,42 @@ const adminController = {
             console.error("Lỗi khi xóa khóa học:", error);
         }
         res.redirect('/admin/courses');
+    },
+    setUserPermission: async (req, res) => {
+        try {
+            const { userId, permission } = req.body;
+            await accountModel.update(userId, { permission: parseInt(permission, 10) });
+        } catch (error) {
+            console.error("Lỗi khi cấp quyền:", error);
+        }
+        res.redirect('/admin/users');
+    },
+
+    addUser: async (req, res) => {
+        try {
+            const { name, email, password, permission } = req.body;
+            const hash = await bcrypt.hash(password, 10);
+            const newUser = {
+                name,
+                email,
+                password: hash,
+                permission: parseInt(permission, 10)
+            };
+            await accountModel.add(newUser);
+        } catch (error) {
+            console.error("Lỗi khi thêm người dùng:", error);
+        }
+        res.redirect('/admin/users');
+    },
+
+    deleteUser: async (req, res) => {
+        try {
+            const { id } = req.body;
+            await accountModel.deleteById(id);
+        } catch (error) {
+            console.error("Lỗi khi xóa người dùng:", error);
+        }
+        res.redirect('/admin/users');
     }
 };
 

@@ -48,4 +48,19 @@ export default {
         return db('account').select('*');
     },
 
+    async countAll() {
+        const result = await db('account').count('id as total');
+        return result[0].total;
+    },
+    async update(id, user) {
+        return db('account').where('id', id).update(user);
+    },
+
+    async deleteById(id) {
+        // Cần cẩn thận khi xóa user vì có thể có ràng buộc khóa ngoại
+        // Ví dụ: instructor, student...
+        // Tạm thời chỉ làm lệnh xóa cơ bản
+        return db('account').where('id', id).del();
+    },
+
 }
