@@ -1,5 +1,11 @@
 import db from "../utils/db.js";
 export default {
+    async updateProfile(id, name, email) {
+        const result = await db("account")
+        .where("id", id)
+        .update({ name: name, email: email });
+        return result;
+    },
     async isEmailAvailable(email) {
         const exist = await db("account")
         .where("email", email)

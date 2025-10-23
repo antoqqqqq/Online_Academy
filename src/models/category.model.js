@@ -14,7 +14,6 @@ export default {
                 slug: cat1.slug,
                 subCategories: await getCategoriesL2(cat1.id)
             })));
-            console.log(JSON.stringify(data, null, 2));
             return data
         } catch (error) {
             console.error('Home page error:', error);

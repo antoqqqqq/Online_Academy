@@ -1,7 +1,11 @@
+import categoryModel from "../models/category.model.js";
+
 const homeController = {
     index: async (req, res, next) => {
         try {
             const data = {
+                categories: await categoryModel.index(),
+
                 banners: [
                     {
                         imageUrl: '/images/banners/banner1.jpg',
@@ -100,9 +104,8 @@ const homeController = {
                     }
                 ]
             };
-            console.log(data);
 
-            return res.render('home', data);
+            return data;
         } catch (error) {
             console.error('Home page error:', error);
             return res.status(500).render('error');
