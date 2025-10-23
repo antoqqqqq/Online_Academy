@@ -25,7 +25,7 @@
 
                     <div class="card mb-3 bg-light text-dark border-0 shadow-sm">
                         <h5 class="card-header bg-white text-dark fw-semibold border-bottom">
-                            Khoá học
+                            Danh sách các lĩnh vực khoá học
                         </h5>
 
                         <ul class="list-group list-group-flush bg-light">
@@ -41,7 +41,7 @@
                                 <div class="collapse mt-2" id="parent{{categoryL1_id}}">
                                     <ul class="list-group list-group-flush ms-3">
                                         {{#each subcategories}}
-                                        <a href="/courses?id={{id}}"
+                                        <a href="/category/{{id}}"
                                             class="list-group-item list-group-item-action border-0 rounded-1 py-1 px-3 text-secondary hover-link">
                                             <i class="bi bi-arrow-bar-right me-1"></i>{{category_name}}
                                         </a>

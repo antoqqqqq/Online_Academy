@@ -79,22 +79,6 @@ app.use(passport.session());
 app.use(loadCategories);
 
 // ==========================
-// CATEGORIES LOAD
-// ==========================
-import categoryModel from "./src/models/category.model.js";
-app.use(async function (req, res, next) {
-  try {
-    const list = await categoryModel.getCategoriesL2_L1();
-    res.locals.globalCategories = list;
-    next();
-  } catch (error) {
-    // Lỗi sẽ được hiển thị ở đây!
-    console.error("LỖI NGHIÊM TRỌNG KHI TẢI CATEGORIES:", error);
-    // Chuyển lỗi đến trang "Something went wrong" một cách tường minh
-    next(error); 
-  }
-});
-// ==========================
 // 🚦 ROUTES
 // ==========================
 app.use((req, res, next) => {

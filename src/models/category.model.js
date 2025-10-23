@@ -49,7 +49,7 @@ export default {
                 categoryL1_id: subs[0].categoryL1_id,
                 subcategories: subs
             }));
-            console.log(categories);
+            // console.log(categories);
             return categories;
         }
         catch (error) {
@@ -57,12 +57,24 @@ export default {
             throw error;
         }
     },
+    async getCategoriesWithMostEnrollments() {
+        return await db('enrollment')
+            .join('courses', 'enrollment.course_id', 'courses.course_id') // nối bảng khoá học
+            .join('categoryL2', 'courses.category_id', 'categoryL2.id')   // nối bảng lĩnh vực
+            .where('enrollment.created_at', '>=', db.raw("CURRENT_DATE - INTERVAL '7 day'")) // chỉ tính trong 7 ngày gần đây
+            .select(
+                'categoryL2.id',
+                'categoryL2.category_name'
+            )
+            .count('enrollment.id as total_enrollments') // đếm số lượt đăng ký
+            .groupBy('categoryL2.id', 'categoryL2.category_name')
+            .orderBy('total_enrollments', 'desc');
 
-    
+    },
     async findAllAdmin() {
         const catL1 = await db('categoryL1').select('*');
         const catL2 = await db('categoryL2').join('categoryL1', 'categoryL2.categoryL1_id', 'categoryL1.id')
-                                         .select('categoryL2.*', 'categoryL1.category_name as parent_name');
+            .select('categoryL2.*', 'categoryL1.category_name as parent_name');
         return { catL1, catL2 };
     },
 
@@ -86,7 +98,7 @@ export default {
             return db('categoryL2').insert(category);
         }
         // Nếu không, đây là L1 (xóa key rỗng đi)
-        delete category.categoryL1_id; 
+        delete category.categoryL1_id;
         return db('categoryL1').insert(category);
     },
 
@@ -100,7 +112,7 @@ export default {
 
     // Xóa lĩnh vực
     async delete(id, level) {
-         if (level === 'L1') {
+        if (level === 'L1') {
             // (Bạn cần thêm logic kiểm tra L1 có L2 con không trước khi xóa)
             return db('categoryL1').where('id', id).del();
         }
