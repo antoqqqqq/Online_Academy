@@ -40,6 +40,9 @@ const hbs = exphbs.create({
     helpers: {
         section: hsb_sections(),
         ...helpers,
+        eq: function (a, b) {
+          return a === b;
+      },
     },
 });
 
@@ -79,10 +82,16 @@ app.use(loadCategories);
 // ==========================
 import categoryModel from "./src/models/category.model.js";
 app.use(async function (req, res, next) {
-  const list = await categoryModel.getCategoriesL2_L1();
-  res.locals.globalCategories = list;
-
-  next();
+  try {
+    const list = await categoryModel.getCategoriesL2_L1();
+    res.locals.globalCategories = list;
+    next();
+  } catch (error) {
+    // Lỗi sẽ được hiển thị ở đây!
+    console.error("LỖI NGHIÊM TRỌNG KHI TẢI CATEGORIES:", error);
+    // Chuyển lỗi đến trang "Something went wrong" một cách tường minh
+    next(error); 
+  }
 });
 // ==========================
 // 🚦 ROUTES

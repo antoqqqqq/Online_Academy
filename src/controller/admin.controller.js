@@ -1,6 +1,7 @@
+import bcrypt from 'bcrypt';
 import accountModel from '../models/accout.model.js';
 import categoryModel from '../models/category.model.js';
-import courseModel from '../models/course.model.js'; // THÊM IMPORT MỚI
+import courseModel from '../models/course.model.js';
 
 const adminController = {
     // --- Dashboard ---

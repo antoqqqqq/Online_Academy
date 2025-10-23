@@ -1,0 +1,212 @@
+<h1 class="h2 mb-4">Quản lý Lĩnh vực</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-grid-fill me-2"></i>Lĩnh vực cấp 1</span>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addL1Modal">
+                    <i class="bi bi-plus-circle-fill me-1"></i> Thêm mới
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <tbody>
+                            {{#each this.catL1}}
+                            <tr>
+                                <td>{{this.category_name}}</td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-primary btn-edit" data-bs-toggle="modal" data-bs-target="#editCategoryModal" data-id="{{this.id}}" data-name="{{this.category_name}}" data-slug="{{this.slug}}" data-level="L1">
+                                        <i class="bi bi-pencil-square"></i> Sửa
+                                    </button>
+                                    <form action="/admin/categories/delete" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa lĩnh vực này?');">
+                                        <input type="hidden" name="id" value="{{this.id}}">
+                                        <input type="hidden" name="level" value="L1">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash-fill"></i> Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {{else}}
+                            <tr>
+                                <td class="text-center text-muted">Chưa có lĩnh vực cấp 1.</td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-diagram-3-fill me-2"></i>Lĩnh vực cấp 2</span>
+                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addL2Modal">
+                    <i class="bi bi-plus-circle-fill me-1"></i> Thêm mới
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <tbody>
+                            {{#each this.catL2}}
+                            <tr>
+                                <td>
+                                    {{this.category_name}}
+                                    <small class="d-block text-muted">thuộc: {{this.parent_name}}</small>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-primary btn-edit" data-bs-toggle="modal" data-bs-target="#editCategoryModal" data-id="{{this.id}}" data-name="{{this.category_name}}" data-slug="{{this.slug}}" data-level="L2">
+                                        <i class="bi bi-pencil-square"></i> Sửa
+                                    </button>
+                                    <form action="/admin/categories/delete" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa lĩnh vực này?');">
+                                        <input type="hidden" name="id" value="{{this.id}}">
+                                        <input type="hidden" name="level" value="L2">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash-fill"></i> Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {{else}}
+                            <tr>
+                                <td class="text-center text-muted">Chưa có lĩnh vực cấp 2.</td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="addL1Modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Thêm Lĩnh vực Cấp 1</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="/admin/categories/add" method="POST">
+        <div class="modal-body">
+            <input type="hidden" name="level" value="L1">
+            <div class="mb-3">
+                <label for="addL1Name" class="form-label">Tên Lĩnh vực</label>
+                <input type="text" class="form-control" id="addL1Name" name="category_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="addL1Slug" class="form-label">Slug</label>
+                <input type="text" class="form-control" id="addL1Slug" name="slug">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-primary">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addL2Modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Thêm Lĩnh vực Cấp 2</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="/admin/categories/add" method="POST">
+        <div class="modal-body">
+            <input type="hidden" name="level" value="L2">
+            <div class="mb-3">
+                <label for="addL2Parent" class="form-label">Thuộc Lĩnh vực Cấp 1</label>
+                <select class="form-select" id="addL2Parent" name="categoryL1_id" required>
+                    <option selected disabled value="">-- Chọn lĩnh vực cha --</option>
+                    {{#each this.allL1}}
+                        <option value="{{this.id}}">{{this.category_name}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="addL2Name" class="form-label">Tên Lĩnh vực</label>
+                <input type="text" class="form-control" id="addL2Name" name="category_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="addL2Slug" class="form-label">Slug</label>
+                <input type="text" class="form-control" id="addL2Slug" name="slug">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-success">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editCategoryModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalTitle">Chỉnh sửa Lĩnh vực</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="/admin/categories/update" method="POST">
+        <div class="modal-body">
+            <input type="hidden" name="id" id="editId">
+            <input type="hidden" name="level" id="editLevel">
+            <div class="mb-3">
+                <label for="editName" class="form-label">Tên Lĩnh vực</label>
+                <input type="text" class="form-control" id="editName" name="category_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="editSlug" class="form-label">Slug</label>
+                <input type="text" class="form-control" id="editSlug" name="slug">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+{{#section 'js'}}
+<script>
+    // Lắng nghe sự kiện khi modal SỬA được mở
+    const editModal = document.getElementById('editCategoryModal');
+    editModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        
+        // Lấy dữ liệu từ các thuộc tính data-* của nút "Sửa"
+        const id = button.getAttribute('data-id');
+        const name = button.getAttribute('data-name');
+        const slug = button.getAttribute('data-slug');
+        const level = button.getAttribute('data-level');
+
+        // Lấy các element trong modal
+        const modalTitle = editModal.querySelector('#editModalTitle');
+        const idInput = editModal.querySelector('#editId');
+        const levelInput = editModal.querySelector('#editLevel');
+        const nameInput = editModal.querySelector('#editName');
+        const slugInput = editModal.querySelector('#editSlug');
+
+        // Cập nhật dữ liệu vào form trong modal
+        modalTitle.textContent = 'Chỉnh sửa Lĩnh vực ' + level;
+        idInput.value = id;
+        levelInput.value = level;
+        nameInput.value = name;
+        slugInput.value = slug;
+    });
+</script>
+{{/section}}
