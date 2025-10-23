@@ -67,41 +67,97 @@ export default {
         const result = await db('courses').count('course_id as total');
         return result[0].total;
     },
+    // courseModel.js
+    //  Random 4 courses for banner
     async find4RandomCourseForBanner() {
-        return db('courses').orderByRaw('RANDOM()').limit(4);
+        return db('courses')
+            .leftJoin('instructor', 'courses.instructor_id', 'instructor.instructor_id')
+            .leftJoin('categoryL2', 'courses.category_id', 'categoryL2.id')
+            .select(
+                'courses.*',
+                'instructor.name as instructor_name',
+                'categoryL2.category_name as category_name'
+            )
+            .orderByRaw('RANDOM()')
+            .limit(4);
     },
+    //  Top 4 courses with highest rating in last 7 days
     async find4CourseWithHighestRatingWEEKWithInstructorName() {
-        return await db('courses')
-            .join('instructor', 'courses.instructor_id', 'instructor.instructor_id') // join instructor table
+        return db('courses')
+            .leftJoin('instructor', 'courses.instructor_id', 'instructor.instructor_id')
+            .leftJoin('categoryL2', 'courses.category_id', 'categoryL2.id')
             .select(
-                'courses.*',                            // all course columns
-                'instructor.name as instructor_name'    // instructor name
+                'courses.*',
+                'instructor.name as instructor_name',
+                'categoryL2.category_name as category_name'
             )
-            .where('courses.latest_update', '>=', db.raw("CURRENT_DATE - INTERVAL '7 day'")) // only last 7 days
-            .orderBy('courses.rating', 'desc') // sort by rating descending
-            .limit(4);                          // get top 4
-
-
+            .where('courses.latest_update', '>=', db.raw("CURRENT_DATE - INTERVAL '7 day'"))
+            .orderBy('courses.rating', 'desc')
+            .limit(4);
     },
+
+    //  Top 10 courses with highest reviews
     async find10CourseWithHighestReviewsWithInstructorName() {
-        return await db('courses')
-            .join('instructor', 'courses.instructor_id', 'instructor.instructor_id') // join instructor table
+        return db('courses')
+            .leftJoin('instructor', 'courses.instructor_id', 'instructor.instructor_id')
+            .leftJoin('categoryL2', 'courses.category_id', 'categoryL2.id')
             .select(
-                'courses.*',                     // all course columns
-                'instructor.name as instructor_name' // instructor name
+                'courses.*',
+                'instructor.name as instructor_name',
+                'categoryL2.category_name as category_name'
             )
-            .orderBy('courses.total_reviews', 'desc') // sort by total_reviews descending
-            .limit(10);                              // get top 10
+            .orderBy('courses.total_reviews', 'desc')
+            .limit(10);
     },
-    async find10LatestCourseWWithInstructorName() {
-        return await db('courses')
-            .join('instructor', 'courses.instructor_id', 'instructor.instructor_id') // join instructor table
+
+    //  Latest 10 courses
+    async find10LatestCourseWithInstructorName() {
+        return db('courses')
+            .leftJoin('instructor', 'courses.instructor_id', 'instructor.instructor_id')
+            .leftJoin('categoryL2', 'courses.category_id', 'categoryL2.id')
             .select(
-                'courses.*',                          // all course columns
-                'instructor.name as instructor_name'  // instructor name
+                'courses.*',
+                'instructor.name as instructor_name',
+                'categoryL2.category_name as category_name'
             )
-            .orderBy('courses.latest_update', 'desc') // sort by latest_update (most recent first)
-            .limit(10);                               // get top 10
+            .orderBy('courses.latest_update', 'desc')
+            .limit(10);
+    },
+
+    async findById(id) {
+        return db('courses').where('category_id', id).first();
+    },
+    async countById(id) {
+        return db('courses').where('category_id', id).count('category_id as amount').first();
+    },
+    // inside courseModel.js
+    async getCourseWithInstructorName(limit, offset, categoryId = 0) {
+        const query = db('courses')
+            .leftJoin('instructor', 'courses.instructor_id', 'instructor.instructor_id')
+            .leftJoin('categoryL2', 'courses.category_id', 'categoryL2.id')
+            .select('courses.*', 'instructor.name as instructor_name',
+                'categoryL2.category_name as category_name'
+            )
+            .orderBy('courses.latest_update', 'desc')
+            .limit(limit)
+            .offset(offset);
+
+        if (categoryId && categoryId !== 0) {
+            query.where('courses.category_id', categoryId);
+        }
+
+        return query;
+    },
+
+    async countByCategory(categoryId) {
+        const q = db('courses').count('course_id as amount');
+        if (categoryId && categoryId !== 0) q.where('category_id', categoryId);
+        const row = await q.first();
+        // row.amount might be a string depending on DB driver; convert to number
+        return parseInt(row.amount, 10) || 0;
+    },
+    async findAll() {
+        return db('courses');
     },
 
 }

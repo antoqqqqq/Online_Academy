@@ -1,11 +1,12 @@
 {{!-- Course card template --}}
 <div class="card course-card h-100">
     <img src="{{this.image_url}}" class="card-img-top" alt="{{this.title}}" style="height: 200px; object-fit: cover;">
+    {{!-- <img src="https://pokemonletsgo.pokemon.com/assets/img/common/char-pikachu.png" class="card-img-top" alt="{{this.title}}" style="height: 200px; object-fit: cover;"> --}}
     <div class="card-body">
         <h5 class="card-title text-truncate" title="{{this.title}}">{{this.title}}</h5>
         <p class="card-text mb-1">
             <small class="text-muted">
-                <i class="fas fa-graduation-cap"></i> {{this.category}}
+                <i class="fas fa-graduation-cap"></i> {{this.category_name}}
             </small>
         </p>
         <p class="card-text mb-1">
@@ -16,7 +17,7 @@
         <div class="d-flex align-items-center mb-2">
             <div class="ratings">
                 <i class="fas fa-star text-warning"></i>
-                <span class="rating-value">{{this.rating}}</span>
+                <span class="rating-value">{{this.rating}} rating</span>
                 <small class="text-muted">({{this.total_reviews }} đánh giá)</small>
             </div>
         </div>
@@ -36,25 +37,25 @@
 
 {{!-- Add this CSS to your existing style section --}}
 <style>
-.course-card {
-    transition: transform 0.2s, box-shadow 0.2s;
-}
+    .course-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
 
-.course-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
 
-.course-card .card-title {
-    font-size: 1.1rem;
-    line-height: 1.4;
-}
+    .course-card .card-title {
+        font-size: 1.1rem;
+        line-height: 1.4;
+    }
 
-.ratings {
-    font-size: 0.9rem;
-}
+    .ratings {
+        font-size: 0.9rem;
+    }
 
-.price-section {
-    font-size: 1.1rem;
-}
+    .price-section {
+        font-size: 1.1rem;
+    }
 </style>

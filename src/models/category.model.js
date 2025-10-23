@@ -2,7 +2,9 @@ import db from '../utils/db.js';
 import lodash from 'lodash'; // or write your own grouping logic
 
 async function getCategoriesL2(id) {
-    return await db('categoryL2').where('categoryL1_id', id).select('category_name', 'slug');
+    return await db('categoryL2')
+    .where('categoryL1_id', id)
+    .select('id', 'category_name', 'slug');
 }
 export default {
     async index(req, res) {
@@ -77,7 +79,21 @@ export default {
             .select('categoryL2.*', 'categoryL1.category_name as parent_name');
         return { catL1, catL2 };
     },
-
+    // Get all categories for filter dropdown
+    async getAllForFilter()
+    {
+        return db('categoryL2').select('id', 'category_name');
+    },
+    async countByCategory(categoryId) {
+        const query = db('courses');
+        if (categoryId) query.where('category_id', categoryId);
+        const result = await query.count('id as amount').first();
+        return result.amount;
+    },
+    async findById(categoryId) {
+        return db('categoryL2').where('id', categoryId).first();
+    },
+    
     // Lấy tất cả L1 (dùng cho form)
     async findAllL1() {
         return await db('categoryL1').select('*');
