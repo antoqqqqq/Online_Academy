@@ -16,7 +16,8 @@ import helpers from "./src/helper/curency.helper.js";
 import homeRoute from "./src/routes/home.route.js";
 import courseRoute from "./src/routes/course.route.js";
 import accountRoute from "./src/routes/account.route.js";
-
+import adminRoute from "./src/routes/admin.route.js";
+import { loadCategories } from "./src/middlewares/category.mdw.js";
 
 
 // ==========================
@@ -32,18 +33,20 @@ const __dirname = dirname(__filename);
 // ==========================
 // 🧱 TEMPLATE ENGINE (Handlebars)
 // ==========================
-app.engine(
-  "hbs",
-  exphbs.engine({
+const hbs = exphbs.create({
     extname: ".hbs",
     layoutsDir: path.join(__dirname, "src/views/layouts"),
     partialsDir: path.join(__dirname, "src/views/partials"),
     helpers: {
-      section: hsb_sections(),
-      ...helpers,
+        section: hsb_sections(),
+        ...helpers,
+        eq: function (a, b) {
+          return a === b;
+      },
     },
-  })
-);
+});
+
+app.engine("hbs", hbs.engine);
 app.set("view engine", "hbs");
 app.set("views", "./src/views");
 
@@ -70,15 +73,25 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Load categories cho mọi trang
+app.use(loadCategories);
+
 // ==========================
 // CATEGORIES LOAD
 // ==========================
 import categoryModel from "./src/models/category.model.js";
 app.use(async function (req, res, next) {
-  const list = await categoryModel.getCategoriesL2_L1();
-  res.locals.globalCategories = list;
-
-  next();
+  try {
+    const list = await categoryModel.getCategoriesL2_L1();
+    res.locals.globalCategories = list;
+    next();
+  } catch (error) {
+    // Lỗi sẽ được hiển thị ở đây!
+    console.error("LỖI NGHIÊM TRỌNG KHI TẢI CATEGORIES:", error);
+    // Chuyển lỗi đến trang "Something went wrong" một cách tường minh
+    next(error); 
+  }
 });
 // ==========================
 // 🚦 ROUTES
@@ -87,9 +100,13 @@ app.use((req, res, next) => {
   res.locals.user = req.session.authUser; // Gửi user sang view
   next();
 });
+
 app.use("/", homeRoute);
 app.use("/courses", courseRoute);
 app.use("/account", accountRoute);
+// Use admin route
+app.use("/admin", adminRoute);
+
 
 // ==========================
 // ❌ GLOBAL ERROR HANDLER
