@@ -13,10 +13,12 @@ import dotenv from "dotenv";
 import passport from "passport";
 import db from "./src/utils/db.js";
 import helpers from "./src/helper/curency.helper.js";
+import { Handlebars } from "./src/helper/curency.helper.js"; // import the instance
 import homeRoute from "./src/routes/home.route.js";
 import courseRoute from "./src/routes/course.route.js";
 import accountRoute from "./src/routes/account.route.js";
 import adminRoute from "./src/routes/admin.route.js";
+import categoryRoute from "./src/routes/category.route.js";
 import { loadCategories } from "./src/middlewares/category.mdw.js";
 
 
@@ -40,6 +42,7 @@ const hbs = exphbs.create({
     helpers: {
         section: hsb_sections(),
         ...helpers,
+        ...Handlebars,
         eq: function (a, b) {
           return a === b;
       },
@@ -61,8 +64,6 @@ app.use(express.static(path.join(process.cwd(), "src/public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-// Load categories cho mọi trang
-
 // 🧱 Session
 app.use(
   session({
@@ -89,6 +90,7 @@ app.use((req, res, next) => {
 app.use("/", homeRoute);
 app.use("/courses", courseRoute);
 app.use("/account", accountRoute);
+app.use("/category", categoryRoute);
 // Use admin route
 app.use("/admin", adminRoute);
 

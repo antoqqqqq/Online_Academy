@@ -68,7 +68,7 @@ router.use(async function (req, res, next) {
 // ==========================
 router.use(async function (req, res, next) {
     try {
-        const newestCourses = await courseModel.find10LatestCourseWWithInstructorName();
+        const newestCourses = await courseModel.find10LatestCourseWithInstructorName();
         res.locals.newestCourses = newestCourses;
         next();
     } catch (error) {
@@ -93,10 +93,23 @@ router.use(async function (req, res, next) {
         next(error);
     }
 });
+// ==========================
+// LOAD danh sách lĩnh vực cho dropdown
+// ==========================
+router.use(async function (req, res, next) {
+    try {
+        const dropdown_categories = await categoryModel.index(req, res);
+        res.locals.dropdown_categories = dropdown_categories;
+        next();
+    } catch (error) {
+        // Lỗi sẽ được hiển thị ở đây!
+        console.error("LỖI NGHIÊM TRỌNG KHI TẢI LĨNH VỰC CHO DROPDOWN", error);
+        // Chuyển lỗi đến trang "Something went wrong" một cách tường minh
+        next(error);
+    }
+});
 router.get("/", async (req, res) => {
     try {
-        // const categories = await categoryModel.index(req, res);
-        // res.locals.categories = categories;
         const data = await homeController.index(req, res);
         res.render("home", data);
     } catch (error) {
