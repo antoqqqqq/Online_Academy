@@ -6,7 +6,7 @@ const router = express.Router();
 // Middleware kiểm tra quyền admin
 const isAdmin = (req, res, next) => {
     const user = req.session && req.session.authUser;
-    if (user && Number(user.permission) === 1) {
+    if (user && Number(user.permission) === 0) {
         return next();
     }
     return res.redirect('/');
