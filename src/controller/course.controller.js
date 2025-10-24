@@ -1,6 +1,8 @@
 import categoryModel from "../models/category.model.js";
 import courseModel from "../models/course.model.js";
 import watchlistModel from "../models/watchlist.model.js";
+import feedbackModel from "../models/feedback.model.js";
+import enrollmentModel from "../models/enrollment.model.js";
 
 const courseController = {
     list: async (req, res, next) => {
@@ -84,14 +86,31 @@ const courseController = {
 
             // Kiểm tra xem đã có trong watchlist chưa (nếu user đã đăng nhập)
             let isInWatchlist = false;
+            let isEnrolled = false;
+            let studentFeedback = null;
+            let courseFeedbacks = [];
+            let ratingStats = null;
+            
             if (userId) {
                 isInWatchlist = await watchlistModel.isInWatchlist(userId, courseId);
+                isEnrolled = await enrollmentModel.isEnrolled(userId, courseId);
+                studentFeedback = await feedbackModel.getStudentFeedback(userId, courseId);
             }
+
+            // Lấy danh sách đánh giá của khóa học (5 đánh giá gần nhất)
+            courseFeedbacks = await feedbackModel.getCourseFeedbacks(courseId, 5, 0);
+            
+            // Lấy thống kê đánh giá
+            ratingStats = await feedbackModel.getCourseRatingStats(courseId);
 
             res.render('vwCourse/detail', {
                 layout: 'main',
                 course,
                 isInWatchlist,
+                isEnrolled,
+                studentFeedback,
+                courseFeedbacks,
+                ratingStats,
                 isLoggedIn: !!userId
             });
         } catch (error) {

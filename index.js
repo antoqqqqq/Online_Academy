@@ -6,6 +6,7 @@ import exphbs from "express-handlebars";
 import session from "express-session";
 import hsb_sections from 'express-handlebars-sections';
 import bodyParser from "body-parser";
+import methodOverride from "method-override";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
@@ -21,6 +22,7 @@ import accountRoute from "./src/routes/account.route.js";
 import adminRoute from "./src/routes/admin.route.js";
 import categoryRoute from "./src/routes/category.route.js";
 import enrollmentRoute from "./src/routes/enrollment.route.js";
+import feedbackRoute from "./src/routes/feedback.route.js";
 
 
 // ==========================
@@ -65,6 +67,7 @@ app.use(express.static(path.join(process.cwd(), "src/public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(methodOverride('_method'));
 
 // Load categories cho mọi trang
 app.use(loadCategories);
@@ -97,6 +100,7 @@ app.use("/courses", courseRoute);
 app.use("/account", accountRoute);
 app.use("/category", categoryRoute);
 app.use("/enrollment", enrollmentRoute);
+app.use("/feedback", feedbackRoute);
 // Use admin route
 app.use("/admin", adminRoute);
 
