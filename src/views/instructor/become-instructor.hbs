@@ -1,0 +1,58 @@
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <div class="text-center mb-5">
+                        <i class="fas fa-chalkboard-teacher fa-4x text-primary mb-4"></i>
+                        <h1 class="h2 mb-3">Become an Instructor</h1>
+                        <p class="text-muted">Share your knowledge and teach millions of students worldwide</p>
+                    </div>
+
+                    <div class="row mb-5">
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-video fa-2x text-primary"></i>
+                            </div>
+                            <h5>Create Courses</h5>
+                            <p class="text-muted small">Build engaging video courses with our easy-to-use tools</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-users fa-2x text-primary"></i>
+                            </div>
+                            <h5>Reach Students</h5>
+                            <p class="text-muted small">Teach students from around the world</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-chart-line fa-2x text-primary"></i>
+                            </div>
+                            <h5>Earn Income</h5>
+                            <p class="text-muted small">Generate revenue by sharing your expertise</p>
+                        </div>
+                    </div>
+
+                    <form method="post" action="/instructor/become-instructor">
+                        <div class="mb-4">
+                            <label for="bio" class="form-label fw-bold">Your Bio</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="6" placeholder="Tell us about your experience, expertise, and what you plan to teach. This will help students get to know you better." required></textarea>
+                            <div class="form-text">Write a compelling bio that showcases your expertise and teaching style.</div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>What happens next?</h6>
+                            <p class="mb-0 small">Once you become an instructor, you'll be able to create and publish courses, manage your content, and track your earnings.</p>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-rocket me-2"></i>Become an Instructor
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
