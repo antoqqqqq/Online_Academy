@@ -11,6 +11,7 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { loadCategories } from "./src/middlewares/category.mdw.js";
 import passport from "passport";
+import "./src/config/passport.js"; // Import passport config
 import db from "./src/utils/db.js";
 import helpers from "./src/helper/curency.helper.js";
 import { Handlebars } from "./src/helper/curency.helper.js"; // import the instance
@@ -19,6 +20,7 @@ import courseRoute from "./src/routes/course.route.js";
 import accountRoute from "./src/routes/account.route.js";
 import adminRoute from "./src/routes/admin.route.js";
 import categoryRoute from "./src/routes/category.route.js";
+import enrollmentRoute from "./src/routes/enrollment.route.js";
 
 
 // ==========================
@@ -94,6 +96,7 @@ app.use("/", homeRoute);
 app.use("/courses", courseRoute);
 app.use("/account", accountRoute);
 app.use("/category", categoryRoute);
+app.use("/enrollment", enrollmentRoute);
 // Use admin route
 app.use("/admin", adminRoute);
 

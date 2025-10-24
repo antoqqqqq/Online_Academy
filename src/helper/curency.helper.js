@@ -51,6 +51,44 @@ Handlebars.registerHelper('divide', function (a, b) {
     return b !== 0 ? a / b : 0;
 });
 
+// {{format_date date}}
+Handlebars.registerHelper('format_date', function (date) {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toLocaleDateString('vi-VN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    });
+});
+
+// {{format_time seconds}}
+Handlebars.registerHelper('format_time', function (seconds) {
+    if (!seconds || seconds < 0) return '0:00';
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    
+    if (hours > 0) {
+        return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    } else {
+        return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
+});
+
+// {{format_datetime date}}
+Handlebars.registerHelper('format_datetime', function (date) {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toLocaleString('vi-VN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+});
+
 // --- Export both object and full instance ---
 const helpers = {
     format_currency: formatCurrency,
