@@ -1,0 +1,408 @@
+{{!-- Form đánh giá khóa học --}}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            {{!-- Breadcrumb --}}
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="/courses">Khóa học</a></li>
+                    <li class="breadcrumb-item"><a href="/courses/{{course.course_id}}">{{course.title}}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Đánh giá khóa học</li>
+                </ol>
+            </nav>
+
+            {{!-- Thông tin khóa học --}}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="{{course.image_url}}" alt="{{course.title}}" class="img-fluid rounded" style="max-height: 150px; object-fit: cover;">
+                        </div>
+                        <div class="col-md-9">
+                            <h4 class="card-title mb-2">{{course.title}}</h4>
+                            <p class="card-text text-muted mb-2">
+                                <i class="bi bi-person-circle"></i> {{course.instructor_name}}
+                            </p>
+                            <p class="card-text text-muted mb-0">
+                                <i class="bi bi-tag"></i> {{course.category_name}}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{!-- Form đánh giá --}}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-star-fill text-warning"></i>
+                        {{#if existingFeedback}}
+                            Chỉnh sửa đánh giá của bạn
+                        {{else}}
+                            Đánh giá khóa học
+                        {{/if}}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {{!-- Thông báo --}}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Lưu ý:</strong> Bạn chỉ có thể đánh giá những khóa học mà bạn đã đăng ký học.
+                    </div>
+
+                    {{!-- Form --}}
+                    <form id="feedbackForm">
+                        {{!-- Rating --}}
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Đánh giá của bạn *</label>
+                            <div class="rating-input">
+                                <div class="stars" id="starRating">
+                                    {{#times 5}}
+                                        <i class="bi bi-star star" data-rating="{{this}}"></i>
+                                    {{/times}}
+                                </div>
+                                <input type="hidden" name="rating" id="ratingValue" value="{{#if existingFeedback}}{{existingFeedback.rating}}{{else}}0{{/if}}">
+                                <div class="rating-text mt-2">
+                                    <span id="ratingText">{{#if existingFeedback}}{{existingFeedback.rating}} sao{{else}}Chưa chọn đánh giá{{/if}}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{!-- Comment --}}
+                        <div class="mb-4">
+                            <label for="comment" class="form-label fw-bold">Nội dung đánh giá *</label>
+                            <textarea 
+                                class="form-control" 
+                                id="comment" 
+                                name="comment" 
+                                rows="6" 
+                                placeholder="Hãy chia sẻ trải nghiệm học tập của bạn về khóa học này..."
+                                required
+                            >{{#if existingFeedback}}{{existingFeedback.feedback}}{{/if}}</textarea>
+                            <div class="form-text">
+                                Tối thiểu 10 ký tự, tối đa 1000 ký tự
+                            </div>
+                            <div class="character-count mt-1">
+                                <small class="text-muted">
+                                    <span id="charCount">{{#if existingFeedback}}{{existingFeedback.feedback.length}}{{else}}0{{/if}}</span>/1000 ký tự
+                                </small>
+                            </div>
+                        </div>
+
+                        {{!-- Submit buttons --}}
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="bi bi-check-circle"></i>
+                                {{#if existingFeedback}}
+                                    Cập nhật đánh giá
+                                {{else}}
+                                    Gửi đánh giá
+                                {{/if}}
+                            </button>
+                            <a href="/courses/{{course.course_id}}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i>
+                                Quay lại
+                            </a>
+                            {{#if existingFeedback}}
+                            <button type="button" class="btn btn-outline-danger" id="deleteBtn">
+                                <i class="bi bi-trash"></i>
+                                Xóa đánh giá
+                            </button>
+                            {{/if}}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {{!-- Đánh giá hiện tại (nếu có) --}}
+            {{#if existingFeedback}}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">Đánh giá hiện tại của bạn</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stars me-3">
+                            {{#times existingFeedback.rating}}
+                                <i class="bi bi-star-fill text-warning"></i>
+                            {{/times}}
+                            {{#times (subtract 5 existingFeedback.rating)}}
+                                <i class="bi bi-star text-muted"></i>
+                            {{/times}}
+                        </div>
+                        <small class="text-muted">{{format_datetime existingFeedback.created_at}}</small>
+                    </div>
+                    <p class="mb-0">{{existingFeedback.feedback}}</p>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</div>
+
+{{!-- JavaScript --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const starRating = document.getElementById('starRating');
+    const ratingValue = document.getElementById('ratingValue');
+    const ratingText = document.getElementById('ratingText');
+    const comment = document.getElementById('comment');
+    const charCount = document.getElementById('charCount');
+    const feedbackForm = document.getElementById('feedbackForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+
+    // Rating text mapping
+    const ratingTexts = {
+        0: 'Chưa chọn đánh giá',
+        1: 'Rất không hài lòng',
+        2: 'Không hài lòng',
+        3: 'Bình thường',
+        4: 'Hài lòng',
+        5: 'Rất hài lòng'
+    };
+
+    // Initialize rating
+    const currentRating = parseInt(ratingValue.value) || 0;
+    updateStars(currentRating);
+
+    // Star rating functionality
+    starRating.addEventListener('click', function(e) {
+        if (e.target.classList.contains('star')) {
+            const rating = parseInt(e.target.dataset.rating);
+            ratingValue.value = rating;
+            updateStars(rating);
+            ratingText.textContent = ratingTexts[rating];
+        }
+    });
+
+    // Hover effect for stars
+    starRating.addEventListener('mouseover', function(e) {
+        if (e.target.classList.contains('star')) {
+            const rating = parseInt(e.target.dataset.rating);
+            updateStars(rating);
+        }
+    });
+
+    starRating.addEventListener('mouseout', function() {
+        const currentRating = parseInt(ratingValue.value) || 0;
+        updateStars(currentRating);
+    });
+
+    function updateStars(rating) {
+        const stars = starRating.querySelectorAll('.star');
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.remove('bi-star');
+                star.classList.add('bi-star-fill');
+                star.classList.add('text-warning');
+            } else {
+                star.classList.remove('bi-star-fill');
+                star.classList.remove('text-warning');
+                star.classList.add('bi-star');
+            }
+        });
+    }
+
+    // Character count for comment
+    comment.addEventListener('input', function() {
+        const length = this.value.length;
+        charCount.textContent = length;
+        
+        if (length > 1000) {
+            charCount.classList.add('text-danger');
+        } else {
+            charCount.classList.remove('text-danger');
+        }
+    });
+
+    // Form submission
+    feedbackForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const rating = parseInt(ratingValue.value);
+        const commentText = comment.value.trim();
+
+        // Validation
+        if (rating < 1 || rating > 5) {
+            showToast('Vui lòng chọn đánh giá từ 1 đến 5 sao', 'error');
+            return;
+        }
+
+        if (commentText.length < 10) {
+            showToast('Nội dung đánh giá phải có ít nhất 10 ký tự', 'error');
+            return;
+        }
+
+        if (commentText.length > 1000) {
+            showToast('Nội dung đánh giá không được vượt quá 1000 ký tự', 'error');
+            return;
+        }
+
+        try {
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang xử lý...';
+
+            const formData = new FormData(feedbackForm);
+            const data = Object.fromEntries(formData);
+            
+            let url, method;
+            {{#if existingFeedback}}
+                url = `/feedback/{{course.course_id}}/{{existingFeedback.id}}`;
+                method = 'PUT';
+            {{else}}
+                url = `/feedback/{{course.course_id}}`;
+                method = 'POST';
+            {{/if}}
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showToast(result.message, 'success');
+                setTimeout(() => {
+                    window.location.href = '/courses/{{course.course_id}}';
+                }, 1500);
+            } else {
+                if (result.requireLogin) {
+                    window.location.href = '/account/signin';
+                } else {
+                    showToast(result.message, 'error');
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            {{#if existingFeedback}}
+                submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Cập nhật đánh giá';
+            {{else}}
+                submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Gửi đánh giá';
+            {{/if}}
+        }
+    });
+
+    // Delete feedback
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', async function() {
+            if (!confirm('Bạn có chắc chắn muốn xóa đánh giá này?')) {
+                return;
+            }
+
+            try {
+                deleteBtn.disabled = true;
+                deleteBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang xóa...';
+
+                const response = await fetch(`/feedback/{{course.course_id}}/{{existingFeedback.id}}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    setTimeout(() => {
+                        window.location.href = '/courses/{{course.course_id}}';
+                    }, 1500);
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
+            } finally {
+                deleteBtn.disabled = false;
+                deleteBtn.innerHTML = '<i class="bi bi-trash"></i> Xóa đánh giá';
+            }
+        });
+    }
+
+    // Toast notification function
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed top-0 start-50 translate-middle-x mt-3`;
+        toast.style.zIndex = '9999';
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+});
+</script>
+
+{{!-- CSS --}}
+<style>
+.rating-input .stars {
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+.rating-input .star {
+    transition: color 0.2s ease;
+    margin-right: 0.25rem;
+}
+
+.rating-input .star:hover {
+    color: #ffc107 !important;
+}
+
+.rating-text {
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: ">";
+}
+
+#submitBtn:disabled,
+#deleteBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.alert {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.character-count {
+    text-align: right;
+}
+</style>

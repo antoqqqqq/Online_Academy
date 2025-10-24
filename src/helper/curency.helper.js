@@ -76,6 +76,55 @@ Handlebars.registerHelper('format_time', function (seconds) {
     }
 });
 
+// {{gte a b}} - greater than or equal
+Handlebars.registerHelper('gte', function (a, b) {
+    return a >= b;
+});
+
+// {{lt a b}} - less than
+Handlebars.registerHelper('lt', function (a, b) {
+    return a < b;
+});
+
+// {{gt a b}} - greater than
+Handlebars.registerHelper('gt', function (a, b) {
+    return a > b;
+});
+
+// {{lte a b}} - less than or equal
+Handlebars.registerHelper('lte', function (a, b) {
+    return a <= b;
+});
+
+// {{and a b}} - logical AND
+Handlebars.registerHelper('and', function (a, b) {
+    return a && b;
+});
+
+// {{or a b}} - logical OR
+Handlebars.registerHelper('or', function (a, b) {
+    return a || b;
+});
+
+// {{not a}} - logical NOT
+Handlebars.registerHelper('not', function (a) {
+    return !a;
+});
+
+// {{unless condition}} - opposite of if
+Handlebars.registerHelper('unless', function (condition, options) {
+    if (!condition) {
+        return options.fn(this);
+    } else {
+        return options.inverse(this);
+    }
+});
+
+// {{parseInt value}} - convert to integer
+Handlebars.registerHelper('parseInt', function (value) {
+    return parseInt(value) || 0;
+});
+
 // {{format_datetime date}}
 Handlebars.registerHelper('format_datetime', function (date) {
     if (!date) return '';
