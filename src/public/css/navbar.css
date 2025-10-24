@@ -139,7 +139,14 @@
     background: rgba(255, 255, 255, 0.2);
     color: #fff !important;
 }
+.navbar .form-control {
+    width: 250px;
+}
 
+.navbar .btn-outline-light:hover {
+    background-color: #fff;
+    color: #000;
+}
 /* =======================
    RESPONSIVE ADJUSTMENTS
 ======================= */
