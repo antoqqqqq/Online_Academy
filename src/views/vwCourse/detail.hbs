@@ -1,0 +1,278 @@
+{{!-- Chi tiết khóa học - Simple version để tránh conflict --}}
+<div class="container py-4">
+    <div class="row">
+        {{!-- Cột bên trái - Thông tin khóa học --}}
+        <div class="col-lg-8">
+            {{!-- Ảnh đại diện --}}
+            <div class="course-thumbnail mb-4">
+                <img src="{{course.image_url}}" alt="{{course.title}}" class="img-fluid rounded shadow-sm w-100" 
+                     style="max-height: 400px; object-fit: cover;">
+            </div>
+
+            {{!-- Thông tin cơ bản --}}
+            <div class="course-info bg-white p-4 rounded shadow-sm mb-4">
+                <h1 class="course-title mb-3">{{course.title}}</h1>
+                
+                {{!-- Lĩnh vực --}}
+                <div class="mb-3">
+                    <span class="badge bg-primary">{{course.category_name}}</span>
+                </div>
+
+                {{!-- Thông tin ngắn --}}
+                <div class="d-flex align-items-center mb-3 text-muted">
+                    <div class="me-4">
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <strong>{{course.rating}}</strong>
+                        <span class="ms-1">({{course.total_reviews}} đánh giá)</span>
+                    </div>
+                    <div class="me-4">
+                        <i class="bi bi-people-fill"></i>
+                        <span class="ms-1">{{course.total_enrollment}} học viên</span>
+                    </div>
+                    <div>
+                        <i class="bi bi-clock-fill"></i>
+                        <span class="ms-1">Cập nhật: {{course.latest_update}}</span>
+                    </div>
+                </div>
+
+                {{!-- Mô tả ngắn --}}
+                <div class="course-short-description mb-4">
+                    <h5>Giới thiệu</h5>
+                    <p class="text-muted">{{course.short_description}}</p>
+                </div>
+
+                {{!-- Mô tả chi tiết --}}
+                <div class="course-description">
+                    <h5>Nội dung khóa học</h5>
+                    <p>{{course.description}}</p>
+                </div>
+            </div>
+
+            {{!-- Thông tin giảng viên --}}
+            <div class="instructor-info bg-white p-4 rounded shadow-sm mb-4">
+                <h5 class="mb-3">
+                    <i class="bi bi-person-circle"></i> Giảng viên
+                </h5>
+                <div class="d-flex align-items-center">
+                    <div class="instructor-avatar me-3">
+                        <i class="bi bi-person-circle fs-1 text-primary"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">{{course.instructor_name}}</h6>
+                        <small class="text-muted">Chuyên gia {{course.category_name}}</small>
+                    </div>
+                </div>
+            </div>
+
+            {{!-- Video lectures preview (nếu có) --}}
+            {{#if course.videos}}
+            <div class="course-videos bg-white p-4 rounded shadow-sm">
+                <h5 class="mb-3">
+                    <i class="bi bi-play-circle"></i> Nội dung bài học
+                </h5>
+                <div class="list-group">
+                    {{#each course.videos}}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="bi bi-play-btn text-primary me-2"></i>
+                                <strong>{{this.video_title}}</strong>
+                            </div>
+                            <span class="badge bg-secondary">{{this.duration}} phút</span>
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+            {{/if}}
+        </div>
+
+        {{!-- Cột bên phải - Giá & Nút hành động --}}
+        <div class="col-lg-4">
+            <div class="course-sidebar bg-white p-4 rounded shadow sticky-top" style="top: 20px;">
+                {{!-- Giá --}}
+                <div class="course-price mb-4">
+                    {{#if course.discount_price}}
+                        <div class="d-flex align-items-center">
+                            <h2 class="text-danger mb-0 me-3">{{format_money course.discount_price}}</h2>
+                            <del class="text-muted">{{format_money course.current_price}}</del>
+                        </div>
+                        <div class="mt-2">
+                            <span class="badge bg-danger">
+                                Giảm {{subtract (divide (subtract course.current_price course.discount_price) course.current_price) 100}}%
+                            </span>
+                        </div>
+                    {{else}}
+                        <h2 class="text-primary mb-0">{{format_money course.current_price}}</h2>
+                    {{/if}}
+                </div>
+
+                {{!-- Nút Watchlist - TÍNH NĂNG CHÍNH --}}
+                {{#if isLoggedIn}}
+                    <button id="btnWatchlist" class="btn btn-outline-danger w-100 mb-3" 
+                            data-course-id="{{course.course_id}}"
+                            data-in-watchlist="{{isInWatchlist}}">
+                        <i class="bi {{#if isInWatchlist}}bi-heart-fill{{else}}bi-heart{{/if}}"></i>
+                        <span id="watchlistText">
+                            {{#if isInWatchlist}}
+                                Đã thêm vào yêu thích
+                            {{else}}
+                                Thêm vào yêu thích
+                            {{/if}}
+                        </span>
+                    </button>
+                {{else}}
+                    <a href="/account/signin" class="btn btn-outline-danger w-100 mb-3">
+                        <i class="bi bi-heart"></i>
+                        Đăng nhập để thêm vào yêu thích
+                    </a>
+                {{/if}}
+
+                {{!-- Nút đăng ký học (placeholder) --}}
+                <button class="btn btn-primary w-100 mb-3">
+                    <i class="bi bi-cart-plus"></i>
+                    Đăng ký học ngay
+                </button>
+
+                {{!-- Thông tin khóa học --}}
+                <div class="course-features mt-4">
+                    <h6 class="mb-3">Khóa học bao gồm:</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            Truy cập trọn đời
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            Xem trên mọi thiết bị
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            Chứng chỉ hoàn thành
+                        </li>
+                        {{#if course.videos}}
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            {{course.videos.length}} bài học video
+                        </li>
+                        {{/if}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{!-- JavaScript cho Watchlist --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnWatchlist = document.getElementById('btnWatchlist');
+    
+    if (btnWatchlist) {
+        btnWatchlist.addEventListener('click', async function() {
+            const courseId = this.dataset.courseId;
+            const isInWatchlist = this.dataset.inWatchlist === 'true';
+            
+            try {
+                // Disable button
+                btnWatchlist.disabled = true;
+                
+                // Gọi API
+                const response = await fetch(`/courses/${courseId}/watchlist/toggle`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update UI
+                    const icon = btnWatchlist.querySelector('i');
+                    const text = btnWatchlist.querySelector('#watchlistText');
+                    
+                    if (data.isInWatchlist) {
+                        icon.className = 'bi bi-heart-fill';
+                        text.textContent = 'Đã thêm vào yêu thích';
+                        btnWatchlist.dataset.inWatchlist = 'true';
+                    } else {
+                        icon.className = 'bi bi-heart';
+                        text.textContent = 'Thêm vào yêu thích';
+                        btnWatchlist.dataset.inWatchlist = 'false';
+                    }
+                    
+                    // Hiển thị thông báo
+                    showToast(data.message, 'success');
+                } else {
+                    if (data.requireLogin) {
+                        window.location.href = '/account/signin';
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Lỗi:', error);
+                showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
+            } finally {
+                btnWatchlist.disabled = false;
+            }
+        });
+    }
+    
+    // Hàm hiển thị toast notification
+    function showToast(message, type = 'info') {
+        // Tạo toast element
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed top-0 start-50 translate-middle-x mt-3`;
+        toast.style.zIndex = '9999';
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        // Tự động xóa sau 3 giây
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+});
+</script>
+
+<style>
+.sticky-top {
+    position: sticky;
+}
+
+.course-thumbnail img {
+    border: 1px solid #ddd;
+}
+
+.course-info,
+.instructor-info,
+.course-videos,
+.course-sidebar {
+    transition: box-shadow 0.3s ease;
+}
+
+.course-info:hover,
+.instructor-info:hover,
+.course-videos:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+#btnWatchlist:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.list-group-item {
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+    border-left-color: #0d6efd;
+    background-color: #f8f9fa;
+}
+</style>
+

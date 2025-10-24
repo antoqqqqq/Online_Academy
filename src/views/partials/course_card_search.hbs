@@ -1,0 +1,22 @@
+<div class="col-md-6 col-lg-4">
+    <div class="course-card">
+        <div class="course-image">
+            <i class="fab fa-js"></i>
+        </div>
+        <div class="course-body">
+            <h6 class="course-title">{{this.title}}</h6>
+            <p class="course-instructor">
+                <i class="fas fa-user"></i> {{this.name}}
+            </p>
+            <div class="course-rating">
+                <i class="fas fa-star"></i>
+                <strong>{{this.rating}}</strong>
+                <span class="text-muted">({{total_reviews}} đánh giá)</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <span class="course-price">{{this.current_price}} VND</span>
+                <span class="badge bg-secondary">{{this.total_enrollment}}</span>
+            </div>
+        </div>
+    </div>
+</div>

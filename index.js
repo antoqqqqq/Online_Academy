@@ -9,12 +9,11 @@ import bodyParser from "body-parser";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
-
+import { loadCategories } from "./src/middlewares/category.mdw.js";
 import passport from "passport";
 import db from "./src/utils/db.js";
-import helpers, { Handlebars } from "./src/helper/curency.helper.js";
-import { loadCategories } from "./src/middlewares/category.mdw.js";
-
+import helpers from "./src/helper/curency.helper.js";
+import { Handlebars } from "./src/helper/curency.helper.js"; // import the instance
 import homeRoute from "./src/routes/home.route.js";
 import courseRoute from "./src/routes/course.route.js";
 import accountRoute from "./src/routes/account.route.js";
@@ -36,17 +35,17 @@ const __dirname = dirname(__filename);
 // 🧱 TEMPLATE ENGINE (Handlebars)
 // ==========================
 const hbs = exphbs.create({
-  extname: ".hbs",
-  layoutsDir: path.join(__dirname, "src/views/layouts"),
-  partialsDir: path.join(__dirname, "src/views/partials"),
-  helpers: {
-    section: hsb_sections(),
-    ...helpers,
-    ...Handlebars,
-    eq: function (a, b) {
-      return a === b;
+    extname: ".hbs",
+    layoutsDir: path.join(__dirname, "src/views/layouts"),
+    partialsDir: path.join(__dirname, "src/views/partials"),
+    helpers: {
+        section: hsb_sections(),
+        ...helpers,
+        ...Handlebars,
+        eq: function (a, b) {
+          return a === b;
+      },
     },
-  },
 });
 
 app.engine("hbs", hbs.engine);
@@ -74,12 +73,15 @@ app.use(
     secret: process.env.SESSION_SECRET || "your_secret_key",
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 1000 * 60 * 60 }, // 1 hour
+    cookie: { maxAge: 1000 * 60 * 60  }, // 1 hour
   })
 );
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Load categories cho mọi trang
+app.use(loadCategories);
 
 // ==========================
 // 🚦 ROUTES

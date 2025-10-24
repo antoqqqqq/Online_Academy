@@ -179,7 +179,7 @@
     let countdown = 60;
     let timerInterval;
 
-    function startTimer() {
+    async function startTimer() {
         const resendLink = document.getElementById('resendLink');
         const timerSpan = document.getElementById('timer');
 
@@ -199,13 +199,20 @@
     }
 
     async function resendOTP() {
+        const resendLink = document.getElementById('resendLink');
+        const timerSpan = document.getElementById('timer');
+        resendLink.classList.add('disabled');
+        resendLink.style.pointerEvents = 'none';
+        timerSpan.textContent = '(Đang gửi...)'
         try {
+            const userEmail = document.getElementById('emailDisplay').textContent;
+
+
             const response = await fetch('/account/resend-otp', {
-                method: 'GET',
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: userEmail })
             });
-
             const result = await response.json();
 
             if (result.success) {
@@ -217,8 +224,7 @@
                     timer: 2000
                 });
                 // Start countdown
-                startTimer();
-
+                await startTimer();
                 // Clear inputs
                 inputs.forEach(input => {
                     input.value = '';
@@ -232,6 +238,9 @@
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
+                resendLink.classList.remove('disabled');
+                resendLink.style.pointerEvents = 'auto';
+                timerSpan.textContent = '';
             }
         } catch (error) {
             console.error('Error:', error);
@@ -241,6 +250,9 @@
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
+            resendLink.classList.remove('disabled');
+            resendLink.style.pointerEvents = 'auto';
+            timerSpan.textContent = '';
         }
     }
 
