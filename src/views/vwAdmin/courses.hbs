@@ -1,0 +1,56 @@
+<h1 class="h2 mb-4">Quản lý Khóa học</h1>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <i class="bi bi-book-half me-2"></i>
+        Danh sách tất cả khóa học
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Tên khóa học</th>
+                        <th scope="col">Giảng viên</th>
+                        <th scope="col">Danh mục</th>
+                        <th scope="col">Giá</th>
+                        <th scope="col">Trạng thái</th>
+                        <th scope="col" class="text-end">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each this.courses}}
+                    <tr>
+                        <th scope="row">{{this.id}}</th>
+                        <td>{{this.title}}</td>
+                        <td>{{this.lecturer_name}}</td>
+                        <td>{{this.category_name}}</td>
+                        <td>{{format_currency this.price}}</td>
+                        <td>
+                            {{#if this.is_complete}}
+                                <span class="badge bg-success">Hoàn thành</span>
+                            {{else}}
+                                <span class="badge bg-warning text-dark">Chưa hoàn thành</span>
+                            {{/if}}
+                        </td>
+                        <td class="text-end">
+                            <form action="/admin/courses/delete" method="POST" style="display: inline-block;" onsubmit="return confirm('Bạn có chắc chắn muốn gỡ bỏ khóa học này? Mọi dữ liệu liên quan (bài giảng, feedback,...) cũng sẽ bị xóa vĩnh viễn.');">
+                                <input type="hidden" name="id" value="{{this.id}}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash-fill"></i> Gỡ bỏ
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {{else}}
+                    <tr>
+                        <td colspan="7" class="text-center">Chưa có khóa học nào.</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

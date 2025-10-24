@@ -1,0 +1,119 @@
+<link rel="stylesheet" href="/css/signup.css">
+<div class="register-container">
+    <a href="/" class="btn btn-outline-secondary btn-sm mb-3">
+        <span>←</span> Về Trang Chủ
+    </a>
+    <h2 class="register-title">Đăng Ký Tài Khoản</h2>
+    <form id="registerForm" method="post" action="/account/signup" >
+        <div class="mb-3">
+            <label for="fullName" class="form-label">Họ và Tên <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="fullName" name="name" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Mật Khẩu <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" id="password" name="password" required minlength="6">
+            <div class="form-text">Mật khẩu phải có ít nhất 6 ký tự</div>
+        </div>
+
+        <div class="mb-4">
+            <label for="confirmPassword" class="form-label">Xác Nhận Mật Khẩu <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" id="confirmPassword" required>
+            <div id="passwordError" class="text-danger mt-1" style="display:none;">Mật khẩu không khớp!</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-register w-100">Đăng Ký</button>
+    </form>
+
+    <div class="text-center mt-3">
+        <p class="mb-0">Đã có tài khoản? <a href="/account/signin" class="text-decoration-none fw-bold">Đăng nhập</a>
+        </p>
+    </div>
+</div>
+{{#section 'js'}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.querySelector('#registerForm')
+        .addEventListener('submit', handleSubmit);
+    function handleSubmit(event) {
+        event.preventDefault();
+
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const fullName = document.getElementById('fullName').value;
+        const email = document.getElementById('email').value;
+
+        if (fullName.length === 0) {
+            // alert('Username is required.');
+            Swal.fire({
+                title: 'Error!',
+                text: 'Username is required.',
+                icon: 'error',
+                confirmButtonText: 'Cool'
+            })
+            return;
+        }
+        if (email.length === 0) {
+            // alert('Username is required.');
+            Swal.fire({
+                title: 'Error!',
+                text: 'email is required.',
+                icon: 'error',
+                confirmButtonText: 'Cool'
+            })
+            return;
+        } else if (!/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please enter a valid email address.',
+                icon: 'error',
+                confirmButtonText: 'Cool'
+            })
+            return;
+        }
+
+        if (password.length < 6) {
+            alert('Password must be at least 6 characters long.');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert('Password and Confirm Password do not match.');
+            return;
+        }
+        const url = `/account/signup/is-available?email=${encodeURIComponent(email)}`;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.isAvailable) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Email đã được sử dụng. Vui lòng chọn email khác.',
+                        icon: 'error',
+                        confirmButtonText: 'Cool'
+                    });
+                } else {
+                    event.target.submit();                    
+                }
+            })
+            .catch(error => {
+                console.error('Error checking email availability:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Đã xảy ra lỗi khi kiểm tra email. Vui lòng thử lại sau.',
+                    icon: 'error',
+                    confirmButtonText: 'Cool'
+                });
+            });
+        // Reset form
+
+
+    }
+</script>
+{{/section}}
