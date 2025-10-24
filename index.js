@@ -9,7 +9,7 @@ import bodyParser from "body-parser";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
-import {loadCategories} from "./src/middlewares/category.mdw.js"
+import { loadCategories } from "./src/middlewares/category.mdw.js";
 import passport from "passport";
 import db from "./src/utils/db.js";
 import helpers from "./src/helper/curency.helper.js";
@@ -19,7 +19,6 @@ import courseRoute from "./src/routes/course.route.js";
 import accountRoute from "./src/routes/account.route.js";
 import adminRoute from "./src/routes/admin.route.js";
 import categoryRoute from "./src/routes/category.route.js";
-import { loadCategories } from "./src/middlewares/category.mdw.js";
 
 
 // ==========================

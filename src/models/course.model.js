@@ -164,11 +164,7 @@ export default {
             console.error("Error getting courses with filter:", error);
             throw error;
         }
-    }
-};
-import db from '../utils/db.js';
-
-export default {
+    },
 
     /**
      * Lấy tất cả khóa học cho trang admin
@@ -231,12 +227,13 @@ export default {
             return false; // Trả về false nếu thất bại
         }
     },
+
     async countAll() {
         const result = await db('courses').count('course_id as total');
         return result[0].total;
     },
-    // courseModel.js
-    //  Random 4 courses for banner
+
+    // Random 4 courses for banner
     async find4RandomCourseForBanner() {
         return db('courses')
             .leftJoin('instructor', 'courses.instructor_id', 'instructor.instructor_id')
@@ -249,7 +246,8 @@ export default {
             .orderByRaw('RANDOM()')
             .limit(4);
     },
-    //  Top 4 courses with highest rating in last 7 days
+
+    // Top 4 courses with highest rating in last 7 days
     async find4CourseWithHighestRatingWEEKWithInstructorName() {
         return db('courses')
             .leftJoin('instructor', 'courses.instructor_id', 'instructor.instructor_id')
@@ -264,7 +262,7 @@ export default {
             .limit(4);
     },
 
-    //  Top 10 courses with highest reviews
+    // Top 10 courses with highest reviews
     async find10CourseWithHighestReviewsWithInstructorName() {
         return db('courses')
             .leftJoin('instructor', 'courses.instructor_id', 'instructor.instructor_id')
@@ -278,7 +276,7 @@ export default {
             .limit(10);
     },
 
-    //  Latest 10 courses
+    // Latest 10 courses
     async find10LatestCourseWithInstructorName() {
         return db('courses')
             .leftJoin('instructor', 'courses.instructor_id', 'instructor.instructor_id')
@@ -295,10 +293,11 @@ export default {
     async findById(id) {
         return db('courses').where('category_id', id).first();
     },
+
     async countById(id) {
         return db('courses').where('category_id', id).count('category_id as amount').first();
     },
-    // inside courseModel.js
+
     async getCourseWithInstructorName(limit, offset, categoryId = 0) {
         const query = db('courses')
             .leftJoin('instructor', 'courses.instructor_id', 'instructor.instructor_id')
@@ -324,9 +323,9 @@ export default {
         // row.amount might be a string depending on DB driver; convert to number
         return parseInt(row.amount, 10) || 0;
     },
+
     async findAll() {
         return db('courses');
-    },
-
-}
+    }
+};
 

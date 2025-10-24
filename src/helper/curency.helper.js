@@ -41,6 +41,16 @@ Handlebars.registerHelper('subtract', function (a, b) {
     return a - b;
 });
 
+// {{multiply a b}}
+Handlebars.registerHelper('multiply', function (a, b) {
+    return a * b;
+});
+
+// {{divide a b}}
+Handlebars.registerHelper('divide', function (a, b) {
+    return b !== 0 ? a / b : 0;
+});
+
 // --- Export both object and full instance ---
 const helpers = {
     format_currency: formatCurrency,
