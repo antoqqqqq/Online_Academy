@@ -15,15 +15,15 @@
                             Khóa Học
                         </a>
                         <ul class="dropdown-menu">
-                            {{#each categories}}
+                            {{#each dropdown_categories}}
                             <li class="dropdown-submenu">
-                                <a class="dropdown-item " href="/category/{{this.slug}}" data-bs-toggle="">
+                                <span class="dropdown-item disabled">
                                     {{this.name}}
-                                </a>
+                                </span>
                                 <ul class="dropdown-menu ">
                                     {{#each this.subCategories}}
                                     <li><a class="dropdown-item"
-                                            href="/category/{{../slug}}/{{this.slug}}">{{this.category_name}}</a></li>
+                                            href="/category/byCat?id={{this.id}}">{{this.category_name}}</a></li>
                                     {{/each}}
                                 </ul>
                             </li>

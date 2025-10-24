@@ -1,0 +1,25 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.sidebar {
+    width: 280px;
+}
+
+.sidebar .nav-link {
+    font-size: 1.1rem;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.2s ease;
+}
+
+.sidebar .nav-link:hover, .sidebar .nav-link.active {
+    background-color: #495057;
+}
+
+.sidebar .nav-link .bi {
+    margin-right: 10px;
+}
+
+.content {
+    overflow-y: auto; /* Thêm thanh cuộn nếu nội dung dài */
+}

@@ -1,0 +1,149 @@
+<h1 class="h2 mb-4">Quản lý Người dùng</h1>
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-people-fill me-2"></i>Danh sách người dùng</span>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
+            <i class="bi bi-plus-circle-fill me-1"></i> Cấp tài khoản Giảng viên
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Họ tên</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Quyền hạn</th>
+                        <th scope="col" class="text-end">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each this.users}}
+                    <tr>
+                        <th scope="row">{{this.id}}</th>
+                        <td>{{this.name}}</td>
+                        <td>{{this.email}}</td>
+                        <td>
+                            {{#if (eq this.permission 0)}}
+                                <span class="badge bg-danger">Admin</span>
+                            {{else if (eq this.permission 2)}}
+                                <span class="badge bg-primary">Giảng viên</span>
+                            {{else}}
+                                <span class="badge bg-secondary">Học viên</span>
+                            {{/if}}
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-info btn-set-permission" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#setPermissionModal"
+                                    data-user-id="{{this.id}}"
+                                    data-user-name="{{this.name}}"
+                                    data-user-permission="{{this.permission}}">
+                                <i class="bi bi-shield-lock-fill"></i> Cấp quyền
+                            </button>
+                            <form action="/admin/users/delete" method="POST" style="display: inline-block;" onsubmit="return confirm('Bạn có chắc muốn xóa người dùng này?');">
+                                <input type="hidden" name="id" value="{{this.id}}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash-fill"></i> Xóa
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {{else}}
+                    <tr>
+                        <td colspan="5" class="text-center">Chưa có người dùng nào.</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addUserModalLabel">Cấp tài khoản Giảng viên mới</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/admin/users/add" method="POST">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="name" class="form-label">Họ tên</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Mật khẩu</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+          </div>
+          <input type="hidden" name="permission" value="2">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-primary">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="setPermissionModal" tabindex="-1" aria-labelledby="setPermissionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="setPermissionModalLabel">Cấp quyền cho người dùng</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/admin/users/set-permission" method="POST">
+        <div class="modal-body">
+          <p>Bạn đang thay đổi quyền cho: <strong id="userName"></strong></p>
+          <input type="hidden" id="userId" name="userId">
+          <div class="mb-3">
+            <label for="permissionSelect" class="form-label">Chọn quyền mới</label>
+            <select class="form-select" id="permissionSelect" name="permission">
+              <option value="0">Học viên</option>
+              <option value="2">Giảng viên</option>
+              <option value="1">Admin</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{{#section 'js'}}
+<script>
+    // Lắng nghe sự kiện khi modal cấp quyền được mở
+    const setPermissionModal = document.getElementById('setPermissionModal');
+    setPermissionModal.addEventListener('show.bs.modal', function (event) {
+        // Nút đã được click để mở modal
+        const button = event.relatedTarget;
+        
+        // Lấy dữ liệu từ các thuộc tính data-* của nút
+        const userId = button.getAttribute('data-user-id');
+        const userName = button.getAttribute('data-user-name');
+        const userPermission = button.getAttribute('data-user-permission');
+
+        // Cập nhật nội dung trong modal
+        const modalUserName = setPermissionModal.querySelector('#userName');
+        const modalUserIdInput = setPermissionModal.querySelector('#userId');
+        const modalPermissionSelect = setPermissionModal.querySelector('#permissionSelect');
+
+        modalUserName.textContent = userName;
+        modalUserIdInput.value = userId;
+        modalPermissionSelect.value = userPermission;
+    });
+</script>
+{{/section}}

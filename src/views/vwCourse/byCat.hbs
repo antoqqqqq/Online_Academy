@@ -1,0 +1,61 @@
+<!-- Course Grid -->
+<div class="row g-4">
+    {{#each courses}}
+    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+        {{> course_card}}
+    </div>
+    {{else}}
+    <div class="col-12 text-center">
+        <p>Không tìm thấy khóa học nào.</p>
+    </div>
+    {{/each}}
+</div>
+
+<!-- Pagination -->
+{{#if pagination.totalPages}}
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+
+        <!-- Previous -->
+        {{#if pagination.hasPrev}}
+        <li class="page-item">
+            <a class="page-link"
+               href="/category/byCat?id={{category_id}}&page={{subtract pagination.currentPage 1}}">
+               Trước
+            </a>
+        </li>
+        {{else}}
+        <li class="page-item disabled"><a class="page-link">Trước</a></li>
+        {{/if}}
+
+        <!-- Page numbers -->
+        {{#each pagination.pages}}
+            {{#if isCurrent}}
+            <li class="page-item active" aria-current="page">
+                <a class="page-link" href="javascript:void(0);">{{value}}</a>
+            </li>
+            {{else}}
+            <li class="page-item">
+                <a class="page-link"
+                   href="/category/byCat?id={{../category_id}}&page={{value}}">
+                   {{value}}
+                </a>
+            </li>
+            {{/if}}
+        {{/each}}
+
+        <!-- Next -->
+        {{#if pagination.hasNext}}
+        <li class="page-item">
+            <a class="page-link"
+               href="/category/byCat?id={{category_id}}&page={{add pagination.currentPage 1}}">
+               Tiếp
+            </a>
+        </li>
+        {{else}}
+        <li class="page-item disabled"><a class="page-link">Tiếp</a></li>
+        {{/if}}
+    </ul>
+</nav>
+{{/if}}
+

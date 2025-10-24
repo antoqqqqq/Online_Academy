@@ -2,18 +2,18 @@
 <div id="heroCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
     <div class="carousel-indicators">
         {{#each banners}}
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{@index}}" 
-            {{#if @first}}class="active" aria-current="true"{{/if}}></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{@index}}" {{#if @first}}class="active"
+            aria-current="true" {{/if}}></button>
         {{/each}}
     </div>
     <div class="carousel-inner">
         {{#each banners}}
         <div class="carousel-item {{#if @first}}active{{/if}}">
-            <img src="{{imageUrl}}" class="d-block w-100" alt="{{title}}">
+            <img src="{{image_url}}" class="d-block w-100" alt="{{title}}">
             <div class="carousel-caption">
                 <h1>{{title}}</h1>
                 <p>{{description}}</p>
-                <a href="{{link}}" class="btn btn-primary">Xem ngay</a>
+                <a href="/courses/{{course_id}}" class="btn btn-primary">Xem ngay</a>
             </div>
         </div>
         {{/each}}
@@ -29,7 +29,7 @@
 {{!-- Featured Courses --}}
 <section class="mb-5">
     <div class="container">
-        <h2 class="mb-4">Khoá học nổi bật</h2>
+        <h2 class="mb-4">Khoá học nổi bật trong tuần</h2>
         <div class="row g-4">
             {{#each featuredCourses}}
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
@@ -67,65 +67,90 @@
         </div>
     </div>
 </section>
-
+{{!-- Most enrolled categories --}}
+<section class="mb-5">
+    <div class="container">
+        <h2 class="mb-4">Các lĩnh vực được đăng ký nhiều nhất trong tuần qua</h2>
+        <div class="row justify-content-center g-4">
+            {{#each topCategories}}
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="/category/byCat?id={{id}}" class="text-decoration-none text-dark">
+                    <div class="card h-100 shadow-sm border-0 hover-shadow transition">
+                        <div class="card-body text-center">
+                            <div class="display-6 text-primary mb-2">
+                                <i class="bi bi-bar-chart-fill"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">{{category_name}}</h5>
+                            <p class="text-muted mb-2">Tổng lượt đăng ký</p>
+                            <h4 class="fw-bold text-success">{{total_enrollments}}</h4>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</section>
 <style>
-.carousel-item img {
-    height: 500px;
-    object-fit: cover;
-    filter: brightness(0.7);
-}
-
-.carousel-caption {
-    bottom: 20%;
-}
-
-.carousel-caption h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-}
-
-@media (max-width: 768px) {
     .carousel-item img {
-        height: 300px;
+        height: 500px;
+        object-fit: cover;
+        filter: brightness(0.7);
     }
+
+    .carousel-caption {
+        bottom: 20%;
+    }
+
     .carousel-caption h1 {
-        font-size: 1.8rem;
+        font-size: 2.5rem;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }
-}
-.card {
-    height: 100%;
-    transition: transform 0.2s ease;
-    border: 1px solid rgba(0,0,0,.125);
-    background-color: #fff;
-}
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
+    @media (max-width: 768px) {
+        .carousel-item img {
+            height: 300px;
+        }
 
-/* Add new spacing utilities */
-.row.g-4 > [class^="col-"] {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-}
-
-/* Ensure consistent card heights */
-.card-body {
-    display: flex;
-    flex-direction: column;
-}
-
-.card-footer {
-    margin-top: auto;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .row.g-4 {
-        --bs-gutter-x: 1rem;
-        --bs-gutter-y: 1rem;
+        .carousel-caption h1 {
+            font-size: 1.8rem;
+        }
     }
-}
+
+    .card {
+        height: 100%;
+        transition: transform 0.2s ease;
+        border: 1px solid rgba(0, 0, 0, .125);
+        background-color: #fff;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Add new spacing utilities */
+    .row.g-4>[class^="col-"] {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    /* Ensure consistent card heights */
+    .card-body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-footer {
+        margin-top: auto;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .row.g-4 {
+            --bs-gutter-x: 1rem;
+            --bs-gutter-y: 1rem;
+        }
+    }
 </style>

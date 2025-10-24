@@ -13,10 +13,13 @@ import {loadCategories} from "./src/middlewares/category.mdw.js"
 import passport from "passport";
 import db from "./src/utils/db.js";
 import helpers from "./src/helper/curency.helper.js";
+import { Handlebars } from "./src/helper/curency.helper.js"; // import the instance
 import homeRoute from "./src/routes/home.route.js";
 import courseRoute from "./src/routes/course.route.js";
 import accountRoute from "./src/routes/account.route.js";
-
+import adminRoute from "./src/routes/admin.route.js";
+import categoryRoute from "./src/routes/category.route.js";
+import { loadCategories } from "./src/middlewares/category.mdw.js";
 
 
 // ==========================
@@ -32,18 +35,21 @@ const __dirname = dirname(__filename);
 // ==========================
 // 🧱 TEMPLATE ENGINE (Handlebars)
 // ==========================
-app.engine(
-  "hbs",
-  exphbs.engine({
+const hbs = exphbs.create({
     extname: ".hbs",
     layoutsDir: path.join(__dirname, "src/views/layouts"),
     partialsDir: path.join(__dirname, "src/views/partials"),
     helpers: {
-      section: hsb_sections(),
-      ...helpers,
+        section: hsb_sections(),
+        ...helpers,
+        ...Handlebars,
+        eq: function (a, b) {
+          return a === b;
+      },
     },
-  })
-);
+});
+
+app.engine("hbs", hbs.engine);
 app.set("view engine", "hbs");
 app.set("views", "./src/views");
 
@@ -58,8 +64,10 @@ app.use(express.static(path.join(process.cwd(), "src/public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 // Load categories cho mọi trang
 app.use(loadCategories);
+
 // 🧱 Session
 app.use(
   session({
@@ -71,6 +79,10 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Load categories cho mọi trang
+app.use(loadCategories);
+
 // ==========================
 // 🚦 ROUTES
 // ==========================
@@ -78,9 +90,14 @@ app.use((req, res, next) => {
   res.locals.user = req.session.authUser; // Gửi user sang view
   next();
 });
+
 app.use("/", homeRoute);
 app.use("/courses", courseRoute);
 app.use("/account", accountRoute);
+app.use("/category", categoryRoute);
+// Use admin route
+app.use("/admin", adminRoute);
+
 
 // ==========================
 // ❌ GLOBAL ERROR HANDLER
