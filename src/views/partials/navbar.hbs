@@ -44,12 +44,17 @@
                             <li><a class="dropdown-item" href="/categories/free">Miễn Phí</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/about">Giới Thiệu</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/contact">Liên Hệ</a>
-                    </li>
+                </ul>
+                
+                <!-- Search Form -->
+                <form class="d-flex ms-3 me-3" action="/courses/search" method="GET">
+                    <input class="form-control me-2" type="search" name="q" placeholder="Tìm kiếm khóa học..." aria-label="Search">
+                    <button class="btn btn-outline-light" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+                
+                <ul class="navbar-nav">
                     {{#if user}}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle user-profile" href="#" role="button"
