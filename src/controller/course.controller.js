@@ -1,16 +1,74 @@
-import { use } from "react";
 import courseModel from "../models/course.model.js";
 import instructorModel from "../models/instructor.model.js";
+import lectureModel from "../models/lecture.model.js";
+import videoModel from "../models/video.model.js";
 import db from "../utils/db.js";
 
 const courseController = {
+    // List courses with pagination and filtering by category
     list: async (req, res, next) => {
         try {
             const page = parseInt(req.query.page) || 1;
             const limit = 12;
             const offset = (page - 1) * limit;
-            const courses = await courseModel.findAll({ limit, offset });
-            res.render("course", { courses });
+            const category_id = req.query.category_id || null;
+            const courses = await courseModel.findAll({ limit, offset, category_id });
+            const categories = await courseModel.getCategories();
+            res.render("course/list", { 
+                courses,
+                categories,
+                currentCategory: category_id,
+                currentPage: page,
+                layout: "main"
+             });
+        }
+        catch (error) {
+            next(error);
+        }
+    },
+
+    // Search courses
+    search: async (req, res, next) => {
+        try {
+            const { q, page = 1 } = req.query;
+            const limit = 12;
+            const offset = (page - 1) * limit;
+            if (!q) {
+                return res.redirect("/courses");
+            }
+            const courses = await courseModel.searchCourses(q, { limit, offset });
+            const categories = await courseModel.getCategories();
+            res.render("course/search", {
+                courses,
+                categories,
+                searchTerm: q,
+                currentPage: parseInt(page),
+                layout: "main"
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    },
+
+    // Course details
+    detail: async (req, res, next) => {
+        try {
+            const { id } = req.params;
+            const course = await courseModel.findById(id);
+            if (!course) {
+                return res.status(404).render("error", { message: "Course not found.", layout: "main" });
+            }
+            // Get related courses in the same category
+            const relatedCourses = await courseModel.findAll({ limit: 5, category_id: course.category_id });
+            // Get course lectures
+            const lectures = await lectureModel.findByCourse(id);
+            res.render("course/detail", {
+                course,
+                relatedCourses,
+                lectures,
+                layout: "main"
+            });
         }
         catch (error) {
             next(error);
@@ -20,9 +78,16 @@ const courseController = {
     // GET form to create a new course (instructors only)
     createForm: async (req, res, next) => {
         try {
+            if (!req.user) {
+                return res.redirect("/account/signin");
+            }
+            const instructor = await instructorModel.findByAccountId(req.user.id);
+            if (!instructor) {
+                return res.status(403).render("error", { message: "You are not an instructor.", layout: "main" });
+            }
             // Get categories for dropdown
             const categories = await courseModel.getCategories();
-            res.render("admin/create_course", {
+            res.render("instructor/course/create", {
                 layout : "main",
                 useTinyMCE: true,
                 categories
@@ -40,7 +105,7 @@ const courseController = {
             if (!account) return res.redirect("/account/signin");
             const instructor = await instructorModel.findByAccountId(account.id);
             if (!instructor) {
-                return res.status(403).render("error", { message: "You are not an instructor." });
+                return res.status(403).render("error", { message: "You are not an instructor.", layout: "main" });
             }
             const {
                 title,
@@ -74,8 +139,8 @@ const courseController = {
                 };
                 const result = await courseModel.create(newCourse);
                 const created = Array.isArray(result) ? result[0] : result;
-                req.flash("success", "Course created successfully! Add lectures to complete your course.");
-                res.redirect(`/courses/${created.course_id}`);
+                req.session.flash = { type: "success", message: "Course created successfully! Add lectures to complete your course." };
+                res.redirect(`/instructor/courses/${created.course_id}/lectures`);
             }
         catch (error) {
             next(error);
@@ -88,15 +153,15 @@ const courseController = {
             const { id } = req.params;
             const course = await courseModel.findById(id);
             if (!course) {
-                return res.status(404).render("error", { message: "Course not found." });
+                return res.status(404).render("error", { message: "Course not found.", layout: "main" });
             }
             // Check if current user is the course instructor
             const instructor = await instructorModel.findByAccountId(req.user.id);
             if (!instructor || instructor.instructor_id !== course.instructor_id) {
-                return res.status(403).render("error", { message: "You can only edit your own courses." });
+                return res.status(403).render("error", { message: "You can only edit your own courses.", layout: "main" });
             }
             const categories = await courseModel.getCategories();
-            res.render("admin/edit_course", {
+            res.render("instructor/course/edit", {
                 layout: "main",
                 useTinyMCE: true,
                 course,
@@ -114,12 +179,12 @@ const courseController = {
             const { id } = req.params;
             const course = await courseModel.findById(id);
             if (!course) {
-                return res.status(404).render("error", { message: "Course not found." });
+                return res.status(404).render("error", { message: "Course not found.", layout: "main" });
             }
             // Check if current user is the course instructor
             const instructor = await instructorModel.findByAccountId(req.user.id);
             if (!instructor || instructor.instructor_id !== course.instructor_id) {
-                return res.status(403).render("error", { message: "You can only edit your own courses." });
+                return res.status(403).render("error", { message: "You can only edit your own courses.", layout: "main" });
             }
             const {
                 title,
@@ -143,11 +208,12 @@ const courseController = {
                 current_price: current_price || 0,
                 original_price: original_price || 0,
                 category_id: category_id || null,
-                is_complete: is_complete === "on"
+                is_complete: is_complete === "on",
+                latest_update: new Date()
             };
             await courseModel.update(id, updates);
-            req.flash("success", "Course updated successfully!");
-            res.redirect(`/courses/${id}/edit`);
+            req.session.flash = { type: "success", message: "Course updated successfully!" };
+            res.redirect(`/instructor/courses/${id}/edit`);
         }
         catch (error) {
             next(error);
@@ -160,123 +226,45 @@ const courseController = {
             const { id } = req.params;
             const course = await courseModel.findById(id);
             if (!course) {
-                return res.status(404).render("error", { message: "Course not found." });
+                return res.status(404).render("error", { message: "Course not found.", layout: "main" });
             }
             // Check if current user is the course instructor
             const instructor = await instructorModel.findByAccountId(req.user.id);
             if (!instructor || instructor.instructor_id !== course.instructor_id) {
-                return res.status(403).render("error", { message: "You can only mark your own courses as complete." });
+                return res.status(403).render("error", { message: "You can only mark your own courses as complete.", layout: "main" });
             }
-            await courseModel.update(id, { is_complete: true });
-            req.flash("success", "Course marked as complete!");
-            res.redirect(`/courses/${id}/edit`);
+            await courseModel.update(id, { 
+                is_complete: true,
+                latest_update: new Date()
+             });
+            req.session.flash = { type: "success", message: "Course marked as complete!" };
+            res.redirect(`/instructor/courses/${id}`);
         }
         catch (error) {
             next(error);
         }
     },
 
-    // Lecture management (instructors only) can be added here
-    lectureList: async (req, res, next) => {
+    // Instructor course management dashboard
+    manageCourses: async (req, res, next) => {
         try {
-            const { id } = req.params;
-            const course = await courseModel.findById(id);
-            if (!course) {
-                return res.status(404).render("error", { message: "Course not found." });
-            }
-            // Check if current user is the course instructor
             const instructor = await instructorModel.findByAccountId(req.user.id);
-            if (!instructor || instructor.instructor_id !== course.instructor_id) {
-                return res.status(403).render("error", { message: "You can only manage lectures for your own courses." });
+            if (!instructor) {
+                return res.status(403).render("error", { message: "You are not an instructor.", layout: "main" });
             }
-            const lectures = await lectureModel.findByCourse(id);
-            res.render("admin/lecture_list", {
-                layout: "main",
-                course,
-                lectures
+            const courses = await courseModel.findByInstructor(instructor.instructor_id);
+            const courseCount = await courseModel.countByInstructor(instructor.instructor_id);
+            res.render("instructor/dashboard", {
+                instructor,
+                courses,
+                courseCount,
+                layout: "main"
             });
         }
         catch (error) {
             next(error);
         }
     },
-
-    lectureForm: async (req, res, next) => {
-        try {
-            const { id } = req.params;
-            const course = await courseModel.findById(id);
-            if (!course) {
-                return res.status(404).render("error", { message: "Course not found." });
-            }
-            // Check if current user is the course instructor
-            const instructor = await instructorModel.findByAccountId(req.user.id);
-            if (!instructor || instructor.instructor_id !== course.instructor_id) {
-                return res.status(403).render("error", { message: "You can only manage lectures for your own courses." });
-            }
-            res.render("admin/lecture_form", {
-                layout: "main",
-                useTinyMCE: true,
-                course
-            });
-        }
-        catch (error) {
-            next(error);
-        }
-    },
-
-    createLecture: async (req, res, next) => {
-        try {
-            const { id } = req.params;
-            const course = await courseModel.findById(id);
-            if (!course) {
-                return res.status(404).render("error", { message: "Course not found." });
-            }
-            // Check if current user is the course instructor
-            const instructor = await instructorModel.findByAccountId(req.user.id);
-            if (!instructor || instructor.instructor_id !== course.instructor_id) {
-                return res.status(403).render("error", { message: "You can only manage lectures for your own courses." });
-            }
-            const {
-                title,
-                description,
-                full_description,
-                is_preview,
-            } = req.body;
-            // Handle video upload
-            if (!req.file) {
-                return res.status(400).render("error", { message: "Video file is required." });
-            }
-            const lectureData = {
-                course_id: id,
-                title,
-                description,
-                full_description: JSON.stringify({
-                    content: full_description
-                }),
-                is_preview: is_preview === "on",
-                time: 0 // Will be updated after video processing
-            };
-            // Create lecture record
-            const lecture = await lectureModel.create(lectureData);
-            const lectureId = Array.isArray(lecture) ? lecture[0].id : lecture.id;
-            // Create video record using the video file from multer
-            const videoData = {
-                lecture_id: lectureId,
-                url: req.file.path, // This will be updated with Supabase URL
-                time: 0 // Will be updated after video processing
-            };
-            await videoModel.create(videoData);
-            // Increment course's total_lectures
-            await courseModel.update(id, {
-                total_lectures: db.raw('total_lectures + 1')
-            });
-            req.flash("success", "Lecture created successfully!");
-            res.redirect(`/courses/${id}/lectures`);
-        }
-        catch (error) {
-            next(error);
-        }
-    }
 };
 
 export default courseController;

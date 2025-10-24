@@ -15,9 +15,8 @@ import db from "./src/utils/db.js";
 import helpers from "./src/helper/curency.helper.js";
 import { loadCategories } from "./src/middlewares/category.mdw.js";
 import homeRoute from "./src/routes/home.route.js";
-import courseRoute from "./src/routes/course.route.js";
 import accountRoute from "./src/routes/account.route.js";
-
+import instructorRoute from "./src/routes/instructor.route.js";
 
 
 // ==========================
@@ -80,8 +79,8 @@ app.use((req, res, next) => {
   next();
 });
 app.use("/", homeRoute);
-app.use("/courses", courseRoute);
 app.use("/account", accountRoute);
+app.use("/instructor", instructorRoute);
 
 // ==========================
 // ❌ GLOBAL ERROR HANDLER
