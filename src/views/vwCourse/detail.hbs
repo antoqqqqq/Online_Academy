@@ -128,11 +128,19 @@
                     </a>
                 {{/if}}
 
-                {{!-- Nút đăng ký học (placeholder) --}}
-                <button class="btn btn-primary w-100 mb-3">
+                {{!-- Nút đăng ký học --}}
+                {{#if isLoggedIn}}
+                <button id="enrollBtn" class="btn btn-primary w-100 mb-3" 
+                        data-course-id="{{course.course_id}}">
                     <i class="bi bi-cart-plus"></i>
                     Đăng ký học ngay
                 </button>
+                {{else}}
+                <a href="/account/signin" class="btn btn-primary w-100 mb-3">
+                    <i class="bi bi-cart-plus"></i>
+                    Đăng nhập để đăng ký học
+                </a>
+                {{/if}}
 
                 {{!-- Thông tin khóa học --}}
                 <div class="course-features mt-4">
@@ -163,10 +171,11 @@
     </div>
 </div>
 
-{{!-- JavaScript cho Watchlist --}}
+{{!-- JavaScript cho Watchlist và Enrollment --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const btnWatchlist = document.getElementById('btnWatchlist');
+    const enrollBtn = document.getElementById('enrollBtn');
     
     if (btnWatchlist) {
         btnWatchlist.addEventListener('click', async function() {
@@ -216,6 +225,64 @@ document.addEventListener('DOMContentLoaded', function() {
                 showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
             } finally {
                 btnWatchlist.disabled = false;
+            }
+        });
+    }
+
+    // Xử lý đăng ký khóa học
+    if (enrollBtn) {
+        enrollBtn.addEventListener('click', async function() {
+            const courseId = this.dataset.courseId;
+            
+            try {
+                // Disable button
+                enrollBtn.disabled = true;
+                enrollBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang xử lý...';
+                
+                // Gọi API đăng ký
+                const response = await fetch(`/enrollment/${courseId}/enroll`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    
+                    // Cập nhật UI
+                    enrollBtn.innerHTML = '<i class="bi bi-check-circle"></i> Đã đăng ký';
+                    enrollBtn.className = 'btn btn-success w-100 mb-3';
+                    enrollBtn.disabled = true;
+                    
+                    // Thêm nút "Bắt đầu học"
+                    const startLearningBtn = document.createElement('a');
+                    startLearningBtn.href = `/enrollment/${courseId}/learn`;
+                    startLearningBtn.className = 'btn btn-primary w-100 mb-3';
+                    startLearningBtn.innerHTML = '<i class="bi bi-play-circle"></i> Bắt đầu học';
+                    
+                    enrollBtn.parentNode.insertBefore(startLearningBtn, enrollBtn.nextSibling);
+                    
+                } else {
+                    if (data.requireLogin) {
+                        showToast(data.message, 'error');
+                        setTimeout(() => {
+                            window.location.href = '/account/signin';
+                        }, 1500);
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Lỗi:', error);
+                showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
+            } finally {
+                if (enrollBtn.disabled !== true) {
+                    enrollBtn.disabled = false;
+                    enrollBtn.innerHTML = '<i class="bi bi-cart-plus"></i> Đăng ký học ngay';
+                }
             }
         });
     }
