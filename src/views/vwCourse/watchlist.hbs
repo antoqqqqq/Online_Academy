@@ -1,0 +1,268 @@
+{{!-- Danh sách khóa học yêu thích --}}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2>
+                        <i class="bi bi-heart-fill text-danger"></i>
+                        Danh Sách Yêu Thích
+                    </h2>
+                    <p class="text-muted">Bạn có {{total}} khóa học trong danh sách yêu thích</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{#if courses}}
+    {{#if (eq courses.length 0)}}
+    {{!-- Trường hợp chưa có khóa học nào --}}
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-info text-center py-5">
+                <i class="bi bi-heart fs-1 text-muted"></i>
+                <h4 class="mt-3">Danh sách yêu thích trống</h4>
+                <p class="text-muted">Bạn chưa thêm khóa học nào vào danh sách yêu thích.</p>
+                <a href="/" class="btn btn-primary mt-3">
+                    <i class="bi bi-house-fill"></i>
+                    Khám phá khóa học
+                </a>
+            </div>
+        </div>
+    </div>
+    {{else}}
+    {{!-- Danh sách khóa học --}}
+    <div class="row g-4">
+        {{#each courses}}
+        <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="card course-card h-100 position-relative">
+                {{!-- Nút xóa khỏi yêu thích --}}
+                <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 btn-remove-watchlist" 
+                        data-course-id="{{this.course_id}}"
+                        style="z-index: 10;">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+
+                <img src="{{this.image_url}}" class="card-img-top" alt="{{this.title}}" 
+                     style="height: 200px; object-fit: cover;">
+                
+                <div class="card-body">
+                    <h5 class="card-title text-truncate" title="{{this.title}}">{{this.title}}</h5>
+                    
+                    <p class="card-text mb-1">
+                        <small class="text-muted">
+                            <i class="fas fa-graduation-cap"></i> {{this.category_name}}
+                        </small>
+                    </p>
+                    
+                    <p class="card-text mb-1">
+                        <small class="text-muted">
+                            <i class="fas fa-chalkboard-teacher"></i> {{this.instructor_name}}
+                        </small>
+                    </p>
+                    
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="ratings">
+                            <i class="fas fa-star text-warning"></i>
+                            <span class="rating-value">{{this.rating}}</span>
+                            <small class="text-muted">({{this.total_reviews}} đánh giá)</small>
+                        </div>
+                    </div>
+                    
+                    <div class="price-section mb-2">
+                        {{#if this.discount_price}}
+                        <span class="text-decoration-line-through text-muted">{{format_money this.current_price}}</span>
+                        <span class="text-danger fw-bold ms-2">{{format_money this.discount_price}}</span>
+                        {{else}}
+                        <span class="text-primary fw-bold">{{format_money this.current_price}}</span>
+                        {{/if}}
+                    </div>
+
+                    <small class="text-muted">
+                        <i class="bi bi-clock"></i> Đã thêm: {{this.added_at}}
+                    </small>
+                </div>
+                
+                <div class="card-footer bg-transparent border-top-0">
+                    <a href="/courses/{{this.course_id}}" class="btn btn-outline-primary w-100">
+                        Xem chi tiết
+                    </a>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+
+    {{!-- Pagination --}}
+    {{#if pagination}}
+    {{#if (eq pagination.totalPages 1)}}
+    {{!-- Không hiển thị pagination nếu chỉ có 1 trang --}}
+    {{else}}
+    <nav aria-label="Page navigation" class="mt-5">
+        <ul class="pagination justify-content-center">
+            {{#if pagination.hasPrev}}
+            <li class="page-item">
+                <a class="page-link" href="/courses/watchlist?page={{subtract pagination.currentPage 1}}">
+                    <i class="bi bi-chevron-left"></i> Trước
+                </a>
+            </li>
+            {{/if}}
+
+            {{#each pagination.pages}}
+            <li class="page-item {{#if this.isCurrent}}active{{/if}}">
+                <a class="page-link" href="/courses/watchlist?page={{this.value}}">
+                    {{this.value}}
+                </a>
+            </li>
+            {{/each}}
+
+            {{#if pagination.hasNext}}
+            <li class="page-item">
+                <a class="page-link" href="/courses/watchlist?page={{add pagination.currentPage 1}}">
+                    Tiếp <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+            {{/if}}
+        </ul>
+    </nav>
+    {{/if}}
+    {{/if}}
+    {{/if}}
+    {{else}}
+    {{!-- Trường hợp lỗi hoặc không có data --}}
+    <div class="alert alert-warning text-center">
+        <i class="bi bi-exclamation-triangle fs-1"></i>
+        <h4 class="mt-3">Không thể tải danh sách</h4>
+        <p>Vui lòng thử lại sau.</p>
+    </div>
+    {{/if}}
+</div>
+
+{{!-- JavaScript xử lý xóa khỏi watchlist --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const removeButtons = document.querySelectorAll('.btn-remove-watchlist');
+    
+    removeButtons.forEach(button => {
+        button.addEventListener('click', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const courseId = this.dataset.courseId;
+            const card = this.closest('.col-lg-3, .col-md-4, .col-sm-6');
+            
+            // Confirm
+            if (!confirm('Bạn có chắc muốn xóa khóa học này khỏi danh sách yêu thích?')) {
+                return;
+            }
+            
+            try {
+                // Disable button
+                button.disabled = true;
+                button.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+                
+                // Gọi API toggle (sẽ xóa vì đã có trong watchlist)
+                const response = await fetch(`/courses/${courseId}/watchlist/toggle`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Animate và xóa card
+                    card.style.transition = 'opacity 0.3s ease';
+                    card.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        card.remove();
+                        
+                        // Kiểm tra nếu không còn khóa học nào
+                        const remainingCourses = document.querySelectorAll('.course-card');
+                        if (remainingCourses.length === 0) {
+                            // Reload page để hiển thị empty state
+                            window.location.reload();
+                        }
+                    }, 300);
+                    
+                    showToast(data.message, 'success');
+                } else {
+                    button.disabled = false;
+                    button.innerHTML = '<i class="bi bi-x-lg"></i>';
+                    showToast(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Lỗi:', error);
+                button.disabled = false;
+                button.innerHTML = '<i class="bi bi-x-lg"></i>';
+                showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
+            }
+        });
+    });
+    
+    // Hàm hiển thị toast notification
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed top-0 start-50 translate-middle-x mt-3`;
+        toast.style.zIndex = '9999';
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+});
+</script>
+
+<style>
+.course-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-remove-watchlist {
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+}
+
+.btn-remove-watchlist:hover {
+    opacity: 1;
+}
+
+.btn-remove-watchlist:disabled {
+    opacity: 0.6;
+}
+
+.pagination .page-link {
+    color: #333;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #333;
+    border-color: #333;
+}
+
+.ratings {
+    font-size: 0.9rem;
+}
+
+.price-section {
+    font-size: 1.1rem;
+}
+</style>
+
