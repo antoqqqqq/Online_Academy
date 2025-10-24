@@ -441,10 +441,8 @@ export default {
     // Basic findAll without pagination
     async findAll() {
         return db('courses');
-    }
-};import db from "../utils/db.js";
+    },
 
-export default {
     // Lấy thông tin chi tiết khóa học
     async getCourseById(courseId) {
         try {
@@ -771,5 +769,4 @@ export default {
     async findAll() {
         return db('courses');
     }
-};
-
+}

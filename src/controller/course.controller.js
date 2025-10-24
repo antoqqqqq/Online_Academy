@@ -7,6 +7,7 @@ import lectureModel from "../models/lecture.model.js";
 import videoModel from "../models/video.model.js";
 import db from "../utils/db.js";
 
+
 const courseController = {
     // List courses with pagination and filtering by category
     list: async (req, res, next) => {

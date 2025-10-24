@@ -98,6 +98,8 @@ app.use("/account", accountRoute);
 app.use("/category", categoryRoute);
 app.use("/instructor", instructorRoute);
 app.use("/admin", adminRoute);
+app.use("/admin", adminRoute);
+
 
 // ==========================
 // ❌ GLOBAL ERROR HANDLER
