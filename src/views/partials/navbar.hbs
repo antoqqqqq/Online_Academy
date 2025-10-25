@@ -67,13 +67,24 @@
                                 <li><a class="dropdown-item" href="/admin">Trang admin</a></li>
                             {{else if (eq user.permission 2)}}
                                 <li><a class="dropdown-item" href="/teacher">Khóa Học Của Tôi</a></li>
-                            {{else}}
-                                <li><a class="dropdown-item" href="/my-courses">Khóa học ưa thích</a></li>
+                            {{else}}                            
+                            <li><a class="dropdown-item" href="/enrollment/my-courses">
+                                <i class="bi bi-book"></i> Khóa Học Của Tôi
+                            </a></li>
+                            <li><a class="dropdown-item" href="/courses/watchlist">
+                                <i class="bi bi-heart-fill text-danger"></i> Danh Sách Yêu Thích
+                            </a></li>
+                            <li><a class="dropdown-item" href="/feedback/my-feedbacks">
+                                <i class="bi bi-star-fill text-warning"></i> Đánh Giá Của Tôi
+                            </a></li>
                             {{/if}}
+
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="/account/signout">Đăng Xuất</a></li>
+                            <li><a class="dropdown-item" href="/account/signout">
+                                <i class="bi bi-box-arrow-right"></i> Đăng Xuất
+                            </a></li>
                         </ul>
                     </li>
                     {{else}}
