@@ -17,6 +17,15 @@ export default {
             
             if (!course) return null;
 
+            if (course.full_description && typeof course.full_description === 'string') {
+                try {
+                    course.full_description = JSON.parse(course.full_description);
+                } catch (error) {
+                    console.log('Failed to parse full_description as JSON, using as-is');
+                    // If parsing fails, keep it as string
+                }
+            }
+
             // Lấy danh sách video của khóa học
             const videos = await db("video")
                 .join("lecture", "video.lecture_id", "lecture.id")
@@ -113,6 +122,7 @@ export default {
             throw error;
         }
     },
+
     async search(keyword){
         try {
             return db("courses")
@@ -122,6 +132,7 @@ export default {
             throw error;
         }
     },
+
     // Lấy danh sách khóa học với filter
     async getCoursesWithFilter(filters = {}) {
         try {
@@ -326,6 +337,28 @@ export default {
 
     async findAll() {
         return db('courses');
+    },
+
+    // Get next available course_id
+    async getNextCourseId() {
+        const maxResult = await db('courses')
+            .max('course_id as max_id')
+            .first();
+        return (maxResult.max_id || 0) + 1;
+    },
+
+    // Create course with manual ID handling
+    async createWithId(courseData) {
+        // Get next ID if not provided
+        if (!courseData.course_id) {
+            courseData.course_id = await this.getNextCourseId();
+        }
+        
+        const [newCourse] = await db('courses')
+            .insert(courseData)
+            .returning('*');
+        
+        return newCourse;
     }
 };
 

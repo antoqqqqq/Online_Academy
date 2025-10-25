@@ -51,10 +51,32 @@ Handlebars.registerHelper('divide', function (a, b) {
     return b !== 0 ? a / b : 0;
 });
 
+// {{#if (includes str substr)}}
+Handlebars.registerHelper('includes', function (str, substr) {
+    if (typeof str === 'string' && typeof substr === 'string') {
+        return str.includes(substr);
+    }
+    return false;
+});
+
+// {{#if (or a b)}}
+Handlebars.registerHelper('or', function (a, b) {
+    return a || b;
+});
+
 // --- Export both object and full instance ---
 const helpers = {
     format_currency: formatCurrency,
     format_money: format_money,
+    includes: function(str, substr) {
+        if (typeof str === 'string' && typeof substr === 'string') {
+            return str.includes(substr);
+        }
+        return false;
+    },
+    or: function(a, b) {
+        return a || b;
+    }
 };
 
 export { Handlebars };  // full instance (for app.engine)

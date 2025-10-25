@@ -1,0 +1,86 @@
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Instructor Dashboard</h5>
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/instructor">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/instructor/courses/create">Create Course</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/account/profile">My Profile</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Instructor Profile -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">Instructor Profile</h6>
+                    <form action="/instructor/profile" method="POST">
+                        <div class="mb-3">
+                            <label for="bio" class="form-label">Bio</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="4" 
+                                      placeholder="Tell students about yourself...">{{instructor.bio}}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>My Courses</h2>
+                <a href="/instructor/courses/create" class="btn btn-primary">Create New Course</a>
+            </div>
+
+            {{#if courses.length}}
+                <div class="row">
+                    {{#each courses}}
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            {{#if this.image_url}}
+                                <img src="{{this.image_url}}" class="card-img-top" alt="{{this.title}}" 
+                                    style="height: 200px; object-fit: cover;"
+                                    onerror="this.onerror=null; this.src='/upload/images/default-course.jpg'">
+                            {{else}}
+                                <img src="/src/public/upload/images/default-course.jpg" class="card-img-top" alt="{{this.title}}" 
+                                    style="height: 200px; object-fit: cover;">
+                            {{/if}}
+                            <div class="card-body">
+                                <h5 class="card-title">{{this.title}}</h5>
+                                <p class="card-text text-muted">{{this.description}}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-{{#if this.is_complete}}success{{else}}warning{{/if}}">
+                                        {{#if this.is_complete}}Complete{{else}}In Progress{{/if}}
+                                    </span>
+                                    <span class="text-primary fw-bold">{{format_money this.current_price}}</span>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <a href="/instructor/courses/{{this.course_id}}/edit" 
+                                class="btn btn-outline-primary btn-sm">Edit Course</a>
+                                <a href="/courses/{{this.course_id}}" 
+                                class="btn btn-outline-secondary btn-sm">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            {{else}}
+                <div class="text-center py-5">
+                    <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No Courses Yet</h4>
+                    <p class="text-muted">Create your first course to start teaching</p>
+                    <a href="/instructor/courses/create" class="btn btn-primary">Create Your First Course</a>
+                </div>
+            {{/if}}
+        </div>
+    </div>
+</div>

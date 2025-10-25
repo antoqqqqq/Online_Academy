@@ -19,6 +19,8 @@ import courseRoute from "./src/routes/course.route.js";
 import accountRoute from "./src/routes/account.route.js";
 import adminRoute from "./src/routes/admin.route.js";
 import categoryRoute from "./src/routes/category.route.js";
+import instructorRoute from "./src/routes/instructor.route.js";
+
 
 
 // ==========================
@@ -96,7 +98,7 @@ app.use("/account", accountRoute);
 app.use("/category", categoryRoute);
 // Use admin route
 app.use("/admin", adminRoute);
-
+app.use("/instructor", instructorRoute);
 
 // ==========================
 // ❌ GLOBAL ERROR HANDLER
