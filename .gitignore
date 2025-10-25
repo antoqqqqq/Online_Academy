@@ -45,3 +45,6 @@ Thumbs.db
 *.sql
 *.sql.gz
 abc.js
+
+# Static files (videos, images)
+static/

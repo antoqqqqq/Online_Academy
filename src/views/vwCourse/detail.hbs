@@ -265,11 +265,22 @@
 
                 {{!-- Nút đăng ký học --}}
                 {{#if isLoggedIn}}
-                <button id="enrollBtn" class="btn btn-primary w-100 mb-3" 
-                        data-course-id="{{course.course_id}}">
-                    <i class="bi bi-cart-plus"></i>
-                    Đăng ký học ngay
-                </button>
+                    {{#if isEnrolled}}
+                        <a href="/courses/{{course.course_id}}/lecture/{{course.first_lecture_id}}" class="btn btn-success w-100 mb-3">
+                            <i class="bi bi-play-circle"></i>
+                            Tiếp tục học
+                        </a>
+                        <a href="/enrollment/my-courses" class="btn btn-outline-primary w-100 mb-3">
+                            <i class="bi bi-list-ul"></i>
+                            Khóa học của tôi
+                        </a>
+                    {{else}}
+                        <button id="enrollBtn" class="btn btn-primary w-100 mb-3" 
+                                data-course-id="{{course.course_id}}">
+                            <i class="bi bi-cart-plus"></i>
+                            Đăng ký học ngay
+                        </button>
+                    {{/if}}
                 {{else}}
                 <a href="/account/signin" class="btn btn-primary w-100 mb-3">
                     <i class="bi bi-cart-plus"></i>
