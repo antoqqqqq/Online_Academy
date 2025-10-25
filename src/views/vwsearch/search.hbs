@@ -1,11 +1,12 @@
-<link rel="stylesheet" href="/css/search.css" <!-- Search Header -->
+<link rel="stylesheet" href="/css/search.css"> <!-- Search Header -->
+<link rel="stylesheet" href="/css/course_card.css">
 <div class="search-header">
     <div class="container">
         <h1 class="text-center mb-4">Tìm Kiếm Khóa Học</h1>
         <form class="search-box" method="post" action="/courses/search">
             <div class="input-group">
                 <input type="text" class="form-control" id="searchInput" name="searchInput"
-                    placeholder="Tìm kiếm khóa học, giảng viên, chủ đề..." value="JavaScript">
+                    placeholder="Tìm kiếm khóa học, giảng viên, chủ đề..." value="{{q}}">
                 <button class="btn btn-warning" type="submit">
                     <i class="fas fa-search"></i> Tìm Kiếm
                 </button>
@@ -52,19 +53,19 @@
                 <div class="filter-group">
                     <h6>Đánh Giá</h6>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="rating45" value="4.5">
+                        <input class="form-check-input" type="radio" id="rating45" name="rating" value="4.5">
                         <label class="form-check-label" for="rating45">
                             <i class="fas fa-star text-warning"></i> 4.5 trở lên
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="rating4" value="4">
+                        <input class="form-check-input" type="radio" id="rating4" name="rating" value="4">
                         <label class="form-check-label" for="rating4">
                             <i class="fas fa-star text-warning"></i> 4.0 trở lên
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="rating35" value="3.5">
+                        <input class="form-check-input" type="radio" id="rating35" name="rating" value="3.5">
                         <label class="form-check-label" for="rating35">
                             <i class="fas fa-star text-warning"></i> 3.5 trở lên
                         </label>
@@ -115,9 +116,13 @@
 
             <div class="row" id="coursesContainer">
                 <!-- Course 1 -->
-                {{#each course_card_search}}
-                {{> course_card_search}}
+                
+                {{#each course_card}}
+                <div class="col-md-6 col-lg-4">
+                {{> course_card}}
+                </div>
                 {{/each}}
+                
                 <!-- Pagination -->
                 <nav aria-label="Page navigation" class="mt-4">
                     <ul class="pagination justify-content-center">

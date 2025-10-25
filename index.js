@@ -85,8 +85,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Load categories cho mọi trang
-app.use(loadCategories);
 
 // ==========================
 // 🚦 ROUTES
