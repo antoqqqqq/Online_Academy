@@ -63,7 +63,13 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="/account/profile">Hồ Sơ</a></li>
-                            <li><a class="dropdown-item" href="/my-courses">Khóa Học Của Tôi</a></li>
+                            {{#if (eq user.permission 0)}}
+                                <li><a class="dropdown-item" href="/admin">Trang admin</a></li>
+                            {{else if (eq user.permission 2)}}
+                                <li><a class="dropdown-item" href="/teacher">Khóa Học Của Tôi</a></li>
+                            {{else}}
+                                <li><a class="dropdown-item" href="/my-courses">Khóa học ưa thích</a></li>
+                            {{/if}}
                             <li>
                                 <hr class="dropdown-divider">
                             </li>

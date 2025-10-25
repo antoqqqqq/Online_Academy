@@ -9,7 +9,7 @@ router.get('/search', async function (req, res) {
     res.render('vwsearch/search', {
         q: q,
         amount: course.length,
-        course_card_search: course
+        course_card: course
     })
 })
 router.post('/search', async function (req, res) {
@@ -20,7 +20,7 @@ router.post('/search', async function (req, res) {
     res.render('vwsearch/search', {
         q: q,
         amount: course.length,
-        course_card_search: course
+        course_card: course
     })
 })
 export default router;

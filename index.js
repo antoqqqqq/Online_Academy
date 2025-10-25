@@ -19,7 +19,6 @@ import courseRoute from "./src/routes/course.route.js";
 import accountRoute from "./src/routes/account.route.js";
 import adminRoute from "./src/routes/admin.route.js";
 import categoryRoute from "./src/routes/category.route.js";
-import { loadCategories } from "./src/middlewares/category.mdw.js";
 
 
 // ==========================
@@ -80,8 +79,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Load categories cho mọi trang
-app.use(loadCategories);
 
 // ==========================
 // 🚦 ROUTES
