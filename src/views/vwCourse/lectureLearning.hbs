@@ -1,355 +1,202 @@
-{{!-- Trang học video của chương --}}
-<div class="container-fluid py-4">
+<div class="container-fluid">
     <div class="row">
-        {{!-- Sidebar - Danh sách chương --}}
+        <!-- Sidebar với danh sách bài giảng -->
         <div class="col-lg-3 col-md-4">
-            <div class="course-sidebar bg-white rounded shadow-sm p-3 sticky-top" style="top: 20px;">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="mb-0">
-                        <i class="bi bi-list-ul"></i> Nội dung khóa học
-                    </h6>
-                    <span class="badge bg-primary">{{allLectures.length}} chương</span>
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list"></i> Nội dung khóa học
+                    </h5>
                 </div>
-
-                {{!-- Course Header --}}
-                <div class="course-header mb-3 p-2 bg-primary text-white rounded">
-                    <h6 class="mb-1 text-truncate">{{course.title}}</h6>
-                    <small class="opacity-75">{{course.instructor_name}}</small>
-                </div>
-
-                {{!-- Lecture List --}}
-                <div class="lecture-list">
-                    {{#each allLectures}}
-                    <div class="lecture-item mb-1">
-                        <a href="/enrollment/{{../course.course_id}}/learn/{{this.id}}" 
-                           class="lecture-link text-decoration-none d-flex align-items-center p-2 rounded {{#if (eq this.id ../lecture.id)}}bg-primary text-white{{else}}hover-bg-light{{/if}}">
-                            <div class="lecture-icon me-2">
-                                {{#if (eq this.id ../lecture.id)}}
-                                    <i class="bi bi-play-circle-fill"></i>
-                                {{else}}
-                                    <i class="bi bi-play-circle"></i>
-                                {{/if}}
-                            </div>
-                            <div class="lecture-info flex-grow-1">
-                                <div class="lecture-title fw-semibold small">{{this.title}}</div>
-                                <div class="lecture-meta small opacity-75">
-                                    <i class="bi bi-clock"></i> {{this.time}} phút
-                                </div>
-                            </div>
-                        </a>
+                <div class="card-body p-0">
+                    <div class="course-progress mb-3 p-3 bg-light">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Tiến độ khóa học</small>
+                            <small class="fw-bold">{{courseProgress.progressPercentage}}%</small>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {{courseProgress.progressPercentage}}%"></div>
+                        </div>
+                        <small class="text-muted">
+                            {{courseProgress.completedLectures}}/{{courseProgress.totalLectures}} chương đã hoàn thành
+                        </small>
                     </div>
-                    {{/each}}
+                    
+                    <div class="lecture-list">
+                        {{#each allLectures}}
+                        <div class="lecture-item {{#if (eq this.id ../lecture.id)}}active{{/if}}">
+                            <a href="/courses/{{../course.course_id}}/lecture/{{this.id}}" 
+                               class="d-flex align-items-center p-3 text-decoration-none {{#if (eq this.id ../lecture.id)}}bg-primary text-white{{else}}text-dark{{/if}}">
+                                <div class="lecture-icon me-3">
+                                    {{#if (eq this.id ../lecture.id)}}
+                                        <i class="fas fa-play-circle text-white"></i>
+                                    {{else}}
+                                        <i class="fas fa-play-circle text-muted"></i>
+                                    {{/if}}
+                                </div>
+                                <div class="lecture-content flex-grow-1">
+                                    <h6 class="mb-1 {{#if (eq this.id ../lecture.id)}}text-white{{else}}text-dark{{/if}}">
+                                        {{this.lecture_title}}
+                                    </h6>
+                                    <small class="{{#if (eq this.id ../lecture.id)}}text-white-50{{else}}text-muted{{/if}}">
+                                        {{this.videos.length}} video
+                                    </small>
+                                </div>
+                                <div class="lecture-status">
+                                    {{#if (eq this.id ../lecture.id)}}
+                                        <i class="fas fa-check-circle text-white"></i>
+                                    {{else}}
+                                        <i class="fas fa-circle text-muted"></i>
+                                    {{/if}}
+                                </div>
+                            </a>
+                        </div>
+                        {{/each}}
+                    </div>
                 </div>
             </div>
         </div>
 
-        {{!-- Main Content - Video Player --}}
+        <!-- Main content với video player -->
         <div class="col-lg-9 col-md-8">
-            <div class="learning-content">
-                {{!-- Course Header --}}
-                <div class="course-header bg-white rounded shadow-sm p-3 mb-3">
+            <div class="card">
+                <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h4 class="course-title mb-1">{{lecture.title}}</h4>
-                            <p class="text-muted mb-0 small">
-                                <i class="bi bi-person"></i> {{course.instructor_name}} | 
-                                <i class="bi bi-tag"></i> {{course.category_name}}
-                            </p>
+                            <h4 class="mb-1">{{lecture.lecture_title}}</h4>
+                            <small class="text-muted">{{course.title}} - {{course.instructor_name}}</small>
                         </div>
-                        <a href="/enrollment/{{course.course_id}}/learn" class="btn btn-outline-secondary btn-sm">
-                            <i class="bi bi-arrow-left"></i> Quay lại
-                        </a>
+                        <div class="lecture-navigation">
+                            {{#if previousLecture}}
+                            <a href="/courses/{{course.course_id}}/lecture/{{previousLecture.id}}" 
+                               class="btn btn-outline-secondary btn-sm me-2">
+                                <i class="fas fa-chevron-left"></i> Bài trước
+                            </a>
+                            {{/if}}
+                            {{#if nextLecture}}
+                            <a href="/courses/{{course.course_id}}/lecture/{{nextLecture.id}}" 
+                               class="btn btn-primary btn-sm">
+                                Bài tiếp <i class="fas fa-chevron-right"></i>
+                            </a>
+                            {{/if}}
+                        </div>
                     </div>
                 </div>
-
-                {{!-- Video Player --}}
-                {{#if currentVideo}}
-                <div class="video-player-section bg-white rounded shadow-sm p-4 mb-4">
-                    {{#if currentVideo.video_url}}
-                    <div class="video-player-container">
-                        <video id="courseVideo" class="w-100 rounded" controls 
-                               poster="{{course.image_url}}"
-                               data-video-id="{{currentVideo.id}}"
-                               data-course-id="{{course.course_id}}"
-                               data-lecture-id="{{lecture.id}}">
+                
+                <div class="card-body">
+                    <!-- Video Player -->
+                    <div class="video-container mb-4">
+                        {{#if currentVideo}}
+                        <video id="player" 
+                               class="plyr-video w-100" 
+                               controls 
+                               crossorigin 
+                               playsinline 
+                               poster="{{currentVideo.thumbnail_url}}">
                             <source src="{{currentVideo.video_url}}" type="video/mp4">
-                            Trình duyệt của bạn không hỗ trợ video.
+                            <p>Trình duyệt của bạn không hỗ trợ video HTML5.</p>
                         </video>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <strong>Debug:</strong> Video URL: {{currentVideo.video_url}}
+                            </small>
+                        </div>
+                        {{else if lecture.videos.length}}
+                        <!-- Fallback: Sử dụng video đầu tiên trong chương -->
+                        <video id="player" 
+                               class="plyr-video w-100" 
+                               controls 
+                               crossorigin 
+                               playsinline>
+                            <source src="{{lecture.videos.0.video_url}}" type="video/mp4">
+                            <p>Trình duyệt của bạn không hỗ trợ video HTML5.</p>
+                        </video>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <strong>Debug:</strong> Video URL: {{lecture.videos.0.video_url}}
+                            </small>
+                        </div>
+                        {{else}}
+                        <div class="video-placeholder bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+                            <div class="text-center">
+                                <i class="bi bi-play-circle text-muted" style="font-size: 4rem;"></i>
+                                <h5 class="mt-3 text-muted">Video đang được cập nhật</h5>
+                                <p class="text-muted">Nội dung video cho chương này sẽ sớm được cập nhật.</p>
+                                {{#if lecture.videos.length}}
+                                <div class="mt-3">
+                                    <small class="badge bg-info me-2">Video ID: {{lecture.videos.0.id}}</small>
+                                    <small class="badge bg-info">Thời lượng: {{lecture.videos.0.duration}} giây</small>
+                                </div>
+                                {{/if}}
+                            </div>
+                        </div>
+                        {{/if}}
+                    </div>
+
+                    <!-- Video List trong chương -->
+                    {{#if lecture.videos}}
+                    <div class="video-list">
+                        <h6 class="mb-3">
+                            <i class="fas fa-video"></i> Danh sách video trong chương
+                        </h6>
+                        <div class="list-group">
+                            {{#each lecture.videos}}
+                            <div class="list-group-item video-item {{#if @first}}active{{/if}}" 
+                                 data-video-id="{{this.id}}" 
+                                 data-video-url="{{this.video_url}}"
+                                 data-video-title="{{this.video_title}}">
+                                <div class="d-flex align-items-center">
+                                    <div class="video-thumbnail me-3">
+                                        {{#if this.thumbnail_url}}
+                                        <img src="{{this.thumbnail_url}}" 
+                                             alt="{{this.video_title}}" 
+                                             class="rounded video-thumb" 
+                                             style="width: 60px; height: 40px; object-fit: cover;">
+                                        {{else}}
+                                        <div class="video-thumb-placeholder rounded d-flex align-items-center justify-content-center bg-light" 
+                                             style="width: 60px; height: 40px;">
+                                            <i class="fas fa-play text-muted"></i>
+                                        </div>
+                                        {{/if}}
+                                    </div>
+                                    <div class="video-info flex-grow-1">
+                                        <h6 class="mb-1">{{this.video_title}}</h6>
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock"></i> {{format_time this.duration}}
+                                        </small>
+                                    </div>
+                                    <div class="video-status">
+                                        <i class="fas fa-play-circle text-primary"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            {{/each}}
+                        </div>
                     </div>
                     {{else}}
-                    {{!-- Placeholder khi chưa có video URL --}}
-                    <div class="video-placeholder bg-light rounded p-5 text-center">
-                        <i class="bi bi-video display-1 text-muted mb-3"></i>
-                        <h4 class="text-muted mb-3">Video đang được cập nhật</h4>
-                        <p class="text-muted">Nội dung video cho chương này sẽ sớm được cập nhật.</p>
-                        <div class="mt-4">
-                            <span class="badge bg-info">Video ID: {{currentVideo.id}}</span>
-                            <span class="badge bg-secondary ms-2">Thời lượng: {{currentVideo.time}} giây</span>
-                        </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Chương này chưa có video nào.
                     </div>
                     {{/if}}
 
-                    {{!-- Video Info --}}
-                    <div class="video-info mt-3">
-                        <h5 class="video-title mb-2">{{lecture.title}}</h5>
-                        <div class="video-meta text-muted mb-3">
-                            <i class="bi bi-clock"></i> {{lecture.time}} phút |
-                            <i class="bi bi-calendar"></i> {{format_date lecture.created_at}}
-                        </div>
-                        
-                        {{!-- Video Description --}}
-                        {{#if lecture.description}}
-                        <div class="video-description">
-                            <h6>Mô tả chương học:</h6>
-                            <p>{{lecture.description}}</p>
-                        </div>
-                        {{/if}}
-                    </div>
-                </div>
-
-                {{!-- Navigation Buttons --}}
-                <div class="video-navigation d-flex justify-content-between">
-                    <div>
-                        {{#if previousLecture}}
-                        <a href="/enrollment/{{course.course_id}}/learn/{{previousLecture.id}}" 
-                           class="btn btn-outline-primary">
-                            <i class="bi bi-chevron-left"></i> Chương trước
-                        </a>
-                        {{/if}}
-                    </div>
-                    <div>
-                        {{#if nextLecture}}
-                        <a href="/enrollment/{{course.course_id}}/learn/{{nextLecture.id}}" 
-                           class="btn btn-primary">
-                            Chương tiếp theo <i class="bi bi-chevron-right"></i>
-                        </a>
-                        {{else}}
-                        <button class="btn btn-success" onclick="markCourseCompleted()">
-                            <i class="bi bi-trophy"></i> Hoàn thành khóa học
-                        </button>
-                        {{/if}}
-                    </div>
-                </div>
-
-                {{else}}
-                {{!-- No Video Available --}}
-                <div class="no-video bg-white rounded shadow-sm p-5 text-center">
-                    <i class="bi bi-video display-1 text-muted mb-3"></i>
-                    <h4 class="text-muted mb-3">Không có video nào</h4>
-                    <p class="text-muted">Chương học này chưa có nội dung video.</p>
-                </div>
-                {{/if}}
-
-                {{!-- Lecture Description --}}
-                {{#if lecture.full_description}}
-                <div class="lecture-description bg-white rounded shadow-sm p-4 mt-4">
-                    <h5 class="mb-3">Nội dung chi tiết</h5>
-                    {{#if lecture.full_description.overview}}
-                    <div class="mb-3">
-                        <h6>Tổng quan:</h6>
-                        <p>{{lecture.full_description.overview}}</p>
-                    </div>
-                    {{/if}}
-                    
-                    {{#if lecture.full_description.objectives}}
-                    <div>
-                        <h6>Mục tiêu học tập:</h6>
-                        <ul class="list-unstyled">
-                            {{#each lecture.full_description.objectives}}
-                            <li class="mb-2">
-                                <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                {{this}}
-                            </li>
-                            {{/each}}
-                        </ul>
+                    <!-- Mô tả chương -->
+                    {{#if lecture.description}}
+                    <div class="lecture-description mt-4">
+                        <h6><i class="fas fa-info-circle"></i> Mô tả chương</h6>
+                        <p class="text-muted">{{lecture.description}}</p>
                     </div>
                     {{/if}}
                 </div>
-                {{/if}}
             </div>
         </div>
     </div>
 </div>
 
-{{!-- JavaScript cho Video Player --}}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const video = document.getElementById('courseVideo');
-    
-    // Chỉ chạy JavaScript nếu có video element
-    if (!video) return;
-    
-    const videoId = video.dataset.videoId;
-    const courseId = video.dataset.courseId;
-    const lectureId = video.dataset.lectureId;
-    
-    if (!videoId || !courseId || !lectureId) return;
+<!-- Plyr.io CSS -->
+<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+<link rel="stylesheet" href="/css/lecture-learning.css" />
 
-    let progressTimer;
-    let lastSavedTime = 0;
-
-    // Load saved progress
-    loadVideoProgress();
-
-    // Video event listeners
-    video.addEventListener('loadedmetadata', function() {
-        loadVideoProgress();
-    });
-
-    video.addEventListener('timeupdate', function() {
-        // Save progress every 5 seconds
-        const currentTime = video.currentTime;
-        if (Math.abs(currentTime - lastSavedTime) >= 5) {
-            saveVideoProgress(currentTime, video.duration);
-            lastSavedTime = currentTime;
-        }
-    });
-
-    video.addEventListener('ended', function() {
-        // Mark video as completed
-        markVideoCompleted();
-    });
-
-    // Load video progress from server
-    async function loadVideoProgress() {
-        try {
-            const response = await fetch(`/enrollment/video/progress`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    videoId: videoId,
-                    action: 'get'
-                })
-            });
-
-            const data = await response.json();
-            if (data.success && data.progress) {
-                const progress = data.progress;
-                if (progress.current_time > 0) {
-                    video.currentTime = progress.current_time;
-                }
-            }
-        } catch (error) {
-            console.error('Error loading video progress:', error);
-        }
-    }
-
-    // Save video progress to server
-    async function saveVideoProgress(currentTime, duration) {
-        try {
-            await fetch(`/enrollment/video/progress`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    videoId: videoId,
-                    currentTime: currentTime,
-                    duration: duration,
-                    isCompleted: false
-                })
-            });
-        } catch (error) {
-            console.error('Error saving video progress:', error);
-        }
-    }
-
-    // Mark video as completed
-    async function markVideoCompleted() {
-        try {
-            const response = await fetch(`/enrollment/video/complete`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    videoId: videoId
-                })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                showToast('Chúc mừng! Bạn đã hoàn thành chương học này.', 'success');
-                // Reload page to update progress
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
-            }
-        } catch (error) {
-            console.error('Error marking video completed:', error);
-        }
-    }
-
-    // Global function for course completion
-    window.markCourseCompleted = function() {
-        showToast('Chúc mừng! Bạn đã hoàn thành khóa học này.', 'success');
-    };
-
-    // Toast notification function
-    function showToast(message, type = 'info') {
-        const toast = document.createElement('div');
-        toast.className = `alert alert-${type === 'success' ? 'success' : 'info'} position-fixed top-0 start-50 translate-middle-x mt-3`;
-        toast.style.zIndex = '9999';
-        toast.textContent = message;
-        
-        document.body.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.remove();
-        }, 3000);
-    }
-});
-</script>
-
-<style>
-.video-player-container {
-    position: relative;
-    background: #000;
-    border-radius: 0.5rem;
-    overflow: hidden;
-}
-
-.video-player-container video {
-    max-height: 500px;
-}
-
-.lecture-link {
-    transition: all 0.2s ease;
-}
-
-.lecture-link:hover {
-    background-color: #f8f9fa !important;
-    color: #333 !important;
-}
-
-.lecture-link.bg-primary:hover {
-    background-color: #0d6efd !important;
-    color: white !important;
-}
-
-.course-sidebar {
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-}
-
-.lecture-item {
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.lecture-item:last-child {
-    border-bottom: none;
-}
-
-@media (max-width: 768px) {
-    .video-player-container video {
-        max-height: 250px;
-    }
-    
-    .course-sidebar {
-        max-height: 300px;
-        margin-bottom: 1rem;
-    }
-}
-</style>
+<!-- Plyr.io JavaScript -->
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+<script src="/js/lecture-learning.js"></script>

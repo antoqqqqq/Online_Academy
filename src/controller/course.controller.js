@@ -3,72 +3,12 @@ import courseModel from "../models/course.model.js";
 import watchlistModel from "../models/watchlist.model.js";
 import feedbackModel from "../models/feedback.model.js";
 import enrollmentModel from "../models/enrollment.model.js";
+import lectureModel from "../models/lecture.model.js";
+import videoProgressModel from "../models/videoProgress.model.js";
 
 const courseController = {
-    list: async (req, res, next) => {
-        try {
-            const page = parseInt(req.query.page) || 1;
-            const limit = 12;
-            const categoryId = req.query.category;
-
-            // Mock categories data
-            const categories = await categoryModel.index();
-            // Mock courses data
-            const subCategories = [
-                {
-                    id: 1,
-                    title: 'Khóa học JavaScript Cơ bản',
-                    thumbnail: 'https://picsum.photos/300/200',
-                    instructor: 'John Doe',
-                    category: 'IT & Phần mềm',
-                    rating: 4.5,
-                    reviewCount: 120,
-                    price: 1200000,
-                    discountPrice: 899000
-                },
-                {
-                    id: 2,
-                    title: 'Digital Marketing từ A-Z',
-                    thumbnail: 'https://picsum.photos/300/200',
-                    instructor: 'Jane Smith',
-                    category: 'Marketing',
-                    rating: 4.8,
-                    reviewCount: 250,
-                    price: 1500000,
-                    discountPrice: null
-                },
-                {
-                    id: 3,
-                    title: 'UI/UX Design Master',
-                    thumbnail: 'https://picsum.photos/300/200',
-                    instructor: 'David Wilson',
-                    category: 'Thiết kế',
-                    rating: 4.7,
-                    reviewCount: 180,
-                    price: 2000000,
-                    discountPrice: 1599000
-                },
-                {
-                    id: 4,
-                    title: 'Python cho người mới bắt đầu',
-                    thumbnail: 'https://picsum.photos/300/200',
-                    instructor: 'Sarah Johnson',
-                    category: 'IT & Phần mềm',
-                    rating: 4.6,
-                    reviewCount: 300,
-                    price: 1800000,
-                    discountPrice: 1299000
-                }
-            ];
-
-
-        } catch (error) {
-            next(error);
-        }
-    },
-
     /**
-     * Xem chi tiết khóa học (Simple version - để tránh conflict)
+     * Xem chi tiết khóa học
      */
     detail: async (req, res, next) => {
         try {
@@ -77,14 +17,17 @@ const courseController = {
 
             // Lấy thông tin khóa học
             const course = await courseModel.getCourseById(courseId);
-            
             if (!course) {
                 return res.status(404).render('error', {
                     message: 'Không tìm thấy khóa học'
                 });
             }
 
-            // Kiểm tra xem đã có trong watchlist chưa (nếu user đã đăng nhập)
+            // Lấy lecture đầu tiên của khóa học
+            const firstLecture = await lectureModel.getFirstLecture(courseId);
+            course.first_lecture_id = firstLecture ? firstLecture.id : null;
+
+            // Kiểm tra trạng thái học viên
             let isInWatchlist = false;
             let isEnrolled = false;
             let studentFeedback = null;
@@ -97,10 +40,8 @@ const courseController = {
                 studentFeedback = await feedbackModel.getStudentFeedback(userId, courseId);
             }
 
-            // Lấy danh sách đánh giá của khóa học (5 đánh giá gần nhất)
+            // Lấy danh sách đánh giá và thống kê
             courseFeedbacks = await feedbackModel.getCourseFeedbacks(courseId, 5, 0);
-            
-            // Lấy thống kê đánh giá
             ratingStats = await feedbackModel.getCourseRatingStats(courseId);
 
             res.render('vwCourse/detail', {
@@ -124,7 +65,6 @@ const courseController = {
      */
     toggleWatchlist: async (req, res) => {
         try {
-            // Kiểm tra đăng nhập
             if (!req.session.authUser) {
                 return res.json({
                     success: false,
@@ -136,10 +76,7 @@ const courseController = {
             const courseId = req.params.id;
             const userId = req.session.authUser.id;
 
-            // Toggle watchlist
             const result = await watchlistModel.toggle(userId, courseId);
-
-            // Kiểm tra trạng thái hiện tại
             const isInWatchlist = await watchlistModel.isInWatchlist(userId, courseId);
 
             return res.json({
@@ -160,7 +97,6 @@ const courseController = {
      */
     viewWatchlist: async (req, res, next) => {
         try {
-            // Kiểm tra đăng nhập
             if (!req.session.authUser) {
                 return res.redirect('/account/signin');
             }
@@ -170,7 +106,6 @@ const courseController = {
             const limit = 12;
             const offset = (page - 1) * limit;
 
-            // Lấy danh sách khóa học yêu thích
             const courses = await watchlistModel.getByUserId(userId, limit, offset);
             const total = await watchlistModel.countByUserId(userId);
             const totalPages = Math.ceil(total / limit);
@@ -193,6 +128,137 @@ const courseController = {
         } catch (error) {
             console.error('Lỗi khi xem watchlist:', error);
             next(error);
+        }
+    },
+
+    /**
+     * Xem nội dung bài giảng với media player
+     */
+    viewLecture: async (req, res, next) => {
+        try {
+            // Kiểm tra đăng nhập
+            if (!req.session.authUser) {
+                return res.redirect('/account/signin');
+            }
+
+            const courseId = req.params.courseId;
+            const lectureId = req.params.lectureId;
+            const userId = req.session.authUser.id;
+
+            // Kiểm tra xem học viên đã đăng ký khóa học chưa
+            const isEnrolled = await enrollmentModel.isEnrolled(userId, courseId);
+            if (!isEnrolled) {
+                return res.status(403).render('error', {
+                    message: 'Bạn cần đăng ký khóa học để xem nội dung bài giảng'
+                });
+            }
+
+            // Lấy thông tin khóa học
+            const course = await courseModel.getCourseById(courseId);
+            if (!course) {
+                return res.status(404).render('error', {
+                    message: 'Không tìm thấy khóa học'
+                });
+            }
+
+            // Lấy thông tin chương và video
+            const lecture = await lectureModel.getLectureWithVideos(lectureId);
+            if (!lecture) {
+                return res.status(404).render('error', {
+                    message: 'Không tìm thấy bài giảng'
+                });
+            }
+
+            // Lấy video đầu tiên của chương làm video hiện tại
+            const currentVideo = lecture.videos && lecture.videos.length > 0 ? lecture.videos[0] : null;
+
+            // Lấy danh sách tất cả chương của khóa học
+            const allLectures = await lectureModel.getLecturesByCourseId(courseId);
+
+            // Lấy tiến độ học của học viên
+            const courseProgress = await videoProgressModel.getCourseProgress(userId, courseId);
+
+            // Tìm chương hiện tại trong danh sách
+            const currentLectureIndex = allLectures.findIndex(l => l.id == lectureId);
+            const previousLecture = currentLectureIndex > 0 ? allLectures[currentLectureIndex - 1] : null;
+            const nextLecture = currentLectureIndex < allLectures.length - 1 ? allLectures[currentLectureIndex + 1] : null;
+
+            res.render('vwCourse/lectureLearning', {
+                layout: 'main',
+                course,
+                lecture,
+                currentVideo,
+                allLectures,
+                currentLectureIndex,
+                previousLecture,
+                nextLecture,
+                courseProgress,
+                isLoggedIn: true
+            });
+        } catch (error) {
+            console.error('Lỗi khi xem bài giảng:', error);
+            next(error);
+        }
+    },
+
+    /**
+     * API để lưu tiến độ học video
+     */
+    saveVideoProgress: async (req, res) => {
+        try {
+            if (!req.session.authUser) {
+                return res.json({
+                    success: false,
+                    message: 'Vui lòng đăng nhập'
+                });
+            }
+
+            const userId = req.session.authUser.id;
+            const { videoId, currentTime, duration, isCompleted } = req.body;
+
+            const result = await videoProgressModel.saveVideoProgress(userId, videoId, {
+                currentTime: parseFloat(currentTime),
+                duration: parseFloat(duration),
+                isCompleted: isCompleted === 'true'
+            });
+
+            res.json(result);
+        } catch (error) {
+            console.error('Lỗi khi lưu tiến độ video:', error);
+            res.json({
+                success: false,
+                message: 'Có lỗi xảy ra khi lưu tiến độ'
+            });
+        }
+    },
+
+    /**
+     * API để lấy tiến độ học video
+     */
+    getVideoProgress: async (req, res) => {
+        try {
+            if (!req.session.authUser) {
+                return res.json({
+                    success: false,
+                    message: 'Vui lòng đăng nhập'
+                });
+            }
+
+            const userId = req.session.authUser.id;
+            const videoId = req.params.videoId;
+
+            const progress = await videoProgressModel.getVideoProgress(userId, videoId);
+
+            res.json({
+                success: true,
+                progress
+            });
+        } catch (error) {
+            console.error('Lỗi khi lấy tiến độ video:', error);
+            res.json({
+                success: false,
+                message: 'Có lỗi xảy ra khi lấy tiến độ'
+            });
         }
     }
 };
