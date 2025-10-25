@@ -1,0 +1,223 @@
+/* ========================================
+   LECTURE LEARNING PAGE STYLES
+   ======================================== */
+
+/* Layout & Structure */
+.lecture-item {
+    border-bottom: 1px solid #eee;
+    transition: all 0.2s ease;
+}
+
+.lecture-item:last-child {
+    border-bottom: none;
+}
+
+.lecture-item.active {
+    background-color: #007bff !important;
+}
+
+.lecture-item:hover:not(.active) {
+    background-color: #f8f9fa;
+}
+
+.lecture-item.active:hover {
+    background-color: #0056b3 !important;
+}
+
+/* Video Components */
+.video-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.video-item:hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+.video-item.active {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+}
+
+.video-thumb {
+    transition: transform 0.2s ease;
+}
+
+.video-item:hover .video-thumb {
+    transform: scale(1.05);
+}
+
+.video-thumb-placeholder {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+/* Progress Components */
+.course-progress {
+    border-bottom: 1px solid #dee2e6;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+/* Video Player */
+.plyr-video {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.video-container {
+    position: relative;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Navigation */
+.lecture-navigation .btn {
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.lecture-navigation .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar */
+.lecture-list {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.lecture-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.lecture-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.lecture-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.lecture-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Status Indicators */
+.video-status i {
+    transition: color 0.2s ease;
+}
+
+.video-item.completed .video-status i {
+    color: #28a745 !important;
+}
+
+.video-item.in-progress .video-status i {
+    color: #ffc107 !important;
+}
+
+/* Cards */
+.card {
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Plyr Customizations */
+.plyr--video {
+    border-radius: 8px;
+}
+
+.plyr__control--overlaid {
+    background: rgba(0, 123, 255, 0.9);
+}
+
+.plyr__control--overlaid:hover {
+    background: rgba(0, 123, 255, 1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .lecture-navigation {
+        margin-top: 1rem;
+    }
+    
+    .lecture-navigation .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .lecture-list {
+        max-height: 40vh;
+    }
+    
+    .video-container {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .lecture-item .lecture-content h6 {
+        font-size: 0.9rem;
+    }
+    
+    .video-item .video-info h6 {
+        font-size: 0.9rem;
+    }
+}
+
+/* Button States */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Text Utilities */
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.text-truncate-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
