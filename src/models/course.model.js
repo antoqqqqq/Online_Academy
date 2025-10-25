@@ -116,6 +116,8 @@ export default {
     async search(keyword){
         try {
             return db("courses")
+                .leftJoin('instructor', 'courses.instructor_id', 'instructor.instructor_id')
+                .leftJoin('categoryL2', 'courses.category_id', 'categoryL2.id')
                 .whereRaw(`fts @@ to_tsquery(remove_accent(?))`,[keyword])
         } catch{
             console.error("Error getting courses with filter:", error);
@@ -165,7 +167,6 @@ export default {
             throw error;
         }
     },
-
     /**
      * Lấy tất cả khóa học cho trang admin
      * Nối 3 bảng: courses, instructor (để lấy tên GV), categoryL2 (để lấy tên danh mục)
