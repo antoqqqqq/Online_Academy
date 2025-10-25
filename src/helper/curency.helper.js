@@ -142,6 +142,15 @@ Handlebars.registerHelper('format_datetime', function (date) {
 const helpers = {
     format_currency: formatCurrency,
     format_money: format_money,
+    includes: function(str, substr) {
+        if (typeof str === 'string' && typeof substr === 'string') {
+            return str.includes(substr);
+        }
+        return false;
+    },
+    or: function(a, b) {
+        return a || b;
+    }
 };
 
 export { Handlebars };  // full instance (for app.engine)

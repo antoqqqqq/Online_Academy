@@ -1,0 +1,173 @@
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Instructor Dashboard</h5>
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/instructor">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/instructor/courses/create">Create Course</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/account/profile">My Profile</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Create New Course</h4>
+                </div>
+                <div class="card-body">
+                    {{#if errors}}
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                {{#each errors}}
+                                    <li>{{this}}</li>
+                                {{/each}}
+                            </ul>
+                        </div>
+                    {{/if}}
+
+                    <form action="/instructor/courses/create" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Course Title *</label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   value="{{formData.title}}" required>
+                            <div class="form-text">Make it engaging and descriptive</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category_id" class="form-label">Category *</label>
+                            <select class="form-select" id="category_id" name="category_id" required>
+                                <option value="">Select a category</option>
+                                {{#each categories}}
+                                    <option value="{{this.id}}" 
+                                            {{#eq this.id ../formData.category_id}}selected{{/eq}}>
+                                        {{this.category_name}}
+                                    </option>
+                                {{/each}}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="level" class="form-label">Level *</label>
+                            <select class="form-select" id="level" name="level" required>
+                                <option value="">Select level</option>
+                                <option value="Beginner" {{#eq "Beginner" formData.level}}selected{{/eq}}>Beginner</option>
+                                <option value="Intermediate" {{#eq "Intermediate" formData.level}}selected{{/eq}}>Intermediate</option>
+                                <option value="Advanced" {{#eq "Advanced" formData.level}}selected{{/eq}}>Advanced</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Short Description *</label>
+                            <textarea class="form-control" id="description" name="description" 
+                                      rows="3" required>{{formData.description}}</textarea>
+                            <div class="form-text">Brief description that appears in course listings</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="full_description" class="form-label">Full Description</label>
+                            <textarea class="form-control" id="full_description" name="full_description" 
+                                    rows="6" placeholder="Enter detailed course description...">{{formData.full_description}}</textarea>
+                            <div class="form-text">Detailed course description (plain text or simple HTML)</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="original_price" class="form-label">Original Price (VND) *</label>
+                                    <input type="number" class="form-control" id="original_price" 
+                                           name="original_price" value="{{formData.original_price}}" 
+                                           min="0" step="1000" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="current_price" class="form-label">Current Price (VND)</label>
+                                    <input type="number" class="form-control" id="current_price" 
+                                           name="current_price" value="{{formData.current_price}}" 
+                                           min="0" step="1000">
+                                    <div class="form-text">Leave empty to use original price</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Course Image</label>
+                            <input type="file" class="form-control" id="image" name="image" 
+                                accept="image/jpeg,image/png,image/gif,image/webp" onchange="previewImage(this)">
+                            <div class="form-text">
+                                <strong>Supported formats:</strong> JPG, PNG, GIF, WebP<br>
+                                <strong>Maximum file size:</strong> 5MB<br>
+                                <strong>Recommended dimensions:</strong> 1280x720 pixels
+                            </div>
+                            
+                            <!-- Image Preview Container -->
+                            <div id="imagePreview" class="mt-2" style="display: none;">
+                                <p class="text-muted mb-1">Image Preview:</p>
+                                <img id="preview" src="#" alt="Image preview" style="max-height: 200px; max-width: 100%;" class="border rounded">
+                                <div class="mt-1">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeImagePreview()">Remove Image</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Error display for upload issues -->
+                            {{#if errors}}
+                                <div class="alert alert-danger mt-2">
+                                    <ul class="mb-0">
+                                        {{#each errors}}
+                                            {{#if (or (includes this "File too large") (includes this "Only image files") (includes this "Unexpected file"))}}
+                                                <li><i class="fas fa-exclamation-triangle"></i> {{this}}</li>
+                                            {{/if}}
+                                        {{/each}}
+                                    </ul>
+                                </div>
+                            {{/if}}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="/instructor" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Create Course</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function previewImage(input) {
+    const preview = document.getElementById('preview');
+    const previewContainer = document.getElementById('imagePreview');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            previewContainer.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        previewContainer.style.display = 'none';
+    }
+}
+
+function removeImagePreview() {
+    const input = document.getElementById('image');
+    const previewContainer = document.getElementById('imagePreview');
+    
+    input.value = ''; // Clear the file input
+    previewContainer.style.display = 'none'; // Hide preview
+}
+</script>
