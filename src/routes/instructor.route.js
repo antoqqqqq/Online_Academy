@@ -37,7 +37,7 @@ router.post('/courses/:id/complete', instructorController.markCourseComplete);
 
 // Profile management
 router.get('/profile', instructorController.showProfile);
-router.post('/profile/update', instructorController.updateProfile);
+router.post('/profile/update', express.urlencoded({ extended: true }), instructorController.updateProfile);
 router.get('/courses/list', instructorController.getMyCourses);
 router.get('/profile/public/:id', instructorController.getPublicProfile);
 

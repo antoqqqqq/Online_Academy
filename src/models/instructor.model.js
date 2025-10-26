@@ -143,26 +143,41 @@ export default {
     // Update instructor profile
     async updateProfile(instructorId, profileData) {
         try {
+            console.log('Starting profile update for instructor:', instructorId);
+            console.log('Profile data received:', profileData);
             // Prepare data for storage in existing bio column
             let enhancedBio = {};
             
             // Get current instructor data to preserve existing bio structure
+             console.log('Getting current instructor data...');
             const currentInstructor = await db('instructor')
                 .where('instructor_id', instructorId)
                 .first();
+
+            if (!currentInstructor) {
+                console.log('Current instructor not found');
+                throw new Error('Instructor not found');
+            }
+            
+            console.log('Current instructor found:', currentInstructor);
             
             // Parse existing bio if it contains JSON data
             if (currentInstructor.bio) {
                 try {
                     enhancedBio = JSON.parse(currentInstructor.bio);
+                    console.log('Parsed existing bio as JSON:', enhancedBio);
                     // Ensure it's an object
                     if (typeof enhancedBio !== 'object' || enhancedBio === null) {
                         enhancedBio = { original_bio: currentInstructor.bio };
+                        console.log('Converted bio to object format');
                     }
                 } catch (e) {
                     // If not JSON, store as original bio
+                    console.log('Existing bio is not JSON, using as plain text');
                     enhancedBio = { original_bio: currentInstructor.bio };
                 }
+            } else {
+                console.log('No existing bio found');
             }
             
             // Update with new data - store everything in bio column as JSON
@@ -174,6 +189,8 @@ export default {
                 expertise: profileData.expertise || enhancedBio.expertise || '',
                 last_updated: new Date().toISOString()
             };
+
+            console.log('Updated bio data structure:', updatedBioData);
             
             // Prepare update data for database - only use existing columns
             const dbUpdateData = {
@@ -184,16 +201,29 @@ export default {
             // If name is provided, update the name column separately
             if (profileData.name) {
                 dbUpdateData.name = profileData.name;
+                console.log('Will update name to:', profileData.name);
             }
 
+            console.log('Database update data:', dbUpdateData);
+
+            console.log('Executing database update...');
             const result = await db('instructor')
                 .where('instructor_id', instructorId)
                 .update(dbUpdateData)
                 .returning('*');
 
-            return result[0];
+            console.log('Database update result:', result);
+
+            // Return the updated instructor
+            const updatedInstructor = await db('instructor')
+                .where('instructor_id', instructorId)
+                .first();
+                
+            console.log('Final updated instructor:', updatedInstructor);
+            return updatedInstructor;
         } catch (error) {
             console.error('Error updating instructor profile:', error);
+            console.error('Error stack in model:', error.stack);
             throw error;
         }
     },

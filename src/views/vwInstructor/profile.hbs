@@ -67,7 +67,7 @@
                     <p class="text-muted mb-0">Manage your public profile information</p>
                 </div>
                 <div class="card-body">
-                    {{!-- Instructor Profile Form}}
+                    {{!-- Instructor Profile Form --}}
                     <form action="/instructor/profile/update" method="POST">
                         <div class="row">
                             <div class="col-md-12">
@@ -212,6 +212,56 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Bio content changed');
             }, 2000);
         });
+    }
+
+    console.log('Profile page loaded');
+    
+    // Form handling
+    const profileForm = document.querySelector('form[action="/instructor/profile/update"]');
+    
+    if (profileForm) {
+        console.log('Form found:', profileForm);
+        
+        profileForm.addEventListener('submit', function(e) {
+            console.log('Form submission started...');
+            
+            // Validate required fields
+            const nameInput = document.getElementById('name');
+            if (!nameInput.value.trim()) {
+                e.preventDefault();
+                alert('Vui lòng nhập họ và tên');
+                nameInput.focus();
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang cập nhật...';
+            submitBtn.disabled = true;
+            
+            console.log('Form validation passed, submitting...');
+            // Allow the form to submit normally
+        });
+        
+        // Log form data on input changes for debugging
+        const formInputs = profileForm.querySelectorAll('input, textarea');
+        formInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                console.log(`📝 Field ${this.name} changed to:`, this.value);
+            });
+        });
+    } else {
+        console.error('Form not found! Check the form action attribute.');
+    }
+    
+    // Check for URL parameters to show messages
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('success')) {
+        console.log('Profile update was successful');
+    }
+    if (urlParams.has('error')) {
+        console.log('Profile update failed');
     }
 });
 </script>

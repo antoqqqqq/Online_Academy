@@ -986,26 +986,33 @@ const instructorController = {
         }
     },
 
-// In the updateProfile method, remove social media fields
+    // Update the instructor profile
     updateProfile: async (req, res) => {
         try {
+            console.log('🔄 Starting profile update process...');
             const accountId = req.session.authUser.id;
             
             // Validate instructor permission
             if (req.session.authUser.permission !== 2) {
+                console.log('User does not have instructor permission');
                 return res.redirect('/?error=access_denied');
             }
 
+            console.log('Request body:', req.body);
             const { bio, expertise, name } = req.body;
 
             // Get instructor
+            console.log('🔍 Finding instructor for account:', accountId);
             const instructor = await instructorModel.findByAccountId(accountId);
             
             if (!instructor) {
+                console.log('Instructor not found for account:', accountId);
                 return res.status(404).render('error', {
                     message: 'Instructor profile not found'
                 });
             }
+
+            console.log('Found instructor:', instructor.instructor_id);
 
             // Prepare update data
             const profileData = {
@@ -1014,23 +1021,38 @@ const instructorController = {
                 name: name || instructor.name
             };
 
+            console.log('Profile data to update:', profileData);
+
             // Update instructor profile with enhanced data storage
-            await instructorModel.updateProfile(instructor.instructor_id, profileData);
+            console.log('Calling instructorModel.updateProfile...');
+            const updateResult = await instructorModel.updateProfile(instructor.instructor_id, profileData);
+        
+            if (!updateResult) {
+                console.log('instructorModel.updateProfile returned null/undefined');
+                throw new Error('Failed to update instructor profile');
+            }
+
+            console.log('instructorModel.updateProfile succeeded:', updateResult);
 
             // Update session user data if name changed
             if (name && name !== req.session.authUser.name) {
+                console.log('🔄 Updating session user name');
                 req.session.authUser.name = name;
                 
                 // Also update account name
+                console.log('🔄 Updating account name in database');
                 const accountModel = (await import('../models/accout.model.js')).default;
                 await accountModel.update(accountId, { name: name });
             }
+
+            console.log('Profile update completed successfully');
 
             // Clear any cached data and redirect with success
             res.redirect('/instructor/profile?success=1');
 
         } catch (error) {
             console.error('Error updating instructor profile:', error);
+            console.error('Error stack:', error.stack);
             res.redirect('/instructor/profile?error=1');
         }
     },
