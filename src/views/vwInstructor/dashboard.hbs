@@ -12,7 +12,7 @@
                             <a class="nav-link" href="/instructor/courses/create">Create Course</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/account/profile">My Profile</a>
+                            <a class="nav-link" href="/instructor/profile">My Profile</a>
                         </li>
                     </ul>
                 </div>
@@ -21,53 +21,79 @@
             <!-- Instructor Profile -->
             <div class="card mt-3">
                 <div class="card-body">
-                    <h6 class="card-title">Instructor Profile</h6>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="card-title mb-0">Instructor Profile</h6>
+                        <a href="/instructor/profile" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-external-link-alt me-1"></i>View Profile
+                        </a>
+                    </div>
                     <form action="/instructor/profile" method="POST">
                         <div class="mb-3">
                             <label for="bio" class="form-label">Bio</label>
                             <textarea class="form-control" id="bio" name="bio" rows="4" 
                                       placeholder="Tell students about yourself...">{{instructor.bio}}</textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-sm">Update Profile</button>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-sm">Update Profile</button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
 
         <div class="col-md-9">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>My Courses</h2>
-                <a href="/instructor/courses/create" class="btn btn-primary">Create New Course</a>
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                <div>
+                    <h2 class="text-primary fw-bold mb-1">Teaching Dashboard</h2>
+                    <p class="text-muted mb-0">Manage your courses and track your teaching progress</p>
+                </div>
+                <a href="/instructor/courses/create" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Create New Course
+                </a>
             </div>
 
             {{#if courses.length}}
                 <div class="row">
                     {{#each courses}}
                     <div class="col-md-6 mb-4">
-                        <div class="card h-100">
+                        <div class="card h-100 course-card">
                             {{#if this.image_url}}
                                 <img src="{{this.image_url}}" class="card-img-top" alt="{{this.title}}" 
                                     style="height: 200px; object-fit: cover;"
-                                    onerror="this.onerror=null; this.src='/upload/images/default-course.jpg'">
+                                    onerror="this.onerror=null; this.src='/static/default/default-course.jpg'">
                             {{else}}
-                                <img src="/src/public/upload/images/default-course.jpg" class="card-img-top" alt="{{this.title}}" 
+                                <img src="/static/default/default-course.jpg" class="card-img-top" alt="{{this.title}}" 
                                     style="height: 200px; object-fit: cover;">
                             {{/if}}
-                            <div class="card-body">
+                            <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">{{this.title}}</h5>
-                                <p class="card-text text-muted">{{this.description}}</p>
-                                <div class="d-flex justify-content-between align-items-center">
+                                <p class="card-text text-muted flex-grow-1">{{this.description}}</p>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
                                     <span class="badge bg-{{#if this.is_complete}}success{{else}}warning{{/if}}">
                                         {{#if this.is_complete}}Complete{{else}}In Progress{{/if}}
                                     </span>
                                     <span class="text-primary fw-bold">{{format_money this.current_price}}</span>
                                 </div>
+                                <div class="mt-auto">
+                                    <small class="text-muted">
+                                        <i class="fas fa-users me-1"></i>{{this.total_enrollment}} students
+                                        {{#if this.rating}}
+                                        • <i class="fas fa-star text-warning me-1"></i>{{this.rating}}
+                                        {{/if}}
+                                    </small>
+                                </div>
                             </div>
-                            <div class="card-footer">
-                                <a href="/instructor/courses/{{this.course_id}}/edit" 
-                                class="btn btn-outline-primary btn-sm">Edit Course</a>
-                                <a href="/courses/{{this.course_id}}" 
-                                class="btn btn-outline-secondary btn-sm">View</a>
+                            <div class="card-footer bg-transparent">
+                                <div class="btn-group w-100" role="group">
+                                    <a href="/instructor/courses/{{this.course_id}}/edit" 
+                                    class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-edit me-1"></i>Edit
+                                    </a>
+                                    <a href="/courses/{{this.course_id}}" 
+                                    class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-eye me-1"></i>View
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -77,10 +103,48 @@
                 <div class="text-center py-5">
                     <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
                     <h4 class="text-muted">No Courses Yet</h4>
-                    <p class="text-muted">Create your first course to start teaching</p>
-                    <a href="/instructor/courses/create" class="btn btn-primary">Create Your First Course</a>
+                    <p class="text-muted mb-4">Start your teaching journey by creating your first course</p>
+                    <a href="/instructor/courses/create" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus me-2"></i>Create Your First Course
+                    </a>
                 </div>
             {{/if}}
         </div>
     </div>
 </div>
+
+<style>
+.course-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e9ecef;
+}
+
+.course-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.nav-pills .nav-link.active {
+    background-color: #0d6efd;
+    font-weight: 500;
+}
+
+.btn-group .btn {
+    border-radius: 0;
+}
+
+.btn-group .btn:first-child {
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+}
+
+.btn-group .btn:last-child {
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}
+</style>

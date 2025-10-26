@@ -11,22 +11,79 @@ export default {
                 .select(
                     "courses.*",
                     "instructor.name as instructor_name",
+                    "instructor.bio as instructor_bio_raw",
+                    "instructor.total_students as instructor_student_count",
                     "categoryL2.category_name as category_name"
                 )
                 .first();
             
             if (!course) return null;
 
+            if (!course.image_url || course.image_url === '' || course.image_url === '/upload/images/default-course.jpg' || course.image_url === '/src/public/upload/images/default-course.jpg') {
+                course.image_url = '/static/default/default-course.jpg';
+            }
+
+            // Parse enhanced instructor data from bio field
+            let instructor_bio = '';
+            let instructor_expertise = '';
+
+            if (course.instructor_bio_raw) {
+                try {
+                    const parsedBio = JSON.parse(course.instructor_bio_raw);
+                    if (typeof parsedBio === 'object' && parsedBio !== null) {
+                        instructor_bio = parsedBio.bio_text || parsedBio.original_bio || '';
+                        instructor_expertise = parsedBio.expertise || '';
+                    } else {
+                        instructor_bio = course.instructor_bio_raw;
+                    }
+                } catch (e) {
+                    instructor_bio = course.instructor_bio_raw;
+                }
+            }
+
+            // Add parsed instructor data to course object
+            course.instructor_bio = instructor_bio;
+            course.instructor_expertise = instructor_expertise;
+
+            // Get instructor's course count
+            const courseCountResult = await db('courses')
+                .where('instructor_id', course.instructor_id)
+                .count('course_id as count')
+                .first();
+            course.instructor_course_count = parseInt(courseCountResult.count) || 0;
+
+            // Calculate instructor rating
+            const ratingResult = await db('courses')
+                .where('instructor_id', course.instructor_id)
+                .avg('rating as average')
+                .first();
+            course.instructor_rating = parseFloat(ratingResult.average || 0).toFixed(1);
+
+            // Get other courses by this instructor
+            const otherCourses = await db('courses')
+                .where('instructor_id', course.instructor_id)
+                .where('course_id', '!=', courseId)
+                .select('course_id', 'title', 'image_url', 'rating', 'total_enrollment')
+                .orderBy('total_enrollment', 'desc')
+                .limit(4);
+            
+            // Fix other courses image URLs
+            course.other_courses = otherCourses.map(otherCourse => ({
+                ...otherCourse,
+                image_url: otherCourse.image_url && otherCourse.image_url !== '' && otherCourse.image_url !== '/upload/images/default-course.jpg' && otherCourse.image_url !== '/src/public/upload/images/default-course.jpg' ? 
+                    otherCourse.image_url : '/static/default/default-course.jpg'
+            }));
+
+            // Parse full_description if it exists
             if (course.full_description && typeof course.full_description === 'string') {
                 try {
                     course.full_description = JSON.parse(course.full_description);
                 } catch (error) {
                     console.log('Failed to parse full_description as JSON, using as-is');
-                    // If parsing fails, keep it as string
                 }
             }
 
-            // Lấy danh sách video của khóa học
+            // Get course videos
             const videos = await db("video")
                 .join("lecture", "video.lecture_id", "lecture.id")
                 .where("lecture.course_id", courseId)
@@ -126,8 +183,6 @@ export default {
     async search(keyword){
         try {
             return db("courses")
-                .leftJoin('instructor', 'courses.instructor_id', 'instructor.instructor_id')
-                .leftJoin('categoryL2', 'courses.category_id', 'categoryL2.id')
                 .whereRaw(`fts @@ to_tsquery(remove_accent(?))`,[keyword])
         } catch{
             console.error("Error getting courses with filter:", error);
@@ -178,6 +233,7 @@ export default {
             throw error;
         }
     },
+
     /**
      * Lấy tất cả khóa học cho trang admin
      * Nối 3 bảng: courses, instructor (để lấy tên GV), categoryL2 (để lấy tên danh mục)
@@ -362,4 +418,3 @@ export default {
         return newCourse;
     }
 };
-

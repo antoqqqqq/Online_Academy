@@ -62,7 +62,7 @@ app.set("views", "./src/views");
 // 📂 STATIC FILES
 // ==========================
 app.use(express.static(path.join(process.cwd(), "src/public")));
-app.use('/static', express.static(path.join(process.cwd(), "static")));
+app.use('/static', express.static(path.join(process.cwd(), "src/static")));
 
 // ==========================
 // 🧩 MIDDLEWARES
