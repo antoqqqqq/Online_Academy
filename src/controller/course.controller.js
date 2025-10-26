@@ -23,6 +23,20 @@ const courseController = {
                 });
             }
 
+            // Ensure course image URL is consistent
+            if (!course.image_url || course.image_url === '' || course.image_url === '/upload/images/default-course.jpg') {
+                course.image_url = '/upload/images/default-course.jpg';
+            }
+
+            // Ensure other courses have consistent image URLs
+            if (course.other_courses && course.other_courses.length > 0) {
+                course.other_courses = course.other_courses.map(otherCourse => ({
+                    ...otherCourse,
+                    image_url: otherCourse.image_url && otherCourse.image_url !== '' ? 
+                        otherCourse.image_url : '/upload/images/default-course.jpg'
+                }));
+            }
+
             // Lấy lecture đầu tiên của khóa học
             const firstLecture = await lectureModel.getFirstLecture(courseId);
             course.first_lecture_id = firstLecture ? firstLecture.id : null;

@@ -1,0 +1,267 @@
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Instructor Dashboard</h5>
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/instructor">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/instructor/courses/create">Create Course</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/instructor/profile">My Profile</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">Teaching Stats</h6>
+                    <div class="stats">
+                        <div class="stat-item mb-2">
+                            <small class="text-muted">Total Courses</small>
+                            <div class="fw-bold">{{courses.length}}</div>
+                        </div>
+                        <div class="stat-item">
+                            <small class="text-muted">Profile Completeness</small>
+                            <div class="progress mt-1" style="height: 6px;">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{#if instructor.bio}}70{{else}}30{{/if}}%"
+                                     aria-valuenow="{{#if instructor.bio}}70{{else}}30{{/if}}" 
+                                     aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                {{#if instructor.bio}}Complete{{else}}Basic{{/if}}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <!-- Success/Error Messages -->
+            {{#if success}}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    Profile updated successfully!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {{/if}}
+
+            {{#if error}}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    Error updating profile. Please try again.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {{/if}}
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Instructor Profile</h4>
+                    <p class="text-muted mb-0">Manage your public profile information</p>
+                </div>
+                <div class="card-body">
+                    {{!-- Instructor Profile Form --}}
+                    <form action="/instructor/profile/update" method="POST">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">
+                                            <i class="bi bi-person-gear"></i> Thông tin cá nhân
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {{!-- Name Field --}}
+                                        <div class="mb-3">
+                                            <label for="name" class="form-label">Họ và tên</label>
+                                            <input type="text" class="form-control" id="name" name="name" 
+                                                value="{{instructor.name}}" required>
+                                        </div>
+
+                                        {{!-- Expertise Field --}}
+                                        <div class="mb-3">
+                                            <label for="expertise" class="form-label">Lĩnh vực chuyên môn</label>
+                                            <input type="text" class="form-control" id="expertise" name="expertise" 
+                                                value="{{instructor.expertise}}" 
+                                                placeholder="Ví dụ: Lập trình web, Thiết kế đồ họa, Marketing...">
+                                        </div>
+
+                                        {{!-- Bio Field --}}
+                                        <div class="mb-3">
+                                            <label for="bio" class="form-label">Giới thiệu bản thân</label>
+                                            <textarea class="form-control" id="bio" name="bio" rows="5" 
+                                                    placeholder="Giới thiệu về kinh nghiệm, chuyên môn và phương pháp giảng dạy của bạn...">{{instructor.bio}}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{!-- Submit Button --}}
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle"></i> Cập nhật hồ sơ
+                                </button>
+                                <a href="/instructor" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Quay lại
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- My Courses Section -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">My Courses</h5>
+                </div>
+                <div class="card-body">
+                    {{#if courses.length}}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Course Title</th>
+                                        <th>Status</th>
+                                        <th>Students</th>
+                                        <th>Rating</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each courses}}
+                                    <tr>
+                                        <td>
+                                            <strong>{{this.title}}</strong>
+                                            <br>
+                                            <small class="text-muted">{{format_money this.current_price}}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{{#if this.is_complete}}success{{else}}warning{{/if}}">
+                                                {{#if this.is_complete}}Complete{{else}}In Progress{{/if}}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <small>{{this.total_enrollment}} students</small>
+                                        </td>
+                                        <td>
+                                            {{#if this.rating}}
+                                                <small>
+                                                    ⭐ {{this.rating}} ({{this.total_reviews}} reviews)
+                                                </small>
+                                            {{else}}
+                                                <small class="text-muted">No ratings yet</small>
+                                            {{/if}}
+                                        </td>
+                                        <td>
+                                            <a href="/instructor/courses/{{this.course_id}}/edit" 
+                                               class="btn btn-outline-primary btn-sm">Edit</a>
+                                            <a href="/courses/{{this.course_id}}" 
+                                               class="btn btn-outline-secondary btn-sm">View</a>
+                                        </td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+                    {{else}}
+                        <div class="text-center py-4">
+                            <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">You haven't created any courses yet.</p>
+                            <a href="/instructor/courses/create" class="btn btn-primary">Create Your First Course</a>
+                        </div>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stats .stat-item {
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 8px;
+}
+
+.stats .stat-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-save bio with debounce
+    const bioTextarea = document.getElementById('bio');
+    let bioTimeout;
+    
+    if (bioTextarea) {
+        bioTextarea.addEventListener('input', function() {
+            clearTimeout(bioTimeout);
+            bioTimeout = setTimeout(() => {
+                // Optional: Auto-save functionality could be added here
+                console.log('Bio content changed');
+            }, 2000);
+        });
+    }
+
+    console.log('Profile page loaded');
+    
+    // Form handling
+    const profileForm = document.querySelector('form[action="/instructor/profile/update"]');
+    
+    if (profileForm) {
+        console.log('Form found:', profileForm);
+        
+        profileForm.addEventListener('submit', function(e) {
+            console.log('Form submission started...');
+            
+            // Validate required fields
+            const nameInput = document.getElementById('name');
+            if (!nameInput.value.trim()) {
+                e.preventDefault();
+                alert('Vui lòng nhập họ và tên');
+                nameInput.focus();
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang cập nhật...';
+            submitBtn.disabled = true;
+            
+            console.log('Form validation passed, submitting...');
+            // Allow the form to submit normally
+        });
+        
+        // Log form data on input changes for debugging
+        const formInputs = profileForm.querySelectorAll('input, textarea');
+        formInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                console.log(`📝 Field ${this.name} changed to:`, this.value);
+            });
+        });
+    } else {
+        console.error('Form not found! Check the form action attribute.');
+    }
+    
+    // Check for URL parameters to show messages
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('success')) {
+        console.log('Profile update was successful');
+    }
+    if (urlParams.has('error')) {
+        console.log('Profile update failed');
+    }
+});
+</script>

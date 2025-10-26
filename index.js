@@ -23,6 +23,8 @@ import adminRoute from "./src/routes/admin.route.js";
 import categoryRoute from "./src/routes/category.route.js";
 import enrollmentRoute from "./src/routes/enrollment.route.js";
 import feedbackRoute from "./src/routes/feedback.route.js";
+import instructorRoute from "./src/routes/instructor.route.js";
+
 
 
 // ==========================
@@ -60,7 +62,7 @@ app.set("views", "./src/views");
 // 📂 STATIC FILES
 // ==========================
 app.use(express.static(path.join(process.cwd(), "src/public")));
-app.use('/static', express.static(path.join(process.cwd(), "static")));
+app.use('/static', express.static(path.join(process.cwd(), "src/static")));
 
 // ==========================
 // 🧩 MIDDLEWARES
@@ -102,7 +104,7 @@ app.use("/enrollment", enrollmentRoute);
 app.use("/feedback", feedbackRoute);
 // Use admin route
 app.use("/admin", adminRoute);
-
+app.use("/instructor", instructorRoute);
 
 // ==========================
 // ❌ GLOBAL ERROR HANDLER

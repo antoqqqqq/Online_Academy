@@ -50,18 +50,119 @@
 
             {{!-- Thông tin giảng viên --}}
             <div class="instructor-info bg-white p-4 rounded shadow-sm mb-4">
-                <h5 class="mb-3">
-                    <i class="bi bi-person-circle"></i> Giảng viên
+                <h5 class="mb-4">
+                    <i class="bi bi-person-badge-fill text-primary"></i> Thông tin giảng viên
                 </h5>
-                <div class="d-flex align-items-center">
-                    <div class="instructor-avatar me-3">
-                        <i class="bi bi-person-circle fs-1 text-primary"></i>
+                <div class="row">
+                    {{!-- Instructor Basic Info --}}
+                    <div class="col-md-3 text-center">
+                        <div class="instructor-avatar mb-3">
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto border"
+                                style="width: 150px; height: 150px;">
+                                <i class="bi bi-person-fill text-muted" style="font-size: 3rem;"></i>
+                            </div>
+                        </div>
+                        
+                        {{!-- Instructor Stats --}}
+                        <div class="instructor-stats">
+                            <div class="stat-item mb-2">
+                                <div class="fw-bold text-primary fs-5">{{course.instructor_course_count}}</div>
+                                <small class="text-muted">Khóa học</small>
+                            </div>
+                            <div class="stat-item mb-2">
+                                <div class="fw-bold text-primary fs-5">{{course.instructor_student_count}}</div>
+                                <small class="text-muted">Học viên</small>
+                            </div>
+                            <div class="stat-item">
+                                <div class="fw-bold text-primary fs-5">{{course.instructor_rating}}</div>
+                                <small class="text-muted">Đánh giá</small>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h6 class="mb-0">{{course.instructor_name}}</h6>
-                        <small class="text-muted">Chuyên gia {{course.category_name}}</small>
+
+                    {{!-- Instructor Details --}}
+                    <div class="col-md-9">
+                        <div class="instructor-details">
+                            {{!-- Name and Expertise --}}
+                            <h4 class="instructor-name mb-2">{{course.instructor_name}}</h4>
+                            {{#if course.instructor_expertise}}
+                                <p class="instructor-expertise mb-3">
+                                    <span class="badge bg-primary">{{course.instructor_expertise}}</span>
+                                </p>
+                            {{/if}}
+
+                            {{!-- Bio --}}
+                            <div class="instructor-bio mb-4">
+                                {{#if course.instructor_bio}}
+                                    <p class="text-muted lh-base">{{course.instructor_bio}}</p>
+                                {{else}}
+                                    <p class="text-muted fst-italic">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Giảng viên chưa cập nhật thông tin giới thiệu.
+                                    </p>
+                                {{/if}}
+                            </div>
+
+                            {{!-- Teaching Experience --}}
+                            <div class="teaching-highlights">
+                                <h6 class="mb-3">Kinh nghiệm giảng dạy:</h6>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            <span>{{course.instructor_course_count}}+ khóa học</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            <span>{{course.instructor_student_count}}+ học viên</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                {{!-- Other Courses by This Instructor --}}
+                {{#if course.other_courses}}
+                <div class="other-courses mt-4 pt-4 border-top">
+                    <h6 class="mb-3">Các khóa học khác của giảng viên:</h6>
+                    <div class="row">
+                        {{#each course.other_courses}}
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                {{#if this.image_url}}
+                                <img src="{{this.image_url}}" alt="{{this.title}}" 
+                                    class="rounded me-3" 
+                                    style="width: 60px; height: 40px; object-fit: cover;"
+                                    onerror="this.onerror=null; this.src='/static/default/default-course.jpg'">
+                                {{else}}
+                                {{!-- Always show default image if no image_url --}}
+                                <img src="{{ensureImageUrl this.image_url}}" alt="{{this.title}}" 
+                                    class="rounded me-3" 
+                                    style="width: 60px; height: 40px; object-fit: cover;">
+                                {{/if}}
+                                <div class="course-info flex-grow-1">
+                                    <a href="/courses/{{this.course_id}}" class="text-decoration-none">
+                                        <h6 class="mb-0 text-dark small">{{this.title}}</h6>
+                                    </a>
+                                    <div class="d-flex align-items-center mt-1">
+                                        <small class="text-warning me-2">
+                                            <i class="bi bi-star-fill"></i> {{this.rating}}
+                                        </small>
+                                        <small class="text-muted">
+                                            <i class="bi bi-people-fill"></i> {{this.total_enrollment}}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+                {{/if}}
             </div>
 
             {{!-- Video lectures preview (nếu có) --}}
@@ -559,6 +660,96 @@ document.addEventListener('DOMContentLoaded', function() {
 .list-group-item:hover {
     border-left-color: #0d6efd;
     background-color: #f8f9fa;
+}
+
+.instructor-info {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-left: 4px solid #0d6efd;
+}
+
+.instructor-avatar img {
+    border: 4px solid #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.instructor-avatar img:hover {
+    transform: scale(1.05);
+}
+
+.instructor-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 0;
+    border-top: 1px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
+    margin: 15px 0;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.instructor-name {
+    color: #2c3e50;
+    font-weight: 700;
+}
+
+.instructor-expertise .badge {
+    font-size: 0.9em;
+    padding: 0.5em 1em;
+}
+
+.instructor-bio {
+    line-height: 1.8;
+    color: #555;
+}
+
+.social-buttons .btn {
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.social-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.teaching-highlights {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 3px solid #28a745;
+}
+
+.other-courses .course-info h6 {
+    transition: color 0.3s ease;
+}
+
+.other-courses .course-info:hover h6 {
+    color: #0d6efd !important;
+}
+
+.other-courses img {
+    transition: transform 0.3s ease;
+}
+
+.other-courses .d-flex:hover img {
+    transform: scale(1.1);
+}
+
+{{! Responsive design }}
+@media (max-width: 768px) {
+    .instructor-stats {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 }
 </style>
 
