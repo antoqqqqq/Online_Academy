@@ -94,10 +94,10 @@
                 <div class="card-header">
                     <ul class="nav nav-tabs card-header-tabs">
                         <li class="nav-item">
-                            <a class="nav-link instructor active" href="#course-info" data-bs-toggle="tab">Course Information</a>
+                            <a class="nav-link active editCourse-tab" href="#course-info" data-bs-toggle="tab">Course Information</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link instructor" href="#lectures" data-bs-toggle="tab">Lectures & Videos</a>
+                            <a class="nav-link editCourse-tab" href="#lectures" data-bs-toggle="tab">Lectures & Videos</a>
                         </li>
                     </ul>
                 </div>
@@ -170,28 +170,6 @@
                                                    name="current_price" value="{{course.current_price}}" 
                                                    min="0" step="1000">
                                         </div>
-                                    </div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="is_complete" 
-                                               name="is_complete" value="true" 
-                                               {{#if course.is_complete}}checked{{/if}}
-                                               {{#unless (eq completionPercentage 100)}}disabled{{/unless}}>
-                                        <label class="form-check-label" for="is_complete">
-                                            Mark course as complete
-                                            {{#unless (eq completionPercentage 100)}}
-                                                <small class="text-muted d-block">
-                                                    (Cannot mark incomplete - {{completionPercentage}}% complete)
-                                                    {{#if (eq completionPercentage 0)}}
-                                                        - Add videos to all lectures
-                                                    {{else}}
-                                                        - Some lectures are missing videos
-                                                    {{/if}}
-                                                </small>
-                                            {{/unless}}
-                                        </label>
                                     </div>
                                 </div>
 
