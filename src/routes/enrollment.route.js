@@ -3,7 +3,14 @@ import enrollmentController from "../controller/enrollment.controller.js";
 import { requireEnrollment, requireLogin } from "../middlewares/enrollment.mdw.js";
 
 const router = express.Router();
-
+async function Istudent(req,res) {
+    if(req.session.authUser.permission ===1){
+        return next();
+    }
+    alert("You are not student!!")
+    res.redirect('/');
+}
+router.use(Istudent);
 // Đăng ký khóa học
 router.post('/:id/enroll', requireLogin, enrollmentController.enroll);
 

@@ -207,7 +207,7 @@ router.post("/profile/changepassword", async (req, res) => {
     const userId = req.session.authUser.id;
     const currentPassword = req.body.currentPassword;
     const newPassword = req.body.newPassword;
-    const user = await accountModel.findById(userId);
+    const user = await accountModel.findUserById(userId);
     const isMatch = await bcrypt.compareSync(currentPassword, user.password);
     if (!isMatch) {
         return res.json({ success: false, err_message: "Current password is incorrect." });
