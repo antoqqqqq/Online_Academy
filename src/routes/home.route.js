@@ -3,6 +3,7 @@ const router = express.Router();
 import categoryModel from "../models/category.model.js";
 import homeController from "../controller/home.controller.js";
 import courseModel from "../models/course.model.js";
+import accoutModel from "../models/accout.model.js";
 // ==========================
 // CATEGORIES LOAD CHO MENU
 // ==========================
@@ -14,6 +15,22 @@ router.use(async function (req, res, next) {
     } catch (error) {
         // Lỗi sẽ được hiển thị ở đây!
         console.error("LỖI NGHIÊM TRỌNG KHI TẢI CATEGORIES:", error);
+        // Chuyển lỗi đến trang "Something went wrong" một cách tường minh
+        next(error);
+    }
+});
+router.use(async function (req, res, next) {
+    try {
+        if (req.session.authUser != null) {
+            const list = await accoutModel.findUserById(req.session.authUser.id);
+            req.session.authUser = list;
+        }
+
+
+        next();
+    } catch (error) {
+        // Lỗi sẽ được hiển thị ở đây!
+        console.error("LỖI NGHIÊM TRỌNG KHI TẢI USER:", error);
         // Chuyển lỗi đến trang "Something went wrong" một cách tường minh
         next(error);
     }
