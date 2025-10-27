@@ -139,5 +139,17 @@ export default {
         const l2 = await db('categoryL2').count('id as total');
         return Number(l1[0].total) + Number(l2[0].total);
     },
+
+    async findL2WithL1ById(l2Id) {
+        return db('categoryL2')
+            .join('categoryL1', 'categoryL2.categoryL1_id', 'categoryL1.id')
+            .where('categoryL2.id', l2Id)
+            .select(
+                'categoryL2.id',
+                'categoryL2.category_name as l2_name',
+                'categoryL1.category_name as l1_name' // Lấy tên L1
+            )
+            .first();
+    },
 }
 

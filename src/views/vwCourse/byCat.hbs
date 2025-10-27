@@ -1,4 +1,15 @@
 <!-- Course Grid -->
+<div class="container py-3">
+    <h3 class="mb-4">
+        Khóa học thuộc lĩnh vực:
+        {{#if l1_name}} {{!-- Kiểm tra xem có tên L1 không --}}
+            <span class="text-muted">{{l1_name}}</span> > {{l2_name}} {{!-- Hiển thị L1 > L2 --}}
+        {{else}}
+            {{l2_name}} {{!-- Chỉ hiển thị L2 nếu không có L1 (vd: Tất cả lĩnh vực) --}}
+        {{/if}}
+    </h3>
+</div>
+
 <link rel="stylesheet" href="/css/course_card.css">
 <div class="row g-4">
     {{#each courses}}

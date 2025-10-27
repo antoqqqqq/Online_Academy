@@ -2,6 +2,7 @@ import express from "express";
 import courseController from "../controller/course.controller.js";
 import courseModel from "../models/course.model.js";
 import lectureModel from "../models/lecture.model.js";
+import categoryModel from "../models/category.model.js";
 
 const router = express.Router();
 
@@ -76,6 +77,46 @@ router.post('/search', async function (req, res) {
             amount: 0,
             course_card_search: []
         });
+    }
+});
+
+router.get('/', async function (req, res) {
+    try {
+        const categoryId = 0; // Luôn là 0 để lấy tất cả
+        const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+        const limit = 8; // Hoặc số lượng bạn muốn hiển thị mỗi trang
+        const offset = (page - 1) * limit;
+
+        const l1_name = null; // Không có L1 cụ thể
+        const l2_name = "Tất cả lĩnh vực"; // Đặt tên L2
+
+        const courses = await courseModel.getCourseWithInstructorName(limit, offset, categoryId);
+        const total = await courseModel.countByCategory(categoryId);
+        const totalPages = Math.max(1, Math.ceil(total / limit));
+        const pages = Array.from({ length: totalPages }, (_, i) => ({
+            value: i + 1,
+            isCurrent: i + 1 === page
+        }));
+
+        // Sử dụng template byCat.hbs để hiển thị
+        res.render('vwCourse/byCat', {
+            layout: 'main',
+            title: 'Tất Cả Khóa Học', // Title cho trang
+            l1_name: l1_name,
+            l2_name: l2_name,
+            courses,
+            category_id: categoryId, // Truyền categoryId=0
+            pagination: {
+                currentPage: page,
+                totalPages,
+                hasPrev: page > 1,
+                hasNext: page < totalPages,
+                pages
+            }
+        });
+    } catch (err) {
+        console.error('Error in GET /courses:', err);
+        res.status(500).send('Server error');
     }
 });
 
