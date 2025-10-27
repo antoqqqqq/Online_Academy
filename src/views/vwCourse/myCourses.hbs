@@ -1,84 +1,100 @@
 {{!-- Trang "Khóa học của tôi" --}}
-<div class="container py-4">
+<div class="container py-2 mt-0">
+    {{!-- Header Section với gradient --}}
+    <div class="row mb-2">
+        <div class="col-12">
+            <div class="my-courses-header text-center py-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
+                <h1 class="display-6 fw-bold mb-2">
+                    <i class="bi bi-book me-2"></i>
+                    Khóa Học Của Tôi
+                </h1>
+                <p class="mb-0">Bạn đang học <span class="badge bg-light text-dark px-2 py-1">{{totalCourses}}</span> khóa học</p>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">
-                    <i class="bi bi-book"></i> Khóa học của tôi
-                </h2>
-                <span class="badge bg-primary fs-6">{{totalCourses}} khóa học</span>
-            </div>
 
             {{#if courses.length}}
             <div class="row g-4">
                 {{#each courses}}
                 <div class="col-lg-4 col-md-6">
-                    <div class="card course-card h-100">
-                        <img src="{{this.image_url}}" class="card-img-top" alt="{{this.title}}" 
-                             style="height: 200px; object-fit: cover;">
+                    <div class="card my-course-card h-100 shadow-sm">
+                        {{!-- Course Image với gradient overlay --}}
+                        <div class="course-image-container position-relative overflow-hidden" style="height: 180px;">
+                            <img src="{{this.image_url}}" class="card-img-top w-100 h-100" 
+                                 alt="{{this.title}}" 
+                                 style="object-fit: cover; transition: transform 0.3s ease;"
+                                 onerror="this.src='/static/default/default-course.jpg'">
+                            <div class="progress-overlay position-absolute bottom-0 start-0 end-0 p-2" 
+                                 style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);">
+                                <small class="text-white d-block mb-1">Tiến độ: {{this.progress.progressPercentage}}%</small>
+                                <div class="progress" style="height: 4px;">
+                                    <div class="progress-bar bg-success" 
+                                         style="width: {{this.progress.progressPercentage}}%"></div>
+                                </div>
+                            </div>
+                        </div>
                         
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">{{this.title}}</h5>
-                            <p class="card-text text-muted mb-2">
-                                <i class="fas fa-chalkboard-teacher"></i> {{this.instructor_name}}
-                            </p>
-                            <p class="card-text text-muted mb-3">
-                                <i class="fas fa-graduation-cap"></i> {{this.category_name}}
-                            </p>
-
-                            {{!-- Progress Bar --}}
-                            <div class="progress-section mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <small class="text-muted">Tiến độ học tập</small>
-                                    <small class="fw-bold text-primary">{{this.progress.progressPercentage}}%</small>
+                        <div class="card-body d-flex flex-column p-3">
+                            <h6 class="card-title fw-bold mb-2 text-truncate-2">{{this.title}}</h6>
+                            
+                            {{!-- Meta Info --}}
+                            <div class="course-meta mb-3">
+                                <div class="d-flex align-items-center mb-1">
+                                    <small class="text-muted">
+                                        <i class="fas fa-chalkboard-teacher me-1"></i> {{this.instructor_name}}
+                                    </small>
                                 </div>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-primary" role="progressbar" 
-                                         style="width: {{this.progress.progressPercentage}}%"
-                                         aria-valuenow="{{this.progress.progressPercentage}}" 
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
+                                <div class="d-flex align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-tag me-1"></i> {{this.category_name}}
+                                    </small>
                                 </div>
-                                <small class="text-muted">
-                                    {{this.progress.completedLectures}}/{{this.progress.totalLectures}} chương đã hoàn thành
-                                </small>
                             </div>
 
-                            {{!-- Course Stats --}}
-                            <div class="course-stats mb-3">
-                                <div class="row text-center">
+                            {{!-- Progress Stats --}}
+                            <div class="progress-stats mb-3 mt-auto">
+                                <div class="row text-center g-2">
                                     <div class="col-4">
-                                        <div class="stat-item">
-                                            <i class="bi bi-play-circle text-primary"></i>
-                                            <small class="d-block text-muted">{{this.progress.totalLectures}}</small>
-                                            <small class="d-block fw-bold">Chương</small>
+                                        <div class="stat-box">
+                                            <i class="bi bi-play-circle-fill text-primary fs-4"></i>
+                                            <div class="mt-1">
+                                                <small class="text-muted d-block">Tổng</small>
+                                                <strong>{{this.progress.totalLectures}}</strong>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-4">
-                                        <div class="stat-item">
-                                            <i class="bi bi-check-circle text-success"></i>
-                                            <small class="d-block text-muted">{{this.progress.completedLectures}}</small>
-                                            <small class="d-block fw-bold">Hoàn thành</small>
+                                        <div class="stat-box">
+                                            <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                                            <div class="mt-1">
+                                                <small class="text-muted d-block">Hoàn thành</small>
+                                                <strong>{{this.progress.completedLectures}}</strong>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-4">
-                                        <div class="stat-item">
-                                            <i class="bi bi-calendar text-info"></i>
-                                            <small class="d-block text-muted">{{format_date this.enrolled_at}}</small>
-                                            <small class="d-block fw-bold">Đăng ký</small>
+                                        <div class="stat-box">
+                                            <i class="bi bi-calendar-event text-info fs-4"></i>
+                                            <div class="mt-1">
+                                                <small class="text-muted d-block">Ngày</small>
+                                                <small class="fw-bold">{{format_date this.enrolled_at}}</small>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="card-footer bg-transparent border-top-0">
+                        <div class="card-footer bg-transparent border-top-0 p-3">
                             <div class="d-grid gap-2">
                                 <a href="/enrollment/{{this.course_id}}/learn" class="btn btn-primary">
-                                    <i class="bi bi-play-circle"></i> Tiếp tục học
+                                    <i class="bi bi-play-circle me-2"></i> Tiếp tục học
                                 </a>
-                                <a href="/courses/{{this.course_id}}" class="btn btn-outline-secondary btn-sm">
-                                    <i class="bi bi-eye"></i> Xem chi tiết
+                                <a href="/courses/{{this.course_id}}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-eye me-2"></i> Xem chi tiết
                                 </a>
                             </div>
                         </div>
@@ -119,14 +135,16 @@
             {{else}}
             {{!-- Empty State --}}
             <div class="text-center py-5">
-                <div class="empty-state">
-                    <i class="bi bi-book display-1 text-muted mb-3"></i>
-                    <h4 class="text-muted mb-3">Bạn chưa có khóa học nào</h4>
+                <div class="empty-state-card">
+                    <div class="empty-icon mb-4">
+                        <i class="bi bi-book" style="font-size: 5rem; color: #ddd;"></i>
+                    </div>
+                    <h3 class="text-dark mb-3">Bạn chưa có khóa học nào</h3>
                     <p class="text-muted mb-4">
                         Hãy khám phá các khóa học thú vị và đăng ký để bắt đầu học tập!
                     </p>
-                    <a href="/courses" class="btn btn-primary btn-lg">
-                        <i class="bi bi-search"></i> Khám phá khóa học
+                    <a href="/courses" class="btn btn-lg btn-primary px-5">
+                        <i class="bi bi-search me-2"></i> Khám phá khóa học
                     </a>
                 </div>
             </div>
@@ -136,50 +154,116 @@
 </div>
 
 <style>
-.course-card {
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 1px solid rgba(0, 0, 0, .125);
+/* My Courses Header */
+.my-courses-header {
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
 }
 
-.course-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+/* My Course Card */
+.my-course-card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.progress-section {
-    background-color: #f8f9fa;
+.my-course-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+.my-course-card:hover img {
+    transform: scale(1.05);
+}
+
+/* Image Container */
+.course-image-container {
+    border-radius: 12px 12px 0 0;
+}
+
+.progress-overlay {
+    z-index: 1;
+}
+
+/* Truncate 2 lines */
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 48px;
+}
+
+/* Meta Info */
+.course-meta {
+    font-size: 0.9rem;
+}
+
+/* Progress Stats */
+.progress-stats {
+    background: #f8f9fa;
     padding: 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid #e9ecef;
+    border-radius: 8px;
 }
 
-.stat-item {
+.stat-box {
     padding: 0.5rem;
 }
 
-.stat-item i {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
+.stat-box i {
+    margin-bottom: 0.25rem;
 }
 
-.empty-state {
-    max-width: 400px;
-    margin: 0 auto;
+.stat-box strong,
+.stat-box small {
+    font-size: 0.85rem;
 }
 
+/* Empty State */
+.empty-state-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    padding: 60px 30px;
+}
+
+.empty-icon i {
+    opacity: 0.3;
+}
+
+/* Card Footer */
+.my-course-card .card-footer {
+    background: #f8f9fa;
+}
+
+/* Pagination */
 .pagination .page-link {
     color: #333;
-    border-color: #dee2e6;
-}
-
-.pagination .page-item.active .page-link {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
+    border: 1px solid #dee2e6;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
 }
 
 .pagination .page-link:hover {
-    color: #0d6efd;
-    background-color: #e9ecef;
-    border-color: #dee2e6;
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #764ba2;
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .my-courses-header h1 {
+        font-size: 2rem !important;
+    }
+    
+    .my-courses-header .lead {
+        font-size: 1rem !important;
+    }
 }
 </style>
