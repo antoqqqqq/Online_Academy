@@ -5,14 +5,14 @@
         <div class="col-lg-8">
             {{!-- Ảnh đại diện --}}
             <div class="course-thumbnail mb-4">
-                <img src="{{course.image_url}}" alt="{{course.title}}" class="img-fluid rounded shadow-sm w-100" 
-                     style="max-height: 400px; object-fit: cover;">
+                <img src="{{course.image_url}}" alt="{{course.title}}" class="img-fluid rounded shadow-sm w-100"
+                    style="max-height: 400px; object-fit: cover;">
             </div>
 
             {{!-- Thông tin cơ bản --}}
             <div class="course-info bg-white p-4 rounded shadow-sm mb-4">
                 <h1 class="course-title mb-3">{{course.title}}</h1>
-                
+
                 {{!-- Lĩnh vực --}}
                 <div class="mb-3">
                     <span class="badge bg-primary">{{course.category_name}}</span>
@@ -38,13 +38,44 @@
                 {{!-- Mô tả ngắn --}}
                 <div class="course-short-description mb-4">
                     <h5>Giới thiệu</h5>
-                    <p class="text-muted">{{course.short_description}}</p>
+                    <p>{{course.description}}</p>
                 </div>
 
                 {{!-- Mô tả chi tiết --}}
                 <div class="course-description">
                     <h5>Nội dung khóa học</h5>
-                    <p>{{course.description}}</p>
+                    {{#if course.full_description.overview}}
+                    <div class="mb-4">
+                        <p></p>
+                        <h5>📘 Tổng quan</h5>
+                        <p>{{course.full_description.overview}}</p>
+                        <p>Độ khó: {{course.level}}</p>
+                        <p>Số giờ: {{course.total_hours}}</p>
+                        <p>Số lớp: {{course.total_lectures}}</p>
+                    </div>
+                    {{/if}}
+
+                    {{#if course.full_description.what_you_will_learn}}
+                    <div class="mb-4">
+                        <h5>🎯 Bạn sẽ học được gì</h5>
+                        <ul>
+                            {{#each course.full_description.what_you_will_learn}}
+                            <li>{{this}}</li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                    {{/if}}
+
+                    {{#if course.full_description.requirements}}
+                    <div class="mb-4">
+                        <h5>🧰 Yêu cầu</h5>
+                        <ul>
+                            {{#each course.full_description.requirements}}
+                            <li>{{this}}</li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                    {{/if}}
                 </div>
             </div>
 
@@ -62,7 +93,7 @@
                                 <i class="bi bi-person-fill text-muted" style="font-size: 3rem;"></i>
                             </div>
                         </div>
-                        
+
                         {{!-- Instructor Stats --}}
                         <div class="instructor-stats">
                             <div class="stat-item mb-2">
@@ -86,20 +117,20 @@
                             {{!-- Name and Expertise --}}
                             <h4 class="instructor-name mb-2">{{course.instructor_name}}</h4>
                             {{#if course.instructor_expertise}}
-                                <p class="instructor-expertise mb-3">
-                                    <span class="badge bg-primary">{{course.instructor_expertise}}</span>
-                                </p>
+                            <p class="instructor-expertise mb-3">
+                                <span class="badge bg-primary">{{course.instructor_expertise}}</span>
+                            </p>
                             {{/if}}
 
                             {{!-- Bio --}}
                             <div class="instructor-bio mb-4">
                                 {{#if course.instructor_bio}}
-                                    <p class="text-muted lh-base">{{course.instructor_bio}}</p>
+                                <p class="text-muted lh-base">{{course.instructor_bio}}</p>
                                 {{else}}
-                                    <p class="text-muted fst-italic">
-                                        <i class="bi bi-info-circle me-1"></i>
-                                        Giảng viên chưa cập nhật thông tin giới thiệu.
-                                    </p>
+                                <p class="text-muted fst-italic">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Giảng viên chưa cập nhật thông tin giới thiệu.
+                                </p>
                                 {{/if}}
                             </div>
 
@@ -134,18 +165,16 @@
                         <div class="col-md-6 mb-3">
                             <div class="d-flex align-items-center">
                                 {{#if this.image_url}}
-                                <img src="{{this.image_url}}" alt="{{this.title}}" 
-                                    class="rounded me-3" 
+                                <img src="{{this.image_url}}" alt="{{this.title}}" class="rounded me-3"
                                     style="width: 60px; height: 40px; object-fit: cover;"
                                     onerror="this.onerror=null; this.src='/static/default/default-course.jpg'">
                                 {{else}}
                                 {{!-- Always show default image if no image_url --}}
-                                <img src="{{ensureImageUrl this.image_url}}" alt="{{this.title}}" 
-                                    class="rounded me-3" 
+                                <img src="{{ensureImageUrl this.image_url}}" alt="{{this.title}}" class="rounded me-3"
                                     style="width: 60px; height: 40px; object-fit: cover;">
                                 {{/if}}
                                 <div class="course-info flex-grow-1">
-                                    <a href="/courses/{{this.course_id}}" class="text-decoration-none">
+                                    <a href="/courses/details?id={{this.course_id}}" class="text-decoration-none">
                                         <h6 class="mb-0 text-dark small">{{this.title}}</h6>
                                     </a>
                                     <div class="d-flex align-items-center mt-1">
@@ -195,25 +224,25 @@
                         Đánh giá & Phản hồi
                     </h5>
                     {{#if isLoggedIn}}
-                        {{#if isEnrolled}}
-                            {{#if studentFeedback}}
-                                <a href="/feedback/{{course.course_id}}" class="btn btn-outline-warning btn-sm">
-                                    <i class="bi bi-pencil"></i> Chỉnh sửa đánh giá
-                                </a>
-                            {{else}}
-                                <a href="/feedback/{{course.course_id}}" class="btn btn-primary btn-sm">
-                                    <i class="bi bi-star"></i> Đánh giá khóa học
-                                </a>
-                            {{/if}}
-                        {{else}}
-                            <span class="text-muted small">
-                                <i class="bi bi-info-circle"></i> Đăng ký học để đánh giá
-                            </span>
-                        {{/if}}
+                    {{#if isEnrolled}}
+                    {{#if studentFeedback}}
+                    <a href="/feedback/{{course.course_id}}" class="btn btn-outline-warning btn-sm">
+                        <i class="bi bi-pencil"></i> Chỉnh sửa đánh giá
+                    </a>
                     {{else}}
-                        <a href="/account/signin" class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-box-arrow-in-right"></i> Đăng nhập để đánh giá
-                        </a>
+                    <a href="/feedback/{{course.course_id}}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-star"></i> Đánh giá khóa học
+                    </a>
+                    {{/if}}
+                    {{else}}
+                    <span class="text-muted small">
+                        <i class="bi bi-info-circle"></i> Đăng ký học để đánh giá
+                    </span>
+                    {{/if}}
+                    {{else}}
+                    <a href="/account/signin" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-box-arrow-in-right"></i> Đăng nhập để đánh giá
+                    </a>
                     {{/if}}
                 </div>
 
@@ -225,10 +254,10 @@
                             <h2 class="text-primary mb-0">{{ratingStats.average_rating}}</h2>
                             <div class="stars mb-2">
                                 {{#times (parseInt ratingStats.average_rating)}}
-                                    <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star-fill text-warning"></i>
                                 {{/times}}
                                 {{#times (subtract 5 (parseInt ratingStats.average_rating))}}
-                                    <i class="bi bi-star text-muted"></i>
+                                <i class="bi bi-star text-muted"></i>
                                 {{/times}}
                             </div>
                             <small class="text-muted">{{ratingStats.total_reviews}} đánh giá</small>
@@ -237,15 +266,17 @@
                     <div class="col-md-8">
                         <div class="rating-breakdown">
                             {{#each ratingStats}}
-                                {{#if (and (gte this 0) (lt @index 5))}}
-                                <div class="d-flex align-items-center mb-2">
-                                    <span class="me-2">{{subtract 5 @index}} sao</span>
-                                    <div class="progress flex-grow-1 me-2" style="height: 8px;">
-                                        <div class="progress-bar bg-warning" style="width: {{divide (multiply this 100) ../ratingStats.total_reviews}}%"></div>
+                            {{#if (and (gte this 0) (lt @index 5))}}
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="me-2">{{subtract 5 @index}} sao</span>
+                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                    <div class="progress-bar bg-warning"
+                                        style="width: {{divide (multiply this 100) ../ratingStats.total_reviews}}%">
                                     </div>
-                                    <small class="text-muted">{{this}}</small>
                                 </div>
-                                {{/if}}
+                                <small class="text-muted">{{this}}</small>
+                            </div>
+                            {{/if}}
                             {{/each}}
                         </div>
                     </div>
@@ -264,10 +295,10 @@
                     </div>
                     <div class="stars mb-2">
                         {{#times studentFeedback.rating}}
-                            <i class="bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
                         {{/times}}
                         {{#times (subtract 5 studentFeedback.rating)}}
-                            <i class="bi bi-star text-muted"></i>
+                        <i class="bi bi-star text-muted"></i>
                         {{/times}}
                     </div>
                     <p class="mb-0">{{studentFeedback.feedback}}</p>
@@ -279,33 +310,33 @@
                 <div class="feedbacks-list">
                     <h6 class="mb-3">Đánh giá từ học viên khác</h6>
                     {{#each courseFeedbacks}}
-                        {{!-- Tạm thời hiển thị tất cả đánh giá để debug --}}
-                        {{#unless (and ../studentFeedback (eq this.student ../studentFeedback.student))}}
-                        <div class="feedback-item mb-3 p-3 border rounded">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div class="d-flex align-items-center">
-                                    <div class="student-avatar me-2">
-                                        <i class="bi bi-person-circle text-primary fs-4"></i>
-                                    </div>
-                                    <div>
-                                        <strong class="d-block">{{this.student_name}}</strong>
-                                        <small class="text-muted">{{format_datetime this.created_at}}</small>
-                                    </div>
+                    {{!-- Tạm thời hiển thị tất cả đánh giá để debug --}}
+                    {{#unless (and ../studentFeedback (eq this.student ../studentFeedback.student))}}
+                    <div class="feedback-item mb-3 p-3 border rounded">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="student-avatar me-2">
+                                    <i class="bi bi-person-circle text-primary fs-4"></i>
                                 </div>
-                                <div class="stars">
-                                    {{#times this.rating}}
-                                        <i class="bi bi-star-fill text-warning"></i>
-                                    {{/times}}
-                                    {{#times (subtract 5 this.rating)}}
-                                        <i class="bi bi-star text-muted"></i>
-                                    {{/times}}
+                                <div>
+                                    <strong class="d-block">{{this.student_name}}</strong>
+                                    <small class="text-muted">{{format_datetime this.created_at}}</small>
                                 </div>
                             </div>
-                            <p class="mb-0">{{this.feedback}}</p>
+                            <div class="stars">
+                                {{#times this.rating}}
+                                <i class="bi bi-star-fill text-warning"></i>
+                                {{/times}}
+                                {{#times (subtract 5 this.rating)}}
+                                <i class="bi bi-star text-muted"></i>
+                                {{/times}}
+                            </div>
                         </div>
-                        {{/unless}}
+                        <p class="mb-0">{{this.feedback}}</p>
+                    </div>
+                    {{/unless}}
                     {{/each}}
-                    
+
                     {{#if (gt ratingStats.total_reviews 5)}}
                     <div class="text-center mt-3">
                         <button class="btn btn-outline-primary btn-sm" onclick="loadMoreFeedbacks()">
@@ -329,59 +360,59 @@
                 {{!-- Giá --}}
                 <div class="course-price mb-4">
                     {{#if course.discount_price}}
-                        <div class="d-flex align-items-center">
-                            <h2 class="text-danger mb-0 me-3">{{format_money course.discount_price}}</h2>
-                            <del class="text-muted">{{format_money course.current_price}}</del>
-                        </div>
-                        <div class="mt-2">
-                            <span class="badge bg-danger">
-                                Giảm {{subtract (divide (subtract course.current_price course.discount_price) course.current_price) 100}}%
-                            </span>
-                        </div>
+                    <div class="d-flex align-items-center">
+                        <h2 class="text-danger mb-0 me-3">{{format_money course.discount_price}}</h2>
+                        <del class="text-muted">{{format_money course.current_price}}</del>
+                    </div>
+                    <div class="mt-2">
+                        <span class="badge bg-danger">
+                            Giảm {{subtract (divide (subtract course.current_price course.discount_price)
+                            course.current_price) 100}}%
+                        </span>
+                    </div>
                     {{else}}
-                        <h2 class="text-primary mb-0">{{format_money course.current_price}}</h2>
+                    <h2 class="text-primary mb-0">{{format_money course.current_price}}</h2>
                     {{/if}}
                 </div>
 
                 {{!-- Nút Watchlist - TÍNH NĂNG CHÍNH --}}
                 {{#if isLoggedIn}}
-                    <button id="btnWatchlist" class="btn btn-outline-danger w-100 mb-3" 
-                            data-course-id="{{course.course_id}}"
-                            data-in-watchlist="{{isInWatchlist}}">
-                        <i class="bi {{#if isInWatchlist}}bi-heart-fill{{else}}bi-heart{{/if}}"></i>
-                        <span id="watchlistText">
-                            {{#if isInWatchlist}}
-                                Đã thêm vào yêu thích
-                            {{else}}
-                                Thêm vào yêu thích
-                            {{/if}}
-                        </span>
-                    </button>
+                <button id="btnWatchlist" class="btn btn-outline-danger w-100 mb-3"
+                    data-course-id="{{course.course_id}}" data-in-watchlist="{{isInWatchlist}}">
+                    <i class="bi {{#if isInWatchlist}}bi-heart-fill{{else}}bi-heart{{/if}}"></i>
+                    <span id="watchlistText">
+                        {{#if isInWatchlist}}
+                        Đã thêm vào yêu thích
+                        {{else}}
+                        Thêm vào yêu thích
+                        {{/if}}
+                    </span>
+                </button>
                 {{else}}
-                    <a href="/account/signin" class="btn btn-outline-danger w-100 mb-3">
-                        <i class="bi bi-heart"></i>
-                        Đăng nhập để thêm vào yêu thích
-                    </a>
+                <a href="/account/signin" class="btn btn-outline-danger w-100 mb-3">
+                    <i class="bi bi-heart"></i>
+                    Đăng nhập để thêm vào yêu thích
+                </a>
                 {{/if}}
 
                 {{!-- Nút đăng ký học --}}
                 {{#if isLoggedIn}}
-                    {{#if isEnrolled}}
-                        <a href="/courses/{{course.course_id}}/lecture/{{course.first_lecture_id}}" class="btn btn-success w-100 mb-3">
-                            <i class="bi bi-play-circle"></i>
-                            Tiếp tục học
-                        </a>
-                        <a href="/enrollment/my-courses" class="btn btn-outline-primary w-100 mb-3">
-                            <i class="bi bi-list-ul"></i>
-                            Khóa học của tôi
-                        </a>
-                    {{else}}
-                        <button id="enrollBtn" class="btn btn-primary w-100 mb-3" 
-                                data-course-id="{{course.course_id}}">
-                            <i class="bi bi-cart-plus"></i>
-                            Đăng ký học ngay
-                        </button>
-                    {{/if}}
+                {{#if isEnrolled}}
+                <a href="/courses/{{course.course_id}}/lecture/{{course.first_lecture_id}}"
+                    class="btn btn-success w-100 mb-3">
+                    <i class="bi bi-play-circle"></i>
+                    Tiếp tục học
+                </a>
+                <a href="/enrollment/my-courses" class="btn btn-outline-primary w-100 mb-3">
+                    <i class="bi bi-list-ul"></i>
+                    Khóa học của tôi
+                </a>
+                {{else}}
+                <button id="enrollBtn" class="btn btn-primary w-100 mb-3" data-course-id="{{course.course_id}}">
+                    <i class="bi bi-cart-plus"></i>
+                    Đăng ký học ngay
+                </button>
+                {{/if}}
                 {{else}}
                 <a href="/account/signin" class="btn btn-primary w-100 mb-3">
                     <i class="bi bi-cart-plus"></i>
@@ -420,188 +451,188 @@
 
 {{!-- JavaScript cho Watchlist và Enrollment --}}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const btnWatchlist = document.getElementById('btnWatchlist');
-    const enrollBtn = document.getElementById('enrollBtn');
-    
-    if (btnWatchlist) {
-        btnWatchlist.addEventListener('click', async function() {
-            const courseId = this.dataset.courseId;
-            const isInWatchlist = this.dataset.inWatchlist === 'true';
-            
-            try {
-                // Disable button
-                btnWatchlist.disabled = true;
-                
-                // Gọi API
-                const response = await fetch(`/courses/${courseId}/watchlist/toggle`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Update UI
-                    const icon = btnWatchlist.querySelector('i');
-                    const text = btnWatchlist.querySelector('#watchlistText');
-                    
-                    if (data.isInWatchlist) {
-                        icon.className = 'bi bi-heart-fill';
-                        text.textContent = 'Đã thêm vào yêu thích';
-                        btnWatchlist.dataset.inWatchlist = 'true';
-                    } else {
-                        icon.className = 'bi bi-heart';
-                        text.textContent = 'Thêm vào yêu thích';
-                        btnWatchlist.dataset.inWatchlist = 'false';
-                    }
-                    
-                    // Hiển thị thông báo
-                    showToast(data.message, 'success');
-                } else {
-                    if (data.requireLogin) {
-                        window.location.href = '/account/signin';
-                    } else {
-                        showToast(data.message, 'error');
-                    }
-                }
-            } catch (error) {
-                console.error('Lỗi:', error);
-                showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
-            } finally {
-                btnWatchlist.disabled = false;
-            }
-        });
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+        const btnWatchlist = document.getElementById('btnWatchlist');
+        const enrollBtn = document.getElementById('enrollBtn');
 
-    // Xử lý đăng ký khóa học
-    if (enrollBtn) {
-        enrollBtn.addEventListener('click', async function() {
-            const courseId = this.dataset.courseId;
-            
-            try {
-                // Disable button
-                enrollBtn.disabled = true;
-                enrollBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang xử lý...';
-                
-                // Gọi API đăng ký
-                const response = await fetch(`/enrollment/${courseId}/enroll`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showToast(data.message, 'success');
-                    
-                    // Cập nhật UI
-                    enrollBtn.innerHTML = '<i class="bi bi-check-circle"></i> Đã đăng ký';
-                    enrollBtn.className = 'btn btn-success w-100 mb-3';
-                    enrollBtn.disabled = true;
-                    
-                    // Thêm nút "Bắt đầu học"
-                    const startLearningBtn = document.createElement('a');
-                    startLearningBtn.href = `/enrollment/${courseId}/learn`;
-                    startLearningBtn.className = 'btn btn-primary w-100 mb-3';
-                    startLearningBtn.innerHTML = '<i class="bi bi-play-circle"></i> Bắt đầu học';
-                    
-                    enrollBtn.parentNode.insertBefore(startLearningBtn, enrollBtn.nextSibling);
-                    
-                } else {
-                    if (data.requireLogin) {
-                        showToast(data.message, 'error');
-                        setTimeout(() => {
-                            window.location.href = '/account/signin';
-                        }, 1500);
-                    } else {
-                        showToast(data.message, 'error');
-                    }
-                }
-            } catch (error) {
-                console.error('Lỗi:', error);
-                showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
-            } finally {
-                if (enrollBtn.disabled !== true) {
-                    enrollBtn.disabled = false;
-                    enrollBtn.innerHTML = '<i class="bi bi-cart-plus"></i> Đăng ký học ngay';
-                }
-            }
-        });
-    }
-    
-    // Hàm hiển thị toast notification
-    function showToast(message, type = 'info') {
-        // Tạo toast element
-        const toast = document.createElement('div');
-        toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed top-0 start-50 translate-middle-x mt-3`;
-        toast.style.zIndex = '9999';
-        toast.textContent = message;
-        
-        document.body.appendChild(toast);
-        
-        // Tự động xóa sau 3 giây
-        setTimeout(() => {
-            toast.remove();
-        }, 3000);
-    }
+        if (btnWatchlist) {
+            btnWatchlist.addEventListener('click', async function () {
+                const courseId = this.dataset.courseId;
+                const isInWatchlist = this.dataset.inWatchlist === 'true';
 
-    // Hàm load thêm đánh giá
-    window.loadMoreFeedbacks = async function() {
-        try {
-            const button = document.querySelector('[onclick="loadMoreFeedbacks()"]');
-            if (button) {
-                button.disabled = true;
-                button.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang tải...';
-            }
+                try {
+                    // Disable button
+                    btnWatchlist.disabled = true;
 
-            const response = await fetch(`/feedback/{{course.course_id}}/list?page=2&limit=10`);
-            const result = await response.json();
-
-            if (result.success && result.data.feedbacks.length > 0) {
-                // Thêm đánh giá mới vào DOM
-                const feedbacksList = document.querySelector('.feedbacks-list');
-                if (feedbacksList) {
-                    result.data.feedbacks.forEach(feedback => {
-                        const feedbackElement = createFeedbackElement(feedback);
-                        feedbacksList.appendChild(feedbackElement);
+                    // Gọi API
+                    const response = await fetch(`/courses/${courseId}/watchlist/toggle`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
                     });
 
-                    // Ẩn nút "Xem thêm" nếu đã load hết
-                    if (result.data.feedbacks.length < 10) {
-                        const loadMoreBtn = document.querySelector('[onclick="loadMoreFeedbacks()"]');
-                        if (loadMoreBtn) {
-                            loadMoreBtn.style.display = 'none';
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Update UI
+                        const icon = btnWatchlist.querySelector('i');
+                        const text = btnWatchlist.querySelector('#watchlistText');
+
+                        if (data.isInWatchlist) {
+                            icon.className = 'bi bi-heart-fill';
+                            text.textContent = 'Đã thêm vào yêu thích';
+                            btnWatchlist.dataset.inWatchlist = 'true';
+                        } else {
+                            icon.className = 'bi bi-heart';
+                            text.textContent = 'Thêm vào yêu thích';
+                            btnWatchlist.dataset.inWatchlist = 'false';
+                        }
+
+                        // Hiển thị thông báo
+                        showToast(data.message, 'success');
+                    } else {
+                        if (data.requireLogin) {
+                            window.location.href = '/account/signin';
+                        } else {
+                            showToast(data.message, 'error');
                         }
                     }
+                } catch (error) {
+                    console.error('Lỗi:', error);
+                    showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
+                } finally {
+                    btnWatchlist.disabled = false;
                 }
-            } else {
-                showToast('Không có thêm đánh giá nào', 'info');
-            }
-        } catch (error) {
-            console.error('Error loading more feedbacks:', error);
-            showToast('Có lỗi xảy ra khi tải đánh giá', 'error');
-        } finally {
-            const button = document.querySelector('[onclick="loadMoreFeedbacks()"]');
-            if (button) {
-                button.disabled = false;
-                button.innerHTML = '<i class="bi bi-arrow-down"></i> Xem thêm đánh giá';
-            }
+            });
         }
-    };
 
-    // Hàm tạo element đánh giá
-    function createFeedbackElement(feedback) {
-        const div = document.createElement('div');
-        div.className = 'feedback-item mb-3 p-3 border rounded';
-        
-        const stars = '★'.repeat(feedback.rating) + '☆'.repeat(5 - feedback.rating);
-        
-        div.innerHTML = `
+        // Xử lý đăng ký khóa học
+        if (enrollBtn) {
+            enrollBtn.addEventListener('click', async function () {
+                const courseId = this.dataset.courseId;
+
+                try {
+                    // Disable button
+                    enrollBtn.disabled = true;
+                    enrollBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang xử lý...';
+
+                    // Gọi API đăng ký
+                    const response = await fetch(`/enrollment/${courseId}/enroll`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showToast(data.message, 'success');
+
+                        // Cập nhật UI
+                        enrollBtn.innerHTML = '<i class="bi bi-check-circle"></i> Đã đăng ký';
+                        enrollBtn.className = 'btn btn-success w-100 mb-3';
+                        enrollBtn.disabled = true;
+
+                        // Thêm nút "Bắt đầu học"
+                        const startLearningBtn = document.createElement('a');
+                        startLearningBtn.href = `/enrollment/${courseId}/learn`;
+                        startLearningBtn.className = 'btn btn-primary w-100 mb-3';
+                        startLearningBtn.innerHTML = '<i class="bi bi-play-circle"></i> Bắt đầu học';
+
+                        enrollBtn.parentNode.insertBefore(startLearningBtn, enrollBtn.nextSibling);
+
+                    } else {
+                        if (data.requireLogin) {
+                            showToast(data.message, 'error');
+                            setTimeout(() => {
+                                window.location.href = '/account/signin';
+                            }, 1500);
+                        } else {
+                            showToast(data.message, 'error');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Lỗi:', error);
+                    showToast('Có lỗi xảy ra, vui lòng thử lại', 'error');
+                } finally {
+                    if (enrollBtn.disabled !== true) {
+                        enrollBtn.disabled = false;
+                        enrollBtn.innerHTML = '<i class="bi bi-cart-plus"></i> Đăng ký học ngay';
+                    }
+                }
+            });
+        }
+
+        // Hàm hiển thị toast notification
+        function showToast(message, type = 'info') {
+            // Tạo toast element
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed top-0 start-50 translate-middle-x mt-3`;
+            toast.style.zIndex = '9999';
+            toast.textContent = message;
+
+            document.body.appendChild(toast);
+
+            // Tự động xóa sau 3 giây
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Hàm load thêm đánh giá
+        window.loadMoreFeedbacks = async function () {
+            try {
+                const button = document.querySelector('[onclick="loadMoreFeedbacks()"]');
+                if (button) {
+                    button.disabled = true;
+                    button.innerHTML = '<i class="bi bi-hourglass-split"></i> Đang tải...';
+                }
+
+                const response = await fetch(`/feedback/{{course.course_id}}/list?page=2&limit=10`);
+                const result = await response.json();
+
+                if (result.success && result.data.feedbacks.length > 0) {
+                    // Thêm đánh giá mới vào DOM
+                    const feedbacksList = document.querySelector('.feedbacks-list');
+                    if (feedbacksList) {
+                        result.data.feedbacks.forEach(feedback => {
+                            const feedbackElement = createFeedbackElement(feedback);
+                            feedbacksList.appendChild(feedbackElement);
+                        });
+
+                        // Ẩn nút "Xem thêm" nếu đã load hết
+                        if (result.data.feedbacks.length < 10) {
+                            const loadMoreBtn = document.querySelector('[onclick="loadMoreFeedbacks()"]');
+                            if (loadMoreBtn) {
+                                loadMoreBtn.style.display = 'none';
+                            }
+                        }
+                    }
+                } else {
+                    showToast('Không có thêm đánh giá nào', 'info');
+                }
+            } catch (error) {
+                console.error('Error loading more feedbacks:', error);
+                showToast('Có lỗi xảy ra khi tải đánh giá', 'error');
+            } finally {
+                const button = document.querySelector('[onclick="loadMoreFeedbacks()"]');
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = '<i class="bi bi-arrow-down"></i> Xem thêm đánh giá';
+                }
+            }
+        };
+
+        // Hàm tạo element đánh giá
+        function createFeedbackElement(feedback) {
+            const div = document.createElement('div');
+            div.className = 'feedback-item mb-3 p-3 border rounded';
+
+            const stars = '★'.repeat(feedback.rating) + '☆'.repeat(5 - feedback.rating);
+
+            div.innerHTML = `
             <div class="d-flex justify-content-between align-items-start mb-2">
                 <div class="d-flex align-items-center">
                     <div class="student-avatar me-2">
@@ -619,137 +650,141 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <p class="mb-0">${feedback.feedback}</p>
         `;
-        
-        return div;
-    }
-});
+
+            return div;
+        }
+    });
 </script>
 
 <style>
-.sticky-top {
-    position: sticky;
-}
+    .sticky-top {
+        position: sticky;
+    }
 
-.course-thumbnail img {
-    border: 1px solid #ddd;
-}
+    .course-thumbnail img {
+        border: 1px solid #ddd;
+    }
 
-.course-info,
-.instructor-info,
-.course-videos,
-.course-sidebar {
-    transition: box-shadow 0.3s ease;
-}
+    .course-info,
+    .instructor-info,
+    .course-videos,
+    .course-sidebar {
+        transition: box-shadow 0.3s ease;
+    }
 
-.course-info:hover,
-.instructor-info:hover,
-.course-videos:hover {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
-}
+    .course-info:hover,
+    .instructor-info:hover,
+    .course-videos:hover {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    }
 
-#btnWatchlist:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
+    #btnWatchlist:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
 
-.list-group-item {
-    border-left: 3px solid transparent;
-    transition: all 0.3s ease;
-}
+    .list-group-item {
+        border-left: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
 
-.list-group-item:hover {
-    border-left-color: #0d6efd;
-    background-color: #f8f9fa;
-}
+    .list-group-item:hover {
+        border-left-color: #0d6efd;
+        background-color: #f8f9fa;
+    }
 
-.instructor-info {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    border-left: 4px solid #0d6efd;
-}
+    .instructor-info {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-left: 4px solid #0d6efd;
+    }
 
-.instructor-avatar img {
-    border: 4px solid #fff;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-}
+    .instructor-avatar img {
+        border: 4px solid #fff;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
 
-.instructor-avatar img:hover {
-    transform: scale(1.05);
-}
+    .instructor-avatar img:hover {
+        transform: scale(1.05);
+    }
 
-.instructor-stats {
-    display: flex;
-    justify-content: space-around;
-    padding: 15px 0;
-    border-top: 1px solid #e9ecef;
-    border-bottom: 1px solid #e9ecef;
-    margin: 15px 0;
-}
-
-.stat-item {
-    text-align: center;
-}
-
-.instructor-name {
-    color: #2c3e50;
-    font-weight: 700;
-}
-
-.instructor-expertise .badge {
-    font-size: 0.9em;
-    padding: 0.5em 1em;
-}
-
-.instructor-bio {
-    line-height: 1.8;
-    color: #555;
-}
-
-.social-buttons .btn {
-    border-radius: 20px;
-    transition: all 0.3s ease;
-}
-
-.social-buttons .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.teaching-highlights {
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
-    border-left: 3px solid #28a745;
-}
-
-.other-courses .course-info h6 {
-    transition: color 0.3s ease;
-}
-
-.other-courses .course-info:hover h6 {
-    color: #0d6efd !important;
-}
-
-.other-courses img {
-    transition: transform 0.3s ease;
-}
-
-.other-courses .d-flex:hover img {
-    transform: scale(1.1);
-}
-
-{{! Responsive design }}
-@media (max-width: 768px) {
     .instructor-stats {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .stat-item {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        justify-content: space-around;
+        padding: 15px 0;
+        border-top: 1px solid #e9ecef;
+        border-bottom: 1px solid #e9ecef;
+        margin: 15px 0;
     }
-}
-</style>
 
+    .stat-item {
+        text-align: center;
+    }
+
+    .instructor-name {
+        color: #2c3e50;
+        font-weight: 700;
+    }
+
+    .instructor-expertise .badge {
+        font-size: 0.9em;
+        padding: 0.5em 1em;
+    }
+
+    .instructor-bio {
+        line-height: 1.8;
+        color: #555;
+    }
+
+    .social-buttons .btn {
+        border-radius: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .social-buttons .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .teaching-highlights {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 3px solid #28a745;
+    }
+
+    .other-courses .course-info h6 {
+        transition: color 0.3s ease;
+    }
+
+    .other-courses .course-info:hover h6 {
+        color: #0d6efd !important;
+    }
+
+    .other-courses img {
+        transition: transform 0.3s ease;
+    }
+
+    .other-courses .d-flex:hover img {
+        transform: scale(1.1);
+    }
+
+        {
+            {
+            ! Responsive design
+        }
+    }
+
+    @media (max-width: 768px) {
+        .instructor-stats {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
+</style>
