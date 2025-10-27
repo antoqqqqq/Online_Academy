@@ -1,38 +1,40 @@
 {{!-- Danh sách đánh giá của học viên --}}
-<div class="container py-4">
-    {{!-- Header --}}
-    <div class="row mb-4">
-        <div class="col">
-            <h2 class="mb-0">
-                <i class="bi bi-star-fill text-warning"></i>
-                Đánh giá của tôi
-            </h2>
-            <p class="text-muted mb-0">Quản lý các đánh giá khóa học của bạn</p>
+<div class="container py-2 mt-0">
+    {{!-- Header với gradient --}}
+    <div class="row mb-2">
+        <div class="col-12">
+            <div class="my-feedback-header text-center py-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
+                <h1 class="display-6 fw-bold mb-2">
+                    <i class="bi bi-star-fill me-2"></i>
+                    Đánh Giá Của Tôi
+                </h1>
+                <p class="mb-0">Quản lý các đánh giá khóa học của bạn</p>
+            </div>
         </div>
     </div>
 
-    {{!-- Stats --}}
-    <div class="row mb-4">
+    {{!-- Stats với gradient --}}
+    <div class="row g-3 mb-4">
         <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body text-center">
-                    <h3 class="mb-0">{{total}}</h3>
-                    <p class="mb-0">Tổng đánh giá</p>
+            <div class="card stats-card-primary text-white shadow-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px;">
+                <div class="card-body text-center py-4">
+                    <h2 class="fw-bold mb-2">{{total}}</h2>
+                    <p class="mb-0 fw-bold">Tổng đánh giá</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body text-center">
-                    <h3 class="mb-0">{{#if feedbacks}}{{feedbacks.length}}{{else}}0{{/if}}</h3>
-                    <p class="mb-0">Trang này</p>
+            <div class="card stats-card-success text-white shadow-sm" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border-radius: 12px;">
+                <div class="card-body text-center py-4">
+                    <h2 class="fw-bold mb-2">{{#if feedbacks}}{{feedbacks.length}}{{else}}0{{/if}}</h2>
+                    <p class="mb-0 fw-bold">Trang này</p>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card bg-info text-white">
-                <div class="card-body text-center">
-                    <h5 class="mb-0">Trang {{pagination.currentPage}} / {{pagination.totalPages}}</h5>
+            <div class="card stats-card-info text-white shadow-sm" style="background: linear-gradient(135deg, #0dcaf0 0%, #0d6efd 100%); border-radius: 12px;">
+                <div class="card-body text-center py-4">
+                    <h5 class="fw-bold mb-1">Trang {{pagination.currentPage}} / {{pagination.totalPages}}</h5>
                     <p class="mb-0">Hiển thị {{feedbacks.length}} đánh giá</p>
                 </div>
             </div>
@@ -44,31 +46,37 @@
         <div class="row">
             {{#each feedbacks}}
             <div class="col-lg-6 mb-4">
-                <div class="card h-100">
+                <div class="card feedback-card h-100 shadow-sm">
                     {{!-- Course Info --}}
-                    <div class="card-header bg-light">
-                        <div class="row align-items-center">
-                            <div class="col-md-3">
-                                <img src="{{this.course_image}}" alt="{{this.course_title}}" class="img-fluid rounded" style="max-height: 80px; object-fit: cover;">
+                    <div class="card-header p-3 border-bottom">
+                        <div class="row align-items-center g-3">
+                            <div class="col-auto">
+                                <img src="{{this.course_image}}" 
+                                     alt="{{this.course_title}}" 
+                                     class="rounded shadow-sm" 
+                                     style="width: 70px; height: 70px; object-fit: cover;"
+                                     onerror="this.src='/static/default/default-course.jpg'">
                             </div>
-                            <div class="col-md-9">
-                                <h6 class="mb-1">
-                                    <a href="/courses/{{this.course}}" class="text-decoration-none">
+                            <div class="col">
+                                <h6 class="mb-1 fw-bold">
+                                    <a href="/courses/{{this.course}}" class="text-decoration-none text-dark">
                                         {{this.course_title}}
                                     </a>
                                 </h6>
+                                <small class="text-muted d-block">
+                                    <i class="bi bi-person me-1"></i>{{this.instructor_name}}
+                                </small>
                                 <small class="text-muted">
-                                    <i class="bi bi-person"></i> {{this.instructor_name}} | 
-                                    <i class="bi bi-tag"></i> {{this.category_name}}
+                                    <i class="bi bi-tag me-1"></i>{{this.category_name}}
                                 </small>
                             </div>
                         </div>
                     </div>
 
-                    {{!-- Rating --}}
+                    {{!-- Rating & Comment --}}
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
-                            <div class="stars me-3">
+                            <div class="stars me-3" style="font-size: 1.3rem;">
                                 {{#times this.rating}}
                                     <i class="bi bi-star-fill text-warning"></i>
                                 {{/times}}
@@ -76,25 +84,29 @@
                                     <i class="bi bi-star text-muted"></i>
                                 {{/times}}
                             </div>
-                            <span class="badge bg-primary">{{this.rating}} sao</span>
-                            <small class="text-muted ms-auto">{{format_datetime this.created_at}}</small>
+                            <span class="badge px-3 py-2" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                {{this.rating}} sao
+                            </span>
+                            <small class="text-muted ms-auto">
+                                <i class="bi bi-clock me-1"></i>{{format_datetime this.created_at}}
+                            </small>
                         </div>
 
                         {{!-- Comment --}}
-                        <div class="mb-3">
-                            <p class="card-text">{{this.feedback}}</p>
+                        <div class="feedback-comment mb-3 p-3" style="background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                            <p class="mb-0 lh-base">{{this.feedback}}</p>
                         </div>
 
                         {{!-- Actions --}}
                         <div class="d-flex gap-2">
-                            <a href="/courses/{{this.course}}" class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-eye"></i> Xem khóa học
+                            <a href="/courses/{{this.course}}" class="btn btn-primary btn-sm flex-fill">
+                                <i class="bi bi-eye me-1"></i> Xem khóa học
                             </a>
                             <a href="/feedback/{{this.course}}" class="btn btn-outline-warning btn-sm">
-                                <i class="bi bi-pencil"></i> Chỉnh sửa
+                                <i class="bi bi-pencil me-1"></i> Sửa
                             </a>
                             <button class="btn btn-outline-danger btn-sm" onclick="deleteFeedback({{this.id}}, {{this.course}})">
-                                <i class="bi bi-trash"></i> Xóa
+                                <i class="bi bi-trash"></i>
                             </button>
                         </div>
                     </div>
@@ -134,16 +146,18 @@
     {{else}}
         {{!-- Empty State --}}
         <div class="text-center py-5">
-            <div class="mb-4">
-                <i class="bi bi-star text-muted" style="font-size: 4rem;"></i>
+            <div class="empty-state-card" style="background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); padding: 60px 30px;">
+                <div class="mb-4">
+                    <i class="bi bi-star text-muted" style="font-size: 5rem; opacity: 0.3;"></i>
+                </div>
+                <h3 class="text-dark mb-3">Chưa có đánh giá nào</h3>
+                <p class="text-muted mb-4">
+                    Bạn chưa đánh giá khóa học nào. Hãy đăng ký và học một khóa học để có thể đánh giá!
+                </p>
+                <a href="/courses" class="btn btn-lg px-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white;">
+                    <i class="bi bi-book me-2"></i> Khám phá khóa học
+                </a>
             </div>
-            <h4 class="text-muted mb-3">Chưa có đánh giá nào</h4>
-            <p class="text-muted mb-4">
-                Bạn chưa đánh giá khóa học nào. Hãy đăng ký và học một khóa học để có thể đánh giá!
-            </p>
-            <a href="/courses" class="btn btn-primary">
-                <i class="bi bi-book"></i> Khám phá khóa học
-            </a>
         </div>
     {{/if}}
 </div>
@@ -202,63 +216,81 @@ function showToast(message, type = 'info') {
 
 {{!-- CSS --}}
 <style>
-.card {
+/* My Feedback Header */
+.my-feedback-header {
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+/* Stats Cards */
+.stats-card-primary,
+.stats-card-success,
+.stats-card-info {
     border: none;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.3s ease;
 }
 
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+.stats-card-primary:hover,
+.stats-card-success:hover,
+.stats-card-info:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
 }
 
+/* Feedback Card */
+.feedback-card {
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.feedback-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+.feedback-card .card-header {
+    background: #f8f9fa;
+    border: none;
+}
+
+.feedback-comment {
+    border-left-color: #667eea !important;
+}
+
+/* Stars */
 .stars {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
 }
 
-.badge {
-    font-size: 0.8rem;
-}
-
-.btn-sm {
-    font-size: 0.875rem;
-}
-
+/* Pagination */
 .pagination .page-link {
-    color: #0d6efd;
-    border-color: #dee2e6;
-}
-
-.pagination .page-item.active .page-link {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
+    color: #333;
+    border: 1px solid #dee2e6;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
 }
 
 .pagination .page-link:hover {
-    color: #0a58ca;
-    background-color: #e9ecef;
-    border-color: #dee2e6;
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
 }
 
-.card-header {
-    background-color: #f8f9fa !important;
-    border-bottom: 1px solid #dee2e6;
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #764ba2;
+    color: white;
 }
 
-.text-muted {
-    color: #6c757d !important;
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
 }
 
-.bg-primary {
-    background-color: #0d6efd !important;
-}
-
-.bg-success {
-    background-color: #198754 !important;
-}
-
-.bg-info {
-    background-color: #0dcaf0 !important;
+.btn-primary:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #65418c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 </style>
