@@ -148,9 +148,9 @@
                                 <div class="mb-3">
                                     <label for="full_description" class="form-label">Full Description</label>
                                     <textarea class="form-control" id="full_description" name="full_description" 
-                                              rows="10">{{course.full_description}}</textarea>
+                                            rows="10">{{course.full_description}}</textarea>
                                     <div class="form-text">
-                                        Use rich text formatting for detailed course description
+                                        Use the rich text editor for detailed course description with formatting
                                     </div>
                                 </div>
 
@@ -552,14 +552,29 @@ function removeImagePreview() {
 
 // Initialize WYSIWYG Editor
 function initWYSIWYG() {
-    const fullDescription = document.getElementById('full_description');
-    if (fullDescription) {
-        // Simple WYSIWYG functionality - you can integrate with TinyMCE, CKEditor, etc.
-        fullDescription.style.height = '300px';
-        fullDescription.style.fontFamily = 'Arial, sans-serif';
-        fullDescription.style.fontSize = '14px';
-        fullDescription.style.lineHeight = '1.5';
-    }
+    tinymce.init({
+        selector: '#full_description',
+        plugins: 'advlist autolink lists link image charmap preview anchor pagebreak',
+        toolbar: 'undo redo | styles | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+        menubar: false,
+        height: 400,
+        branding: false,
+        statusbar: false,
+        content_style: `
+            body { 
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+                font-size: 14px; 
+                line-height: 1.6;
+            }
+            h1, h2, h3 { color: #333; margin-top: 1em; }
+            p { margin-bottom: 1em; }
+        `,
+        setup: function(editor) {
+            editor.on('change', function() {
+                editor.save();
+            });
+        }
+    });
 }
 
 // Main JavaScript
