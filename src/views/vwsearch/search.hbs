@@ -4,17 +4,13 @@
 <div class="search-header">
     <div class="container">
         <h1 class="text-center mb-4">Tìm Kiếm Khóa Học</h1>
-        {{!-- Sửa action thành GET để dễ chia sẻ link và xử lý sort/page/filter bằng query string --}}
+        {{!-- Form tìm kiếm chính --}}
         <form class="search-box" method="GET" action="/courses/search">
             <div class="input-group">
-                <input type="text" class="form-control" id="searchInput" name="q" placeholder="Tìm kiếm khóa học, giảng viên, chủ đề..." value="{{q}}">
-                {{!-- Giữ lại các tham số filter/sort hiện tại khi submit lại form --}}
-                {{#if currentSort.sortBy}}<input type="hidden" name="sortBy" value="{{currentSort.sortBy}}">{{/if}}
-                {{!-- <input type="hidden" name="sortOrder" value="{{currentSort.sortOrder}}"> --}} {{!-- Không cần sortOrder vì nó được suy ra từ sortBy --}}
+                <input type="text" class="form-control" id="searchInputMain" name="q" placeholder="Tìm kiếm khóa học..." value="{{q}}">
+                {{!-- Giữ lại category và sort khi submit TỪ Ô NÀY --}}
                 {{#if currentFilters.category}}<input type="hidden" name="category" value="{{currentFilters.category}}">{{/if}}
-                {{#if currentFilters.price}}<input type="hidden" name="price" value="{{currentFilters.price}}">{{/if}}
-                {{#if currentFilters.rating}}<input type="hidden" name="rating" value="{{currentFilters.rating}}">{{/if}}
-                {{!-- Thêm các input hidden cho các filter khác nếu có --}}
+                {{#if currentSort.sortBy}}<input type="hidden" name="sortBy" value="{{currentSort.sortBy}}">{{/if}}
                 <button class="btn btn-warning" type="submit">
                     <i class="fas fa-search"></i> Tìm Kiếm
                 </button>
@@ -28,14 +24,13 @@
         <div class="col-lg-3">
             <div class="filter-sidebar">
                 <h5 class="filter-title"><i class="fas fa-filter"></i> Bộ Lọc</h5>
-                {{!-- Form filter --}}
+                {{!-- Form filter chỉ còn Category --}}
                 <form id="filterForm" method="GET" action="/courses/search">
-                    {{!-- Input hidden để giữ lại query và sort khi filter --}}
+                    {{!-- Input hidden để giữ lại query và sort KHI SUBMIT FILTER --}}
                     <input type="hidden" name="q" value="{{q}}">
                     <input type="hidden" name="sortBy" value="{{currentSort.sortBy}}">
-                    {{!-- <input type="hidden" name="sortOrder" value="{{currentSort.sortOrder}}"> --}}
 
-                    <div class="filter-group">
+                    <div class="filter-group"> {{!-- Chỉ còn filter group cho Category --}}
                         <h6>Danh Mục</h6>
                         {{#each categories}}
                         <div class="form-check">
@@ -49,66 +44,7 @@
                         </div>
                     </div>
 
-                     <div class="filter-group">
-                        <h6>Giá</h6>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="price" id="priceAll" value="" {{#unless currentFilters.price}}checked{{/unless}}>
-                            <label class="form-check-label" for="priceAll">Tất cả</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="price" id="priceFree" value="free" {{#eq currentFilters.price "free"}}checked{{/eq}}>
-                            <label class="form-check-label" for="priceFree">Miễn phí</label>
-                        </div>
-                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="price" id="pricePaid" value="paid" {{#eq currentFilters.price "paid"}}checked{{/eq}}>
-                            <label class="form-check-label" for="pricePaid">Trả phí</label>
-                        </div>
-                    </div>
-
-                     <div class="filter-group">
-                        <h6>Đánh Giá</h6>
-                         <div class="form-check">
-                            <input class="form-check-input" type="radio" id="ratingAll" name="rating" value="" {{#unless currentFilters.rating}}checked{{/unless}}>
-                            <label class="form-check-label" for="ratingAll">Tất cả</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" id="rating45" name="rating" value="4.5" {{#eq currentFilters.rating 4.5}}checked{{/eq}}>
-                            <label class="form-check-label" for="rating45">
-                                <i class="fas fa-star text-warning"></i> 4.5 trở lên
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" id="rating4" name="rating" value="4.0" {{#eq currentFilters.rating 4.0}}checked{{/eq}}>
-                            <label class="form-check-label" for="rating4">
-                                <i class="fas fa-star text-warning"></i> 4.0 trở lên
-                            </label>
-                        </div>
-                         <div class="form-check">
-                            <input class="form-check-input" type="radio" id="rating35" name="rating" value="3.5" {{#eq currentFilters.rating 3.5}}checked{{/eq}}>
-                            <label class="form-check-label" for="rating35">
-                                <i class="fas fa-star text-warning"></i> 3.5 trở lên
-                            </label>
-                        </div>
-                        {{!-- Thêm các mức rating khác nếu muốn --}}
-                    </div>
-
-                    {{!-- Filter Level (Tạm thời comment lại nếu chưa dùng)
-                    <div class="filter-group">
-                        <h6>Cấp Độ</h6>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="levels" id="levelBeginner" value="Beginner" {{#if (includes currentFilters.levels "Beginner")}}checked{{/if}}>
-                            <label class="form-check-label" for="levelBeginner">Người mới bắt đầu</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="levels" id="levelIntermediate" value="Intermediate" {{#if (includes currentFilters.levels "Intermediate")}}checked{{/if}}>
-                            <label class="form-check-label" for="levelIntermediate">Trung cấp</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="levels" id="levelAdvanced" value="Advanced" {{#if (includes currentFilters.levels "Advanced")}}checked{{/if}}>
-                            <label class="form-check-label" for="levelAdvanced">Nâng cao</label>
-                        </div>
-                    </div>
-                    --}}
+                    {{!-- Xóa các filter group cho Giá, Đánh Giá, Cấp Độ --}}
 
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="fas fa-check"></i> Áp Dụng Lọc
@@ -119,17 +55,16 @@
 
         <div class="col-lg-9">
             <div class="search-results-info">
-                <h5>
+                 <h5>
                     Tìm thấy <strong id="resultCount">{{amount}}</strong> kết quả cho "<strong id="searchQuery">{{q}}</strong>"
                 </h5>
-                <div class="mt-3 d-flex align-items-center">
+                 <div class="mt-3 d-flex align-items-center">
                     <label class="me-2 fw-bold">Sắp xếp:</label>
                     <select class="form-select d-inline-block w-auto" id="sortBy" onchange="sortResults()">
                         <option value="relevance" {{#eq currentSort.sortBy "relevance"}}selected{{/eq}}>Liên quan nhất</option>
                         <option value="newest" {{#eq currentSort.sortBy "newest"}}selected{{/eq}}>Mới nhất</option>
                         <option value="popular" {{#eq currentSort.sortBy "popular"}}selected{{/eq}}>Phổ biến nhất</option>
                         <option value="rating" {{#eq currentSort.sortBy "rating"}}selected{{/eq}}>Đánh giá cao nhất</option>
-                        {{!-- Sửa value cho price để khớp với JavaScript --}}
                         <option value="price-asc" {{#eq currentSort.sortBy "price-asc"}}selected{{/eq}}>Giá thấp đến cao</option>
                         <option value="price-desc" {{#eq currentSort.sortBy "price-desc"}}selected{{/eq}}>Giá cao đến thấp</option>
                     </select>
@@ -144,11 +79,9 @@
             <div class="row" id="coursesContainer">
                 {{#each course_card}}
                 <div class="col-md-6 col-lg-4 mb-4">
-                    {{!-- Sử dụng partial course_card --}}
                     {{> course_card course=this}}
                 </div>
                 {{else}}
-                 {{!-- Chỉ hiển thị nếu không có lỗi và không có kết quả --}}
                 {{#unless errorMessage}}
                 <div class="col-12">
                     <div class="no-results">
@@ -164,17 +97,14 @@
             {{#if pagination}}
             <nav aria-label="Page navigation" class="mt-4">
                 <ul class="pagination justify-content-center">
-                    {{!-- Previous --}}
                     <li class="page-item {{#unless pagination.hasPrev}}disabled{{/unless}}">
                         <a class="page-link" href="{{pagination.baseUrl}}&page={{subtract pagination.currentPage 1}}" tabindex="-1">Trước</a>
                     </li>
-                    {{!-- Pages --}}
                     {{#each pagination.pages}}
                     <li class="page-item {{#if isCurrent}}active{{/if}}">
                         <a class="page-link" href="{{../pagination.baseUrl}}&page={{value}}">{{value}}</a>
                     </li>
                     {{/each}}
-                    {{!-- Next --}}
                     <li class="page-item {{#unless pagination.hasNext}}disabled{{/unless}}">
                         <a class="page-link" href="{{pagination.baseUrl}}&page={{add pagination.currentPage 1}}">Sau</a>
                     </li>
@@ -191,60 +121,40 @@
         const sortByValue = document.getElementById('sortBy').value;
         const currentUrl = new URL(window.location.href);
         const urlParams = currentUrl.searchParams;
-
-        // Cập nhật hoặc thêm tham số sortBy
         urlParams.set('sortBy', sortByValue);
-        // Reset page về 1 khi đổi sort
-        urlParams.set('page', '1');
-
-        // Điều hướng đến URL mới
+        urlParams.set('page', '1'); // Reset về trang 1 khi sort
         window.location.href = currentUrl.pathname + '?' + urlParams.toString();
     }
 
-    // Hàm xử lý khi nhấn nút "Áp Dụng Lọc" (Bây giờ form sẽ submit GET)
-    // function applyFilters() {
-    //     document.getElementById('filterForm').submit();
-    // }
 
-    // Khôi phục trạng thái sort dropdown khi tải trang
+    // Khôi phục trạng thái sort/filter khi tải trang
     document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const sortBy = urlParams.get('sortBy') || 'relevance';
+        const category = urlParams.get('category'); // Chỉ còn category
+
+        // Khôi phục Sort Dropdown
         const sortByDropdown = document.getElementById('sortBy');
         if (sortByDropdown) {
-             // Cần điều chỉnh value nếu cần (ví dụ: price-asc)
-            let selectedValue = sortBy;
+             let selectedValue = sortBy;
+             const sortOrderParam = urlParams.get('sortOrder');
              if (sortBy === 'price') {
-                 const sortOrder = urlParams.get('sortOrder') || 'asc';
-                 selectedValue = `price-${sortOrder}`;
+                 selectedValue = `price-${sortOrderParam || 'asc'}`;
              }
-            sortByDropdown.value = selectedValue;
+            const optionExists = Array.from(sortByDropdown.options).some(option => option.value === selectedValue);
+            if (optionExists) {
+                sortByDropdown.value = selectedValue;
+            } else {
+                 sortByDropdown.value = 'relevance';
+            }
         }
 
-        // Khôi phục trạng thái filter (đã có trong code trước)
-        const category = urlParams.get('category');
-        const price = urlParams.get('price');
-        const rating = urlParams.get('rating');
-        // const levels = urlParams.get('levels')?.split(','); // Nếu dùng filter level
-
+        // Khôi phục Filter Category
         if (category) {
             const catRadio = document.querySelector(`input[name="category"][value="${category}"]`);
             if (catRadio) catRadio.checked = true; else document.getElementById('catFilterAll').checked = true;
         } else {
              document.getElementById('catFilterAll').checked = true;
         }
-        if (price) {
-            const priceRadio = document.querySelector(`input[name="price"][value="${price}"]`);
-            if (priceRadio) priceRadio.checked = true; else document.getElementById('priceAll').checked = true;
-        } else {
-            document.getElementById('priceAll').checked = true;
-        }
-         if (rating) {
-            const ratingRadio = document.querySelector(`input[name="rating"][value="${rating}"]`);
-            if (ratingRadio) ratingRadio.checked = true; else document.getElementById('ratingAll').checked = true;
-        } else {
-             document.getElementById('ratingAll').checked = true;
-        }
-        // ... khôi phục các filter khác tương tự ...
     });
 </script>

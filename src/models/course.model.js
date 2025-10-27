@@ -458,36 +458,42 @@ export default {
     },
 
     //Phần này Đức viết thêm cho chức năng tìm kiếm có phân trang và sắp xếp
-    async searchPaginated(keyword, limit, offset, sortBy = 'relevance', sortOrder = 'asc') {
+    async searchPaginated(keyword, limit, offset, sortBy = 'relevance', sortOrder = 'asc', filters = {}) {
         try {
             const query = db("courses")
                 .leftJoin('instructor', db.raw("CAST(courses.instructor_id AS INTEGER)"), 'instructor.instructor_id')
                 .leftJoin('categoryL2', 'courses.category_id', 'categoryL2.id')
-                .select(
+                .select(/* ... */
                     'courses.*',
                     'instructor.name as instructor_name',
                     'categoryL2.category_name as category_name'
                 )
-                .whereRaw(`fts @@ websearch_to_tsquery('simple', remove_accent(?))`, [keyword]) // Sử dụng websearch_to_tsquery cho tìm kiếm linh hoạt hơn
+                // --- SỬA: Chỉ áp dụng filter keyword và category ---
+                .where(builder => {
+                    if (keyword && keyword.trim() !== '') {
+                        builder.whereRaw(`fts @@ websearch_to_tsquery('simple', remove_accent(?))`, [keyword]);
+                    }
+                    if (filters.category) {
+                        builder.where('courses.category_id', parseInt(filters.category, 10));
+                    }
+                    // Xóa các điều kiện where cho price, rating, levels
+                })
                 .limit(limit)
                 .offset(offset);
 
-            // Xử lý sắp xếp
-            if (sortBy === 'rating') {
+            // Xử lý sắp xếp (giữ nguyên)
+             if (sortBy === 'rating') {
                 query.orderBy('courses.rating', sortOrder === 'desc' ? 'desc' : 'asc');
             } else if (sortBy === 'price') {
-                query.orderBy('courses.current_price', sortOrder === 'asc' ? 'asc' : 'desc'); // Price ascending by default
-            }
-            // Thêm các điều kiện sort khác nếu cần (ví dụ: newest, popular)
-            else if (sortBy === 'newest') {
+                query.orderBy('courses.current_price', sortOrder === 'asc' ? 'asc' : 'desc');
+            } else if (sortBy === 'newest') {
                 query.orderBy('courses.latest_update', 'desc');
             } else if (sortBy === 'popular') {
                 query.orderBy('courses.total_enrollment', 'desc');
             }
-            // Mặc định (relevance) thì không cần orderBy thêm vì FTS có thể đã sắp xếp theo relevance
 
             return await query;
-        } catch (error) { // Đổi tên biến để tránh trùng lặp
+        } catch (error) {
             console.error("Error searching courses:", error);
             throw error;
         }
@@ -496,14 +502,23 @@ export default {
     /**
      * Hàm đếm tổng số kết quả tìm kiếm
      */
-    async countSearchResults(keyword) {
+    async countSearchResults(keyword, filters = {}) {
         try {
-            const result = await db("courses")
-                .whereRaw(`fts @@ websearch_to_tsquery('simple', remove_accent(?))`, [keyword])
-                .count('course_id as total')
-                .first();
+            const query = db("courses")
+                // --- SỬA: Chỉ áp dụng filter keyword và category ---
+                .where(builder => {
+                    if (keyword && keyword.trim() !== '') {
+                        builder.whereRaw(`fts @@ websearch_to_tsquery('simple', remove_accent(?))`, [keyword]);
+                    }
+                    if (filters.category) {
+                        builder.where('courses.category_id', parseInt(filters.category, 10));
+                    }
+                    // Xóa các điều kiện where cho price, rating, levels
+                });
+
+            const result = await query.count('course_id as total').first();
             return parseInt(result.total, 10) || 0;
-        } catch (error) { // Đổi tên biến
+        } catch (error) {
             console.error("Error counting search results:", error);
             throw error;
         }
