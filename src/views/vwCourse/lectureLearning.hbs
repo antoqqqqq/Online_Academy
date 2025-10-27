@@ -1,53 +1,68 @@
-<div class="container-fluid">
+<div class="container-fluid py-2">
+    {{!-- Header với gradient --}}
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="lecture-header text-center py-3 px-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
+                <h4 class="mb-1 fw-bold">
+                    <i class="bi bi-play-circle-fill me-2"></i>
+                    {{course.title}}
+                </h4>
+                <small class="opacity-75">{{course.instructor_name}}</small>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <!-- Sidebar với danh sách bài giảng -->
         <div class="col-lg-3 col-md-4">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <i class="fas fa-list"></i> Nội dung khóa học
-                    </h5>
+            <div class="card lecture-sidebar shadow-sm">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="bi bi-list-ul me-2"></i> Nội dung khóa học
+                    </h6>
                 </div>
                 <div class="card-body p-0">
-                    <div class="course-progress mb-3 p-3 bg-light">
+                    {{!-- Progress Section --}}
+                    <div class="course-progress mb-3 p-3" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <small class="text-muted">Tiến độ khóa học</small>
-                            <small class="fw-bold">{{courseProgress.progressPercentage}}%</small>
+                            <small class="text-muted fw-bold">Tiến độ</small>
+                            <span class="badge bg-success">{{courseProgress.progressPercentage}}%</span>
                         </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-success" role="progressbar" 
-                                 style="width: {{courseProgress.progressPercentage}}%"></div>
+                        <div class="progress mb-2" style="height: 8px; border-radius: 10px;">
+                            <div class="progress-bar" 
+                                 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: {{courseProgress.progressPercentage}}%"></div>
                         </div>
-                        <small class="text-muted">
-                            {{courseProgress.completedLectures}}/{{courseProgress.totalLectures}} chương đã hoàn thành
+                        <small class="text-muted d-block text-center">
+                            {{courseProgress.completedLectures}}/{{courseProgress.totalLectures}} chương
                         </small>
                     </div>
                     
-                    <div class="lecture-list">
+                    <div class="lecture-list" style="max-height: 600px; overflow-y: auto;">
                         {{#each allLectures}}
                         <div class="lecture-item {{#if (eq this.id ../lecture.id)}}active{{/if}}">
                             <a href="/courses/{{../course.course_id}}/lecture/{{this.id}}" 
-                               class="d-flex align-items-center p-3 text-decoration-none {{#if (eq this.id ../lecture.id)}}bg-primary text-white{{else}}text-dark{{/if}}">
+                               class="d-flex align-items-center p-3 text-decoration-none {{#if (eq this.id ../lecture.id)}}bg-gradient text-white shadow-sm{{else}}text-dark hover-lecture{{/if}}"
+                               style="{{#if (eq this.id ../lecture.id)}}background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;{{else}}transition: all 0.3s;{{/if}}">
                                 <div class="lecture-icon me-3">
                                     {{#if (eq this.id ../lecture.id)}}
-                                        <i class="fas fa-play-circle text-white"></i>
+                                        <i class="bi bi-play-circle-fill text-white fs-5"></i>
                                     {{else}}
-                                        <i class="fas fa-play-circle text-muted"></i>
+                                        <i class="bi bi-play-circle text-muted fs-5"></i>
                                     {{/if}}
                                 </div>
                                 <div class="lecture-content flex-grow-1">
-                                    <h6 class="mb-1 {{#if (eq this.id ../lecture.id)}}text-white{{else}}text-dark{{/if}}">
+                                    <h6 class="mb-1 fw-bold {{#if (eq this.id ../lecture.id)}}text-white{{else}}text-dark{{/if}}" style="font-size: 0.9rem;">
                                         {{this.lecture_title}}
                                     </h6>
                                     <small class="{{#if (eq this.id ../lecture.id)}}text-white-50{{else}}text-muted{{/if}}">
-                                        {{this.videos.length}} video
+                                        <i class="bi bi-camera-video"></i> {{this.videos.length}} bài
                                     </small>
                                 </div>
                                 <div class="lecture-status">
                                     {{#if (eq this.id ../lecture.id)}}
-                                        <i class="fas fa-check-circle text-white"></i>
+                                        <i class="bi bi-check-circle-fill text-white"></i>
                                     {{else}}
-                                        <i class="fas fa-circle text-muted"></i>
+                                        <i class="bi bi-circle text-muted"></i>
                                     {{/if}}
                                 </div>
                             </a>
@@ -60,24 +75,26 @@
 
         <!-- Main content với video player -->
         <div class="col-lg-9 col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-1">{{lecture.lecture_title}}</h4>
-                            <small class="text-muted">{{course.title}} - {{course.instructor_name}}</small>
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <div class="mb-2 mb-md-0">
+                            <h5 class="mb-1 fw-bold">{{lecture.lecture_title}}</h5>
+                            <small class="text-muted">
+                                <i class="bi bi-tag me-1"></i>{{course.category_name}}
+                            </small>
                         </div>
-                        <div class="lecture-navigation">
+                        <div class="lecture-navigation d-flex gap-2">
                             {{#if previousLecture}}
                             <a href="/courses/{{course.course_id}}/lecture/{{previousLecture.id}}" 
-                               class="btn btn-outline-secondary btn-sm me-2">
-                                <i class="fas fa-chevron-left"></i> Bài trước
+                               class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-chevron-left"></i> Trước
                             </a>
                             {{/if}}
                             {{#if nextLecture}}
                             <a href="/courses/{{course.course_id}}/lecture/{{nextLecture.id}}" 
-                               class="btn btn-primary btn-sm">
-                                Bài tiếp <i class="fas fa-chevron-right"></i>
+                               class="btn btn-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white;">
+                                Tiếp <i class="bi bi-chevron-right"></i>
                             </a>
                             {{/if}}
                         </div>
@@ -200,3 +217,70 @@
 <!-- Plyr.io JavaScript -->
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 <script src="/js/lecture-learning.js"></script>
+
+<style>
+/* Lecture Learning Styles */
+.lecture-header {
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.lecture-sidebar {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.lecture-sidebar .card-header {
+    border: none;
+}
+
+/* Lecture Item Hover Effect */
+.hover-lecture:hover {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    transform: translateX(5px);
+}
+
+.hover-lecture:hover .bi-play-circle {
+    color: #667eea !important;
+}
+
+/* Progress Bar Gradient */
+.progress-bar {
+    border-radius: 10px;
+}
+
+/* Active Lecture Item */
+.lecture-item.active a {
+    border-radius: 8px;
+}
+
+.lecture-item a {
+    border-radius: 8px;
+    margin: 2px;
+}
+
+/* Video Container */
+.video-container {
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Video List */
+.video-item {
+    border: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.video-item:hover {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    transform: translateX(5px);
+}
+
+.video-item.active {
+    background: linear-gradient(135deg, #e7f3ff 0%, #cfe7ff 100%);
+    border-left: 4px solid #667eea;
+}
+</style>

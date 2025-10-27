@@ -1,53 +1,61 @@
 {{!-- Form đánh giá khóa học --}}
-<div class="container py-4">
+<div class="container py-2 mt-0">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            {{!-- Breadcrumb --}}
-            <nav aria-label="breadcrumb" class="mb-4">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                    <li class="breadcrumb-item"><a href="/courses">Khóa học</a></li>
-                    <li class="breadcrumb-item"><a href="/courses/{{course.course_id}}">{{course.title}}</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Đánh giá khóa học</li>
-                </ol>
-            </nav>
+        <div class="col-lg-10">
+            {{!-- Header Section với gradient --}}
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="feedback-header text-center py-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
+                        <h1 class="display-6 fw-bold mb-3">
+                            <i class="bi bi-star-fill me-2"></i>
+                            {{#if existingFeedback}}
+                                Chỉnh Sửa Đánh Giá
+                            {{else}}
+                                Đánh Giá Khóa Học
+                            {{/if}}
+                        </h1>
+                        <p class="mb-0">Chia sẻ trải nghiệm học tập của bạn</p>
+                    </div>
+                </div>
+            </div>
 
             {{!-- Thông tin khóa học --}}
-            <div class="card mb-4">
+            <div class="card course-info-card mb-4 shadow-sm">
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img src="{{course.image_url}}" alt="{{course.title}}" class="img-fluid rounded" style="max-height: 150px; object-fit: cover;">
+                    <div class="row align-items-center">
+                        <div class="col-md-3 text-center">
+                            <img src="{{course.image_url}}" alt="{{course.title}}" 
+                                 class="img-fluid rounded shadow-sm" 
+                                 style="max-height: 180px; object-fit: cover; width: 100%;"
+                                 onerror="this.src='/static/default/default-course.jpg'">
                         </div>
                         <div class="col-md-9">
-                            <h4 class="card-title mb-2">{{course.title}}</h4>
-                            <p class="card-text text-muted mb-2">
-                                <i class="bi bi-person-circle"></i> {{course.instructor_name}}
-                            </p>
-                            <p class="card-text text-muted mb-0">
-                                <i class="bi bi-tag"></i> {{course.category_name}}
-                            </p>
+                            <h4 class="card-title mb-3 fw-bold">{{course.title}}</h4>
+                            <div class="d-flex flex-wrap gap-3">
+                                <div class="badge bg-primary px-3 py-2">
+                                    <i class="bi bi-tag me-1"></i>{{course.category_name}}
+                                </div>
+                                <div class="text-muted">
+                                    <i class="bi bi-person-circle me-1"></i>{{course.instructor_name}}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             {{!-- Form đánh giá --}}
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="bi bi-star-fill text-warning"></i>
-                        {{#if existingFeedback}}
-                            Chỉnh sửa đánh giá của bạn
-                        {{else}}
-                            Đánh giá khóa học
-                        {{/if}}
+            <div class="card feedback-form-card shadow-sm">
+                <div class="card-header border-bottom bg-white">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-star-fill text-warning me-2"></i>
+                        Form Đánh Giá
                     </h5>
                 </div>
                 <div class="card-body">
                     {{!-- Thông báo --}}
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i>
+                    <div class="alert alert-primary border-0 shadow-sm">
+                        <i class="bi bi-info-circle-fill me-2"></i>
                         <strong>Lưu ý:</strong> Bạn chỉ có thể đánh giá những khóa học mà bạn đã đăng ký học.
                     </div>
 
@@ -91,25 +99,25 @@
                         </div>
 
                         {{!-- Submit buttons --}}
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary" id="submitBtn">
-                                <i class="bi bi-check-circle"></i>
+                        <div class="d-flex gap-3 justify-content-end">
+                            <a href="/courses/{{course.course_id}}" class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                Quay lại
+                            </a>
+                            {{#if existingFeedback}}
+                            <button type="button" class="btn btn-outline-danger px-4" id="deleteBtn">
+                                <i class="bi bi-trash me-2"></i>
+                                Xóa đánh giá
+                            </button>
+                            {{/if}}
+                            <button type="submit" class="btn btn-primary px-4" id="submitBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                                <i class="bi bi-check-circle me-2"></i>
                                 {{#if existingFeedback}}
                                     Cập nhật đánh giá
                                 {{else}}
                                     Gửi đánh giá
                                 {{/if}}
                             </button>
-                            <a href="/courses/{{course.course_id}}" class="btn btn-outline-secondary">
-                                <i class="bi bi-arrow-left"></i>
-                                Quay lại
-                            </a>
-                            {{#if existingFeedback}}
-                            <button type="button" class="btn btn-outline-danger" id="deleteBtn">
-                                <i class="bi bi-trash"></i>
-                                Xóa đánh giá
-                            </button>
-                            {{/if}}
                         </div>
                     </form>
                 </div>
@@ -117,13 +125,16 @@
 
             {{!-- Đánh giá hiện tại (nếu có) --}}
             {{#if existingFeedback}}
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h6 class="mb-0">Đánh giá hiện tại của bạn</h6>
+            <div class="card mt-4 shadow-sm border-left" style="border-left: 4px solid #28a745 !important;">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        Đánh giá hiện tại của bạn
+                    </h6>
                 </div>
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="stars me-3">
+                        <div class="stars me-3" style="font-size: 1.2rem;">
                             {{#times existingFeedback.rating}}
                                 <i class="bi bi-star-fill text-warning"></i>
                             {{/times}}
@@ -131,9 +142,11 @@
                                 <i class="bi bi-star text-muted"></i>
                             {{/times}}
                         </div>
-                        <small class="text-muted">{{format_datetime existingFeedback.created_at}}</small>
+                        <small class="text-muted">
+                            <i class="bi bi-clock me-1"></i>{{format_datetime existingFeedback.created_at}}
+                        </small>
                     </div>
-                    <p class="mb-0">{{existingFeedback.feedback}}</p>
+                    <p class="mb-0 lh-lg">{{existingFeedback.feedback}}</p>
                 </div>
             </div>
             {{/if}}
@@ -367,23 +380,28 @@ document.addEventListener('DOMContentLoaded', function() {
     color: #6c757d;
 }
 
-.card {
+/* Feedback Header */
+.feedback-header {
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+/* Card Styles */
+.course-info-card,
+.feedback-form-card {
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+}
+
+.feedback-form-card .card-header {
     border: none;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background: white;
+    font-weight: 600;
 }
 
-.card-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
-}
-
-.breadcrumb {
-    background-color: transparent;
-    padding: 0;
-}
-
-.breadcrumb-item + .breadcrumb-item::before {
-    content: ">";
+/* Alert */
+.alert-primary {
+    background: linear-gradient(135deg, #e7f3ff 0%, #cfe7ff 100%);
+    border: none;
 }
 
 #submitBtn:disabled,
