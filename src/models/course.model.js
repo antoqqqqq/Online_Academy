@@ -396,6 +396,45 @@ export default {
         return db('courses');
     },
 
+    async findFeedback(id) {
+        const feedback = await db('feedback as f')
+            .leftJoin('student as s', 'f.student', 's.id')
+            .where('f.course', id)
+            .select(
+                'f.id',
+                'f.rating',
+                'f.feedback',
+                'f.created_at',
+                's.id as student_id',
+                db.raw(`'Student ' || s.id as student_name`),
+            )
+            .orderBy('f.created_at', 'desc');
+        return feedback;
+    },
+    async findRelated(id) {
+        // Step 1: Get the category of the target course
+        const course = await db('courses')
+            .select('category_id')
+            .where('course_id', id)
+            .first();
+
+        if (!course || !course.category_id) return [];
+
+        // Step 2: Find top 5 other courses in same category
+        const related = await db('courses as c')
+            .leftJoin('instructor as i', 'c.instructor_id', 'i.instructor_id')
+            .where('c.category_id', course.category_id)
+            .andWhereNot('c.course_id', id)
+            .orderBy('c.total_enrollment', 'desc')
+            .limit(5)
+            .select(
+                'c.*', // ✅ all columns from courses
+                'i.name as instructor_name' // ✅ instructor’s name
+            );
+
+        return related;
+    },
+
     // Get next available course_id
     async getNextCourseId() {
         const maxResult = await db('courses')
