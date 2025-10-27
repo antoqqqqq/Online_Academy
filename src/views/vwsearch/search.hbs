@@ -21,76 +21,69 @@
         <!-- Filter Sidebar -->
         <div class="col-lg-3">
             <div class="filter-sidebar">
-                <h5 class="filter-title"><i class="fas fa-filter"></i> Bộ Lọc</h5>
+                <form id="filterForm" method="post" action="/courses/search">
+                    <input type="hidden" name="searchInput" id="searchInputHidden" value="{{q}}">
+                    <h5 class="filter-title"><i class="fas fa-filter"></i> Bộ Lọc</h5>
 
-                <div class="filter-group">
-                    <h6>Danh Mục</h6>
-                    {{#each categories}}
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="category" id="cat{{@index}}"
-                            value="{{this.id}}">
-                        <label class="form-check-label" for="cat{{@index}}">{{name}}</label>
+                    <div class="filter-group">
+                        <h6>Danh Mục</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="category" id="catAll" value="0" {{#if (eq category 0)}}checked{{/if}}>
+                            <label class="form-check-label" for="catAll">Tất cả</label>
+                        </div>
+                        {{#each categories}}
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="category" id="cat{{@index}}" 
+                                value="{{this.id}}" {{#if (eq ../category this.id)}}checked{{/if}}> 
+                            <label class="form-check-label" for="cat{{@index}}">{{name}}</label>
+                        </div>
+                        {{/each}}
                     </div>
-                    {{/each}}
-                </div>
 
-                <div class="filter-group">
-                    <h6>Giá</h6>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="price" id="priceAll" value="0" checked>
-                        <label class="form-check-label" for="priceAll">Tất cả</label>
+                    <div class="filter-group">
+                        <h6>Giá</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="price" id="priceAll" value="0" {{#if (eq price 0)}}checked{{/if}}>
+                            <label class="form-check-label" for="priceAll">Tất cả</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="price" id="pricePaid" value="2" {{#if (eq price 2)}}checked{{/if}}>
+                            <label class="form-check-label" for="pricePaid">Giảm giá</label>
+                        </div>
                     </div>
-                    {{!-- <div class="form-check">
-                        <input class="form-check-input" type="radio" name="price" id="priceFree" value="1">
-                        <label class="form-check-label" for="priceFree">Miễn phí</label>
-                    </div> --}}
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="price" id="pricePaid" value="2">
-                        <label class="form-check-label" for="pricePaid">Giảm giá</label>
-                    </div>
-                </div>
 
-                <div class="filter-group">
-                    <h6>Đánh Giá</h6>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" id="rating45" name="rating" value="4.5">
-                        <label class="form-check-label" for="rating45">
-                            <i class="fas fa-star text-warning"></i> 4.5 trở lên
-                        </label>
+                    <div class="filter-group">
+                        <h6>Đánh Giá</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="ratingAll" name="rating" value="0"{{#if (eq rating 0)}}checked{{/if}}>
+                            <label class="form-check-label" for="rating0">
+                                <i class="fas fa-star text-warning"></i> Tất cả
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="rating45" name="rating" value="4.5" {{#if (eq rating 4.5)}}checked{{/if}}>
+                            <label class="form-check-label" for="rating45">
+                                <i class="fas fa-star text-warning"></i> 4.5 trở lên
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="rating4" name="rating" value="4" {{#if (eq rating 4)}}checked{{/if}}>
+                            <label class="form-check-label" for="rating4">
+                                <i class="fas fa-star text-warning"></i> 4.0 trở lên
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="rating35" name="rating" value="3.5" {{#if (eq rating 3.5)}}checked{{/if}}>
+                            <label class="form-check-label" for="rating35">
+                                <i class="fas fa-star text-warning"></i> 3.5 trở lên
+                            </label>
+                        </div>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" id="rating4" name="rating" value="4">
-                        <label class="form-check-label" for="rating4">
-                            <i class="fas fa-star text-warning"></i> 4.0 trở lên
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" id="rating35" name="rating" value="3.5">
-                        <label class="form-check-label" for="rating35">
-                            <i class="fas fa-star text-warning"></i> 3.5 trở lên
-                        </label>
-                    </div>
-                </div>
 
-                <div class="filter-group">
-                    <h6>Cấp Độ</h6>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="levelBeginner" value="beginner">
-                        <label class="form-check-label" for="levelBeginner">Người mới bắt đầu</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="levelIntermediate" value="intermediate">
-                        <label class="form-check-label" for="levelIntermediate">Trung cấp</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="levelAdvanced" value="advanced">
-                        <label class="form-check-label" for="levelAdvanced">Nâng cao</label>
-                    </div>
-                </div>
-
-                <button class="btn btn-primary w-100" onclick="applyFilters()">
-                    <i class="fas fa-check"></i> Áp Dụng Lọc
-                </button>
+                    <button class="btn btn-primary w-100" onclick="applyFilters()">
+                        <i class="fas fa-check"></i> Áp Dụng Lọc
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -116,27 +109,15 @@
 
             <div class="row" id="coursesContainer">
                 <!-- Course 1 -->
-                
+
                 {{#each course_card}}
                 <div class="col-md-6 col-lg-4">
-                {{> course_card}}
+                    {{> course_card}}
                 </div>
                 {{/each}}
-                
+
                 <!-- Pagination -->
-                <nav aria-label="Page navigation" class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1">Trước</a>
-                        </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Sau</a>
-                        </li>
-                    </ul>
-                </nav>
             </div>
         </div>
     </div>
+</div>

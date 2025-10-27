@@ -41,19 +41,30 @@ router.get('/search', async function (req, res) {
     try {
         const q = req.query.q || '';
         const keyword = q.replace(/ /g, '&');
-        const courses = await courseModel.search(keyword);
+        const filters ={
+                category :0,
+                price :0,
+                rating : 0
+        }
+        const courses = await courseModel.search(keyword,filters);
         
         res.render('vwsearch/search', {
             q: q,
             amount: courses.length,
-            course_card_search: courses
+            course_card: courses,
+            category:filters.category,
+            price: filters.price,
+            rating:filters.rating
         });
     } catch (error) {
         console.error('Search error:', error);
         res.render('vwsearch/search', {
             q: req.query.q || '',
             amount: 0,
-            course_card_search: []
+            course_card: [],
+            category: 0,
+            price :0,
+            rating:0
         });
     }
 });
@@ -61,20 +72,33 @@ router.get('/search', async function (req, res) {
 router.post('/search', async function (req, res) {
     try {
         const q = req.body.searchInput || '';
+
+        const filters ={
+                category :req.body.category ||0,
+                price : req.body.price || 0,
+                rating :req.body.rating || 0
+        }
+
         const keyword = q.replace(/ /g, '&');
-        const courses = await courseModel.search(keyword);
-        
+        const courses = await courseModel.search(keyword,filters);
+
         res.render('vwsearch/search', {
             q: q,
             amount: courses.length,
-            course_card_search: courses
+            course_card: courses,
+            category:filters.category,
+            price: filters.price,
+            rating:filters.rating
         });
     } catch (error) {
         console.error('Search error:', error);
         res.render('vwsearch/search', {
             q: req.body.searchInput || '',
             amount: 0,
-            course_card_search: []
+            course_card_search: [],
+            category: 0,
+            price :0,
+            rating:0
         });
     }
 });
