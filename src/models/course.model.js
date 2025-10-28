@@ -16,7 +16,7 @@ export default {
                     "categoryL2.category_name as category_name"
                 )
                 .first();
-            
+
             if (!course) return null;
 
             if (!course.image_url || course.image_url === '' || course.image_url === '/upload/images/default-course.jpg' || course.image_url === '/src/public/upload/images/default-course.jpg') {
@@ -66,11 +66,11 @@ export default {
                 .select('course_id', 'title', 'image_url', 'rating', 'total_enrollment')
                 .orderBy('total_enrollment', 'desc')
                 .limit(4);
-            
+
             // Fix other courses image URLs
             course.other_courses = otherCourses.map(otherCourse => ({
                 ...otherCourse,
-                image_url: otherCourse.image_url && otherCourse.image_url !== '' && otherCourse.image_url !== '/upload/images/default-course.jpg' && otherCourse.image_url !== '/src/public/upload/images/default-course.jpg' ? 
+                image_url: otherCourse.image_url && otherCourse.image_url !== '' && otherCourse.image_url !== '/upload/images/default-course.jpg' && otherCourse.image_url !== '/src/public/upload/images/default-course.jpg' ?
                     otherCourse.image_url : '/static/default/default-course.jpg'
             }));
 
@@ -88,7 +88,7 @@ export default {
                 .join("lecture", "video.lecture_id", "lecture.id")
                 .where("lecture.course_id", courseId)
                 .orderBy("video.id", "asc");
-            
+
             course.videos = videos;
             return course;
         } catch (error) {
@@ -166,13 +166,13 @@ export default {
                 .where("course_id", courseId)
                 .count("* as count")
                 .first();
-            
+
             await db("courses")
                 .where("course_id", courseId)
                 .update({
                     total_enrollment: parseInt(count.count)
                 });
-            
+
             return parseInt(count.count);
         } catch (error) {
             console.error("Error updating student count:", error);
@@ -180,11 +180,29 @@ export default {
         }
     },
 
-    async search(keyword){
+    async search(keyword, filter = {}) {
         try {
-            return db("courses")
-                .whereRaw(`fts @@ to_tsquery(remove_accent(?))`,[keyword])
-        } catch{
+            const result = db("courses")
+                .join("instructor", "courses.instructor_id", "instructor.instructor_id")
+                .join("categoryL2", "courses.category_id", "categoryL2.id")
+                .join("categoryL1", "categoryL2.categoryL1_id", "categoryL1.id")
+                .select(
+                    "courses.*",
+                    "instructor.name as instructor_name",
+                    "categoryL1.category_name as category_name",
+                )
+                .whereRaw(`fts @@ to_tsquery(remove_accent(?))`, [keyword])
+            if (filter.category && filter.category != 0) {
+                result.andWhere("categoryL1.id", filter.category)
+            }
+            if (filter.price && filter.price != 0) {
+                result.andWhere("courses.is_onsale", true)
+            }
+            if (filter.rating && filter.rating != 0) {
+                result.andWhere("courses.rating", ">=", filter.rating);
+            }
+            return result
+        } catch (error) {
             console.error("Error getting courses with filter:", error);
             throw error;
         }
@@ -449,11 +467,11 @@ export default {
         if (!courseData.course_id) {
             courseData.course_id = await this.getNextCourseId();
         }
-        
+
         const [newCourse] = await db('courses')
             .insert(courseData)
             .returning('*');
-        
+
         return newCourse;
     },
 

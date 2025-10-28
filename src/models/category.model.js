@@ -12,6 +12,7 @@ export default {
             // Fetch categories from the database
             const categoriesL1 = await db('categoryL1').select('*');
             const data = await Promise.all(categoriesL1.map(async (cat1) => ({
+                id: cat1.id,
                 name: cat1.category_name,
                 slug: cat1.slug,
                 subCategories: await getCategoriesL2(cat1.id)

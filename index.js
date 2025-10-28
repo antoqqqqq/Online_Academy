@@ -49,7 +49,7 @@ const hbs = exphbs.create({
         ...helpers,
         ...Handlebars,
         eq: function (a, b) {
-          return a === b;
+          return a == b;
       },
     },
 });
