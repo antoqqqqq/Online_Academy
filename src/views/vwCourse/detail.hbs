@@ -43,17 +43,14 @@
 
                 {{!-- Mô tả chi tiết --}}
                 <div class="course-description">
-                    <h5>Nội dung khóa học</h5>
-                    {{#if course.full_description.overview}}
-                    <div class="mb-4">
-                        <p></p>
-                        <h5>📘 Tổng quan</h5>
-                        <p>{{course.full_description.overview}}</p>
-                        <p>Độ khó: {{course.level}}</p>
-                        <p>Số giờ: {{course.total_hours}}</p>
-                        <p>Số lớp: {{course.total_lectures}}</p>
-                    </div>
-                    {{/if}}
+                    <h5 class="mb-3">Nội dung chi tiết khóa học</h5>
+                        {{#if course.full_description}}
+                            <div class="content-from-editor">
+                                {{{course.full_description}}} {{!-- SỬA Ở ĐÂY: Dùng 3 dấu ngoặc nhọn --}}
+                            </div>
+                        {{else}}
+                            <p class="text-muted fst-italic">Nội dung chi tiết chưa được cập nhật.</p>
+                        {{/if}}
 
                     {{#if course.full_description.what_you_will_learn}}
                     <div class="mb-4">
@@ -195,26 +192,46 @@
             </div>
 
             {{!-- Video lectures preview (nếu có) --}}
-            {{#if course.videos}}
-            <div class="course-videos bg-white p-4 rounded shadow-sm">
-                <h5 class="mb-3">
-                    <i class="bi bi-play-circle"></i> Nội dung bài học
-                </h5>
+            <div class="course-lectures bg-white p-4 rounded shadow-sm mb-4">
+            <h5 class="mb-3">
+                <i class="bi bi-list-task"></i> Đề cương khóa học
+            </h5>
+            {{#if lectures.length}}
                 <div class="list-group">
-                    {{#each course.videos}}
-                    <div class="list-group-item">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="bi bi-play-btn text-primary me-2"></i>
-                                <strong>{{this.video_title}}</strong>
-                            </div>
-                            <span class="badge bg-secondary">{{this.duration}} phút</span>
+                    {{#each lectures}}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-play-btn-fill {{#if this.is_preview}}text-primary{{else}}text-muted{{/if}} me-2"></i>
+                            <strong>{{this.title}}</strong>
+                            <small class="text-muted d-block ms-4">({{this.time}} phút)</small>
+                        </div>
+                        <div>
+                            {{#if this.is_preview}}
+                                {{!-- Link xem trước cho guest và user chưa đăng ký --}}
+                                <a href="/courses/{{../course.course_id}}/lecture/{{this.id}}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-eye"></i> Xem trước
+                                </a>
+                            {{else}}
+                                {{#if ../isEnrolled}}
+                                    {{!-- Link học cho user đã đăng ký --}}
+                                    <a href="/courses/{{../course.course_id}}/lecture/{{this.id}}" class="btn btn-outline-success btn-sm">
+                                        <i class="bi bi-play"></i> Học ngay
+                                    </a>
+                                {{else}}
+                                    {{!-- Hiển thị khóa cho guest/user chưa đăng ký --}}
+                                    <span class="badge bg-light text-secondary p-2" title="Yêu cầu đăng ký khóa học">
+                                        <i class="bi bi-lock-fill"></i>
+                                    </span>
+                                {{/if}}
+                            {{/if}}
                         </div>
                     </div>
                     {{/each}}
                 </div>
-            </div>
+            {{else}}
+                <p class="text-muted fst-italic">Nội dung bài học chưa được cập nhật.</p>
             {{/if}}
+        </div>
 
             {{!-- Đánh giá và phản hồi --}}
             <div class="course-feedback bg-white p-4 rounded shadow-sm mt-4">

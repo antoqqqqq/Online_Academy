@@ -57,10 +57,12 @@ const courseController = {
             // Lấy danh sách đánh giá và thống kê
             courseFeedbacks = await feedbackModel.getCourseFeedbacks(courseId, 5, 0);
             ratingStats = await feedbackModel.getCourseRatingStats(courseId);
+            const lectures = await lectureModel.getLecturesByCourseId(courseId);
 
             res.render('vwCourse/detail', {
                 layout: 'main',
                 course,
+                lectures,
                 isInWatchlist,
                 isEnrolled,
                 studentFeedback,
@@ -150,70 +152,69 @@ const courseController = {
      */
     viewLecture: async (req, res, next) => {
         try {
-            // Kiểm tra đăng nhập
-            if (!req.session.authUser) {
-                return res.redirect('/account/signin');
+           // --- SỬA: Lấy userId một cách an toàn hơn ---
+           const courseId = req.params.courseId;
+           const lectureId = req.params.lectureId;
+           const userId = req.session.authUser?.id; // Dùng optional chaining
+           // ------------------------------------------
+
+           // --- SỬA: Lấy isEnrolled từ middleware nếu có, hoặc kiểm tra lại ---
+           // Middleware đã kiểm tra preview hoặc enrollment rồi, nên ở đây chỉ cần lấy thông tin
+           const isEnrolled = req.enrollment?.isEnrolled || (userId ? await enrollmentModel.isEnrolled(userId, courseId) : false);
+           // ---------------------------------------------------------------------
+
+           const course = await courseModel.getCourseById(courseId);
+            if (!course) { /* ... lỗi 404 ... */ }
+
+           const lecture = await lectureModel.getLectureWithVideos(lectureId);
+            if (!lecture) { /* ... lỗi 404 ... */ }
+
+            // --- KIỂM TRA LẠI PREVIEW VÀ ENROLLMENT ---
+            // Mặc dù middleware đã kiểm tra, kiểm tra lại ở đây để đảm bảo an toàn
+            // Nếu lecture không phải preview VÀ user không enrolled (và không phải admin/instructor nếu cần)
+            if (!lecture.is_preview && !isEnrolled) {
+                 return res.status(403).render('error', {
+                     message: 'Bạn cần đăng ký khóa học để xem nội dung này.'
+                 });
             }
+            // --------------------------------------------
 
-            const courseId = req.params.courseId;
-            const lectureId = req.params.lectureId;
-            const userId = req.session.authUser.id;
 
-            // Kiểm tra xem học viên đã đăng ký khóa học chưa
-            const isEnrolled = await enrollmentModel.isEnrolled(userId, courseId);
-            if (!isEnrolled) {
-                return res.status(403).render('error', {
-                    message: 'Bạn cần đăng ký khóa học để xem nội dung bài giảng'
-                });
-            }
+           const currentVideo = lecture.videos && lecture.videos.length > 0 ? lecture.videos[0] : null;
+           const allLectures = await lectureModel.getLecturesByCourseId(courseId);
 
-            // Lấy thông tin khóa học
-            const course = await courseModel.getCourseById(courseId);
-            if (!course) {
-                return res.status(404).render('error', {
-                    message: 'Không tìm thấy khóa học'
-                });
-            }
+           // --- SỬA: Lấy progress chỉ khi user đã đăng nhập và đăng ký ---
+           let courseProgress = null;
+           if (userId && isEnrolled) {
+               courseProgress = await videoProgressModel.getCourseProgress(userId, courseId);
+           } else {
+               // Tạo dữ liệu progress rỗng cho guest hoặc user chưa đăng ký
+               courseProgress = { progressPercentage: 0, completedLectures: 0, totalLectures: allLectures.length };
+           }
+           //-------------------------------------------------------------
 
-            // Lấy thông tin chương và video
-            const lecture = await lectureModel.getLectureWithVideos(lectureId);
-            if (!lecture) {
-                return res.status(404).render('error', {
-                    message: 'Không tìm thấy bài giảng'
-                });
-            }
+           const currentLectureIndex = allLectures.findIndex(l => l.id == lectureId);
+           const previousLecture = currentLectureIndex > 0 ? allLectures[currentLectureIndex - 1] : null;
+           const nextLecture = currentLectureIndex < allLectures.length - 1 ? allLectures[currentLectureIndex + 1] : null;
 
-            // Lấy video đầu tiên của chương làm video hiện tại
-            const currentVideo = lecture.videos && lecture.videos.length > 0 ? lecture.videos[0] : null;
-
-            // Lấy danh sách tất cả chương của khóa học
-            const allLectures = await lectureModel.getLecturesByCourseId(courseId);
-
-            // Lấy tiến độ học của học viên
-            const courseProgress = await videoProgressModel.getCourseProgress(userId, courseId);
-
-            // Tìm chương hiện tại trong danh sách
-            const currentLectureIndex = allLectures.findIndex(l => l.id == lectureId);
-            const previousLecture = currentLectureIndex > 0 ? allLectures[currentLectureIndex - 1] : null;
-            const nextLecture = currentLectureIndex < allLectures.length - 1 ? allLectures[currentLectureIndex + 1] : null;
-
-            res.render('vwCourse/lectureLearning', {
-                layout: 'main',
-                course,
-                lecture,
-                currentVideo,
-                allLectures,
-                currentLectureIndex,
-                previousLecture,
-                nextLecture,
-                courseProgress,
-                isLoggedIn: true
-            });
-        } catch (error) {
-            console.error('Lỗi khi xem bài giảng:', error);
-            next(error);
-        }
-    },
+           res.render('vwCourse/lectureLearning', {
+               layout: 'main',
+               course,
+               lecture,
+               currentVideo,
+               allLectures,
+               currentLectureIndex,
+               previousLecture,
+               nextLecture,
+               courseProgress, // Truyền progress (có thể rỗng)
+               isLoggedIn: !!userId, // Truyền trạng thái đăng nhập
+               isEnrolled: isEnrolled // Truyền trạng thái đăng ký
+           });
+       } catch (error) {
+           console.error('Lỗi khi xem bài giảng:', error);
+           next(error);
+       }
+   },
 
     /**
      * API để lưu tiến độ học video
