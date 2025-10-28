@@ -194,7 +194,7 @@ const instructorController = {
                 total_hours: 0,
                 total_lectures: 0,
                 total_enrollment: 0,
-                full_description: createFullDescriptionJSON(full_description),
+                full_description: full_description || null,
                 latest_update: new Date()
             };
 
@@ -463,7 +463,7 @@ const instructorController = {
                 current_price: currentPrice,
                 is_complete: finalIsComplete,
                 is_onsale: isOnSale,
-                full_description: createFullDescriptionJSON(full_description),
+                full_description: full_description || null,
                 latest_update: new Date()
             };
 

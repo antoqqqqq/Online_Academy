@@ -75,13 +75,13 @@ export default {
             }));
 
             // Parse full_description if it exists
-            if (course.full_description && typeof course.full_description === 'string') {
-                try {
-                    course.full_description = JSON.parse(course.full_description);
-                } catch (error) {
-                    console.log('Failed to parse full_description as JSON, using as-is');
-                }
-            }
+            // if (course.full_description && typeof course.full_description === 'string') {
+            //     try {
+            //         course.full_description = JSON.parse(course.full_description);
+            //     } catch (error) {
+            //         console.log('Failed to parse full_description as JSON, using as-is');
+            //     }
+            // }
 
             // Get course videos
             const videos = await db("video")
