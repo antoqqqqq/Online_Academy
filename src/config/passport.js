@@ -23,7 +23,7 @@ passport.use(new LocalStrategy(async (email, password, done) => {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'http://localhost:3000/account/google/callback'
+  callbackURL: process.env.CALLBACKURL
 }, async (accessToken, refreshToken, profile, done) => {
   const user = await accountModel.findOrCreateGoogleUser(profile);
   return done(null, user);
