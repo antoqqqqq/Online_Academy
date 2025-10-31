@@ -4,8 +4,9 @@ import lectureModel from '../models/lecture.model.js'; // Thêm import lectureMo
 
 export const requireEnrollment = async (req, res, next) => {
     try {
-        const courseId = req.params.courseId; // Lấy từ route /:courseId/...
-        const lectureId = req.params.lectureId; // Lấy từ route .../lecture/:lectureId
+        // Hỗ trợ cả 2 kiểu route: '/:id/learn' và '/:courseId/learn/:lectureId'
+        const courseId = req.params.courseId || req.params.id;
+        const lectureId = req.params.lectureId; // Lấy từ route .../learn/:lectureId
         const studentId = req.session.authUser?.id; // Dùng optional chaining ?.
 
         // --- KIỂM TRA PREVIEW ---
@@ -13,7 +14,6 @@ export const requireEnrollment = async (req, res, next) => {
             const lecture = await lectureModel.getLectureById(lectureId);
             // Nếu bài giảng tồn tại VÀ được phép xem trước
             if (lecture && lecture.is_preview) {
-                console.log(`Lecture ${lectureId} is previewable. Allowing access.`);
                 return next(); // Cho phép truy cập mà không cần kiểm tra đăng ký/đăng nhập
             }
         }
@@ -70,7 +70,27 @@ export const requireEnrollment = async (req, res, next) => {
     }
 };
 
-export const requireLogin = (req, res, next) => { /* ... */ };
+export const requireLogin = (req, res, next) => {
+    try {
+        if (req.session && req.session.authUser) {
+            return next();
+        }
+
+        // If the client expects JSON (AJAX/API), return 401 JSON instead of redirect
+        const acceptsJson = req.xhr || (req.headers.accept && req.headers.accept.includes('application/json'));
+        if (acceptsJson) {
+            return res.status(401).json({ success: false, message: 'Vui lòng đăng nhập' });
+        }
+
+        return res.redirect('/account/signin');
+    } catch (error) {
+        console.error('Error in requireLogin middleware:', error);
+        return res.status(500).render('error', {
+            message: 'Có lỗi xảy ra khi xác thực đăng nhập',
+            layout: 'main'
+        });
+    }
+};
 
 export default {
     requireEnrollment,

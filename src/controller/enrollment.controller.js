@@ -78,11 +78,8 @@ const enrollmentController = {
      */
     myCourses: async (req, res, next) => {
         try {
-            console.log('📚 My courses request for user:', req.session.authUser?.id);
-            
             // Kiểm tra đăng nhập
             if (!req.session.authUser || !req.session.authUser.id) {
-                console.error('❌ No authUser or id found');
                 return res.redirect('/account/signin');
             }
 
@@ -91,14 +88,9 @@ const enrollmentController = {
             const limit = 12;
             const offset = (page - 1) * limit;
 
-            console.log('🔍 Getting enrolled courses for student:', studentId);
-
             // Lấy danh sách khóa học đã đăng ký
             const enrolledCourses = await enrollmentModel.getEnrolledCourses(studentId, limit, offset);
-            console.log('✅ Found enrolled courses:', enrolledCourses.length);
-
             const totalCourses = await enrollmentModel.countEnrolledCourses(studentId);
-            console.log('📊 Total enrolled courses:', totalCourses);
 
             const totalPages = Math.ceil(totalCourses / limit);
 
@@ -125,7 +117,7 @@ const enrollmentController = {
                             }
                         };
                     } catch (progressError) {
-                        console.error('⚠️ Error getting progress for course:', course.course_id, progressError);
+                        console.error('Error getting progress for course:', course.course_id, progressError);
                         return {
                             ...course,
                             progress: {
@@ -137,8 +129,6 @@ const enrollmentController = {
                     }
                 })
             );
-
-            console.log('🎓 Courses with progress:', coursesWithProgress.length);
 
             res.render('vwCourse/myCourses', {
                 layout: 'main',
@@ -152,7 +142,7 @@ const enrollmentController = {
                 }
             });
         } catch (error) {
-            console.error('❌ Lỗi khi xem khóa học của tôi:', error);
+            console.error('Lỗi khi xem khóa học của tôi:', error);
             next(error);
         }
     },

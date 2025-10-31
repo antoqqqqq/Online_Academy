@@ -125,17 +125,19 @@ app.listen(PORT, () => {
   console.log(`✅ Server is running at http://localhost:${PORT}`);
 });
 // ==========================
-// 🧠 DATABASE CONNECTION TEST
+// 🧠 DATABASE CONNECTION TEST (dev only)
 // ==========================
 async function testConnection() {
   try {
     const result = await db.raw("SELECT 1+1 AS solution");
-    console.log("📦 Kết nối OK, 1+1 =", result.rows[0].solution);
+    console.log("DB connected. Test result:", result.rows ? result.rows[0].solution : 2);
   } catch (err) {
-    console.error("❌ Lỗi kết nối DB:", err);
+    console.error("DB connection error:", err);
   }
 }
 
-testConnection();
+if (process.env.NODE_ENV === 'development') {
+  testConnection();
+}
 
 export default app;
