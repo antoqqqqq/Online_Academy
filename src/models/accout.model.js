@@ -50,8 +50,21 @@ export default {
         return result;
     },
     
-    async findAll() {
-        return db('account').select('*');
+    async findAll(permissionFilter = null) { // Thêm tham số filter
+        let query = db('account').select('*').orderBy('id', 'asc');
+        
+        // Lọc theo giá trị permission (0, 1, 2)
+        if (permissionFilter === '0') { // Admin
+            query.where('permission', 0);
+        } else if (permissionFilter === '2') { // Giảng viên
+            query.where('permission', 2);
+        } else if (permissionFilter === '1') { // Học viên (Permission 1 hoặc NULL - mặc định)
+            query.where(builder => {
+                builder.where('permission', 1).orWhereNull('permission');
+            });
+        }
+        
+        return query;
     },
 
     async countAll() {

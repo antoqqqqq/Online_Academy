@@ -30,10 +30,16 @@ const adminController = {
     // --- User Management ---
     viewUsers: async (req, res) => {
         try {
-            const users = await accountModel.findAll(); 
+            // Lấy filter từ query parameter, ví dụ: /admin/users?role=2
+            const roleFilter = req.query.role || null; 
+            
+            // Dùng hàm findAll mới có hỗ trợ filter
+            const users = await accountModel.findAll(roleFilter); 
+            
             res.render('vwAdmin/users', { 
                 layout: 'admin',
-                users: users 
+                users: users,
+                currentRole: roleFilter // Truyền filter hiện tại sang view
             });
         } catch (error) {
             console.error("Lỗi khi xem danh sách người dùng:", error);
