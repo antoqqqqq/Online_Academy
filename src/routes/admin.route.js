@@ -22,6 +22,7 @@ router.get('/users', adminController.viewUsers);
 router.post('/users/set-permission', adminController.setUserPermission);
 router.post('/users/add', adminController.addUser);
 router.post('/users/delete', adminController.deleteUser);
+router.post('/users/toggle-lock', adminController.toggleUserLock); // Route để khóa/mở khóa
 
 
 // --- Category Management (Đã thêm từ trước) ---
@@ -34,7 +35,8 @@ router.post('/categories/delete', adminController.deleteCategory);
 // THÊM CÁC ROUTE MỚI DƯỚI ĐÂY:
 router.get('/courses', adminController.viewCourses); // Xem danh sách khóa học
 router.post('/courses/delete', adminController.deleteCourse); // Gỡ bỏ khóa học
+router.post('/courses/toggle-lock', adminController.toggleCourseLock);  // Route để khóa/mở khóa khóa học
 
-
+router.post('/users/toggle-lock', adminController.toggleUserLock); // Route để khóa/mở khóa
 export default router;
 

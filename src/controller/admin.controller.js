@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import accountModel from '../models/accout.model.js';
 import categoryModel from '../models/category.model.js';
 import courseModel from '../models/course.model.js';
+import instructorModel from '../models/instructor.model.js';
 
 const adminController = {
     // --- Dashboard ---
@@ -30,10 +31,16 @@ const adminController = {
     // --- User Management ---
     viewUsers: async (req, res) => {
         try {
-            const users = await accountModel.findAll(); 
+            // Lấy filter từ query parameter, ví dụ: /admin/users?role=2
+            const roleFilter = req.query.role || null; 
+            
+            // Dùng hàm findAll mới có hỗ trợ filter
+            const users = await accountModel.findAll(roleFilter); 
+            
             res.render('vwAdmin/users', { 
                 layout: 'admin',
-                users: users 
+                users: users,
+                currentRole: roleFilter // Truyền filter hiện tại sang view
             });
         } catch (error) {
             console.error("Lỗi khi xem danh sách người dùng:", error);
@@ -115,20 +122,30 @@ const adminController = {
         res.redirect('/admin/categories');
     },
 
-    // --- Course Management (YÊU CẦU 4.2) ---
-    // CÁC HÀM MỚI BẮT ĐẦU TỪ ĐÂY:
     viewCourses: async (req, res) => {
         try {
-            // Gọi hàm model để lấy danh sách khóa học
-            const courses = await courseModel.findAllAdmin();
+            // Lấy filter từ query parameter
+            const categoryFilter = req.query.category || null; 
+            const instructorFilter = req.query.instructor || null; 
+            
+            // Lấy tất cả danh mục L2 và giảng viên để hiển thị filter dropdown
+            const allCategoriesL2 = await categoryModel.getAllForFilter(); 
+            const allInstructors = await instructorModel.getAllInstructorsSimple(); // Dùng hàm mới
+            
+            // Gọi hàm model để lấy danh sách khóa học với filter
+            const courses = await courseModel.findAllAdmin(categoryFilter, instructorFilter);
             
             res.render('vwAdmin/courses', {
                 layout: 'admin',
-                courses: courses // Gửi dữ liệu sang view
+                courses: courses, // Gửi dữ liệu khóa học
+                allCategories: allCategoriesL2, // Gửi danh sách Category L2
+                allInstructors: allInstructors, // Gửi danh sách Instructor
+                currentCategory: categoryFilter, // Gửi filter Category hiện tại
+                currentInstructor: instructorFilter // Gửi filter Instructor hiện tại
             });
         } catch (error) {
             console.error("Lỗi khi xem danh sách khóa học:", error);
-            res.redirect('/admin'); // Chuyển về dashboard nếu lỗi
+            res.redirect('/admin'); 
         }
     },
 
@@ -176,7 +193,36 @@ const adminController = {
             console.error("Lỗi khi xóa người dùng:", error);
         }
         res.redirect('/admin/users');
-    }
+    },
+    toggleUserLock: async (req, res) => {
+        try {
+            const { id, currentStatus } = req.body;
+            // Chuyển trạng thái hiện tại (string) thành trạng thái mới (boolean)
+            const newStatus = currentStatus === 'true' ? false : true; 
+            
+            await accountModel.update(id, { is_active: newStatus });
+            
+            return res.redirect('/admin/users');
+        } catch (error) {
+            console.error("Lỗi khi khóa/mở khóa người dùng:", error);
+            res.redirect('/admin/users');
+        }
+    },
+    toggleCourseLock: async (req, res) => {
+        try {
+            const { id, currentStatus } = req.body;
+            // Chuyển trạng thái hiện tại (string) thành trạng thái mới (boolean)
+            const newStatus = currentStatus === 'true' ? false : true; 
+            
+            // Cập nhật trạng thái is_active cho khóa học
+            await courseModel.updateCourseStatus(id, newStatus);
+            
+            return res.redirect('/admin/courses');
+        } catch (error) {
+            console.error("Lỗi khi khóa/mở khóa khóa học:", error);
+            res.redirect('/admin/courses');
+        }
+    },
 };
 
 export default adminController;

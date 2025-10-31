@@ -63,6 +63,7 @@ export default {
             const otherCourses = await db('courses')
                 .where('instructor_id', course.instructor_id)
                 .where('course_id', '!=', courseId)
+                .where("courses.is_active", true)
                 .select('course_id', 'title', 'image_url', 'rating', 'total_enrollment')
                 .orderBy('total_enrollment', 'desc')
                 .limit(4);
@@ -494,7 +495,7 @@ export default {
                     if (filters.category) {
                         builder.where('courses.category_id', parseInt(filters.category, 10));
                     }
-                    // Xóa các điều kiện where cho price, rating, levels
+                    builder.where('courses.is_active', true);
                 })
                 .limit(limit)
                 .offset(offset);
@@ -540,5 +541,43 @@ export default {
             console.error("Error counting search results:", error);
             throw error;
         }
+    },
+    async updateCourseStatus(courseId, newStatus) {
+        try {
+            return db('courses')
+                .where('course_id', courseId)
+                .update({ is_active: newStatus });
+        } catch (error) {
+            console.error("Error updating course status:", error);
+            throw error;
+        }
+    },
+
+    async findAllAdmin(categoryId = null, instructorId = null) { // THÊM THAM SỐ
+        const query = db('courses')
+            .join('instructor', 'courses.instructor_id', 'instructor.instructor_id')
+            .join('categoryL2', 'courses.category_id', 'categoryL2.id')
+            .select(
+                'courses.course_id as id',
+                'courses.title',
+                'courses.is_complete',
+                'courses.current_price as price',
+                'courses.is_active', // Cần thiết cho cột Trạng thái Khóa
+                'instructor.name as lecturer_name',
+                'categoryL2.category_name'
+            )
+            .orderBy('courses.course_id', 'asc');
+
+        // Áp dụng filter Category
+        if (categoryId) {
+            query.where('courses.category_id', categoryId);
+        }
+
+        // Áp dụng filter Instructor
+        if (instructorId) {
+            query.where('courses.instructor_id', instructorId);
+        }
+
+        return query;
     },
 };

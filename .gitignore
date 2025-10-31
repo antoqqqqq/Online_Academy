@@ -46,3 +46,4 @@ Thumbs.db
 *.sql.gz
 
 # Static files (videos, images)
+src/static/
