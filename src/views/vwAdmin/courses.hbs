@@ -16,6 +16,7 @@
                         <th scope="col">Danh mục</th>
                         <th scope="col">Giá</th>
                         <th scope="col">Trạng thái</th>
+                        <th scope="col">Trạng thái Khóa</th> 
                         <th scope="col" class="text-end">Hành động</th>
                     </tr>
                 </thead>
@@ -34,8 +35,33 @@
                                 <span class="badge bg-warning text-dark">Chưa hoàn thành</span>
                             {{/if}}
                         </td>
+                        {{!-- BẮT ĐẦU THÊM CỘT TRẠNG THÁI KHÓA --}}
+                        <td>
+                            {{#if (eq this.is_active false)}}
+                                <span class="badge bg-danger">Đã khóa</span>
+                            {{else}}
+                                <span class="badge bg-success">Hoạt động</span>
+                            {{/if}}
+                        </td>
+                        {{!-- KẾT THÚC THÊM CỘT TRẠNG THÁI KHÓA --}}
                         <td class="text-end">
-                            <form action="/admin/courses/delete" method="POST" style="display: inline-block;" onsubmit="return confirm('Bạn có chắc chắn muốn gỡ bỏ khóa học này? Mọi dữ liệu liên quan (bài giảng, feedback,...) cũng sẽ bị xóa vĩnh viễn.');">
+                            {{!-- BẮT ĐẦU NÚT KHÓA/MỞ KHÓA --}}
+                            <form action="/admin/courses/toggle-lock" method="POST" class="d-inline"
+                                onsubmit="return confirm('Bạn có chắc chắn muốn {{#if (eq this.is_active false)}}MỞ KHÓA{{else}}KHÓA{{/if}} khóa học {{this.title}}?');">
+                                <input type="hidden" name="id" value="{{this.id}}">
+                                <input type="hidden" name="currentStatus" value="{{this.is_active}}">
+                                <button type="submit" class="btn btn-sm {{#if (eq this.is_active false)}}btn-outline-success{{else}}btn-outline-warning{{/if}} me-2">
+                                    {{#if (eq this.is_active false)}}
+                                        <i class="bi bi-unlock-fill"></i> Mở khóa
+                                    {{else}}
+                                        <i class="bi bi-lock-fill"></i> Khóa
+                                    {{/if}}
+                                </button>
+                            </form>
+                            {{!-- KẾT THÚC NÚT KHÓA/MỞ KHÓA --}}
+
+                            <form action="/admin/courses/delete" method="POST" style="display: inline-block;"
+                                onsubmit="return confirm('Bạn có chắc chắn muốn gỡ bỏ khóa học này? Mọi dữ liệu liên quan (bài giảng, feedback,...) cũng sẽ bị xóa vĩnh viễn.');">
                                 <input type="hidden" name="id" value="{{this.id}}">
                                 <button type="submit" class="btn btn-sm btn-outline-danger">
                                     <i class="bi bi-trash-fill"></i> Gỡ bỏ

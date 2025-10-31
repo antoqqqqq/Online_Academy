@@ -176,7 +176,36 @@ const adminController = {
             console.error("Lỗi khi xóa người dùng:", error);
         }
         res.redirect('/admin/users');
-    }
+    },
+    toggleUserLock: async (req, res) => {
+        try {
+            const { id, currentStatus } = req.body;
+            // Chuyển trạng thái hiện tại (string) thành trạng thái mới (boolean)
+            const newStatus = currentStatus === 'true' ? false : true; 
+            
+            await accountModel.update(id, { is_active: newStatus });
+            
+            return res.redirect('/admin/users');
+        } catch (error) {
+            console.error("Lỗi khi khóa/mở khóa người dùng:", error);
+            res.redirect('/admin/users');
+        }
+    },
+    toggleCourseLock: async (req, res) => {
+        try {
+            const { id, currentStatus } = req.body;
+            // Chuyển trạng thái hiện tại (string) thành trạng thái mới (boolean)
+            const newStatus = currentStatus === 'true' ? false : true; 
+            
+            // Cập nhật trạng thái is_active cho khóa học
+            await courseModel.updateCourseStatus(id, newStatus);
+            
+            return res.redirect('/admin/courses');
+        } catch (error) {
+            console.error("Lỗi khi khóa/mở khóa khóa học:", error);
+            res.redirect('/admin/courses');
+        }
+    },
 };
 
 export default adminController;

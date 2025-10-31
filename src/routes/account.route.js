@@ -105,6 +105,12 @@ router.post("/signin", async (req, res) => {
             err_message: "Invalid email or password.",
         });
     }
+    if (user.is_active === false) { 
+        return res.render("vwaccount/signin", {
+            layout: "account",
+            err_message: "Tài khoản của bạn đã bị khóa.", // Thông báo cho người dùng
+        });
+    }
     req.session.isAuthenticated = true;
     req.session.authUser = user;
     const url = "/";

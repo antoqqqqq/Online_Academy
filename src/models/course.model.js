@@ -63,6 +63,7 @@ export default {
             const otherCourses = await db('courses')
                 .where('instructor_id', course.instructor_id)
                 .where('course_id', '!=', courseId)
+                .where("courses.is_active", true)
                 .select('course_id', 'title', 'image_url', 'rating', 'total_enrollment')
                 .orderBy('total_enrollment', 'desc')
                 .limit(4);
@@ -494,7 +495,7 @@ export default {
                     if (filters.category) {
                         builder.where('courses.category_id', parseInt(filters.category, 10));
                     }
-                    // Xóa các điều kiện where cho price, rating, levels
+                    builder.where('courses.is_active', true);
                 })
                 .limit(limit)
                 .offset(offset);
@@ -538,6 +539,16 @@ export default {
             return parseInt(result.total, 10) || 0;
         } catch (error) {
             console.error("Error counting search results:", error);
+            throw error;
+        }
+    },
+    async updateCourseStatus(courseId, newStatus) {
+        try {
+            return db('courses')
+                .where('course_id', courseId)
+                .update({ is_active: newStatus });
+        } catch (error) {
+            console.error("Error updating course status:", error);
             throw error;
         }
     },

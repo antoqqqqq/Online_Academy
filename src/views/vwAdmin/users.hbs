@@ -9,53 +9,82 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Họ tên</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Quyền hạn</th>
-                        <th scope="col" class="text-end">Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each this.users}}
-                    <tr>
-                        <th scope="row">{{this.id}}</th>
-                        <td>{{this.name}}</td>
-                        <td>{{this.email}}</td>
-                        <td>
-                            {{#if (eq this.permission 0)}}
-                                <span class="badge bg-danger">Admin</span>
-                            {{else if (eq this.permission 2)}}
-                                <span class="badge bg-primary">Giảng viên</span>
-                            {{else}}
-                                <span class="badge bg-secondary">Học viên</span>
-                            {{/if}}
-                        </td>
-                        <td class="text-end">
-                            <button class="btn btn-sm btn-outline-info btn-set-permission" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#setPermissionModal"
-                                    data-user-id="{{this.id}}"
-                                    data-user-name="{{this.name}}"
-                                    data-user-permission="{{this.permission}}">
-                                <i class="bi bi-shield-lock-fill"></i> Cấp quyền
+          <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Họ tên</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Quyền hạn</th>
+                    <th scope="col">Trạng thái</th>
+                    <th scope="col" class="text-end">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each this.users}}
+                <tr>
+                    <th scope="row">{{this.id}}</th>
+                    <td>{{this.name}}</td>
+                    <td>{{this.email}}</td>
+                    <td>
+                        {{#if (eq this.permission 0)}}
+                          <span class="badge bg-danger">Admin</span>
+                        {{else if (eq this.permission 2)}}
+                            <span class="badge bg-primary">Giảng viên</span>
+                        {{else}}
+                            <span class="badge bg-secondary">Học viên</span>
+                        {{/if}}
+                    </td>
+                    {{!-- BẮT ĐẦU HIỂN THỊ TRẠNG THÁI --}}
+                    <td>
+                        {{#if (eq this.is_active false)}}
+                            <span class="badge bg-danger">Đã khóa</span>
+                        {{else}}
+                            <span class="badge bg-success">Hoạt động</span>
+                        {{/if}}
+                    </td>
+                    {{!-- KẾT THÚC HIỂN THỊ TRẠNG THÁI --}}
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-info btn-set-permission" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#setPermissionModal"
+                                data-user-id="{{this.id}}"
+                                data-user-name="{{this.name}}"
+                                data-user-permission="{{this.permission}}">
+                            <i class="bi bi-shield-lock-fill"></i> Cấp quyền
+                        </button>
+                        
+                        {{!-- BẮT ĐẦU NÚT KHÓA/MỞ KHÓA --}}
+                        {{#unless (eq this.permission 0)}} {{!-- Không cho phép khóa Admin --}}
+                        <form action="/admin/users/toggle-lock" method="POST" class="d-inline"
+                            onsubmit="return confirm('Bạn có chắc chắn muốn {{#if (eq this.is_active false)}}MỞ KHÓA{{else}}KHÓA{{/if}} tài khoản {{this.name}}?');">
+                            <input type="hidden" name="id" value="{{this.id}}">
+                            <input type="hidden" name="currentStatus" value="{{this.is_active}}">
+                            <button type="submit" class="btn btn-sm {{#if (eq this.is_active false)}}btn-outline-success{{else}}btn-outline-warning{{/if}}">
+                                {{#if (eq this.is_active false)}}
+                                    <i class="bi bi-unlock-fill"></i> Mở khóa
+                                {{else}}
+                                    <i class="bi bi-lock-fill"></i> Khóa
+                                {{/if}}
                             </button>
-                            <form action="/admin/users/delete" method="POST" style="display: inline-block;" onsubmit="return confirm('Bạn có chắc muốn xóa người dùng này?');">
-                                <input type="hidden" name="id" value="{{this.id}}">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-trash-fill"></i> Xóa
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {{else}}
-                    <tr>
-                        <td colspan="5" class="text-center">Chưa có người dùng nào.</td>
-                    </tr>
-                    {{/each}}
+                        </form>
+                        {{/unless}}
+                        {{!-- KẾT THÚC NÚT KHÓA/MỞ KHÓA --}}
+
+                        <form action="/admin/users/delete" method="POST" style="display: inline-block;"
+                            onsubmit="return confirm('Bạn có chắc muốn xóa người dùng này?');">
+                            <input type="hidden" name="id" value="{{this.id}}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash-fill"></i> Xóa
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {{else}}
+                      <tr>
+                          <td colspan="5" class="text-center">Chưa có người dùng nào.</td>
+                      </tr>
+                      {{/each}}
                 </tbody>
             </table>
         </div>
