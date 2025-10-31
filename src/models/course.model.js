@@ -552,4 +552,32 @@ export default {
             throw error;
         }
     },
+
+    async findAllAdmin(categoryId = null, instructorId = null) { // THÊM THAM SỐ
+        const query = db('courses')
+            .join('instructor', 'courses.instructor_id', 'instructor.instructor_id')
+            .join('categoryL2', 'courses.category_id', 'categoryL2.id')
+            .select(
+                'courses.course_id as id',
+                'courses.title',
+                'courses.is_complete',
+                'courses.current_price as price',
+                'courses.is_active', // Cần thiết cho cột Trạng thái Khóa
+                'instructor.name as lecturer_name',
+                'categoryL2.category_name'
+            )
+            .orderBy('courses.course_id', 'asc');
+
+        // Áp dụng filter Category
+        if (categoryId) {
+            query.where('courses.category_id', categoryId);
+        }
+
+        // Áp dụng filter Instructor
+        if (instructorId) {
+            query.where('courses.instructor_id', instructorId);
+        }
+
+        return query;
+    },
 };

@@ -435,5 +435,17 @@ export default {
         } catch (error) {
             console.error('Error migrating instructor data:', error);
         }
-    }
+    },
+    async getAllInstructorsSimple() {
+        try {
+            const instructors = await db('instructor')
+                .select('instructor_id', 'name')
+                .orderBy('name', 'asc');
+
+            return instructors;
+        } catch (error) {
+            console.error('Error getting all instructors simple:', error);
+            return [];
+        }
+    },
 };

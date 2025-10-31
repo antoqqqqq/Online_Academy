@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import accountModel from '../models/accout.model.js';
 import categoryModel from '../models/category.model.js';
 import courseModel from '../models/course.model.js';
+import instructorModel from '../models/instructor.model.js';
 
 const adminController = {
     // --- Dashboard ---
@@ -121,20 +122,30 @@ const adminController = {
         res.redirect('/admin/categories');
     },
 
-    // --- Course Management (YÊU CẦU 4.2) ---
-    // CÁC HÀM MỚI BẮT ĐẦU TỪ ĐÂY:
     viewCourses: async (req, res) => {
         try {
-            // Gọi hàm model để lấy danh sách khóa học
-            const courses = await courseModel.findAllAdmin();
+            // Lấy filter từ query parameter
+            const categoryFilter = req.query.category || null; 
+            const instructorFilter = req.query.instructor || null; 
+            
+            // Lấy tất cả danh mục L2 và giảng viên để hiển thị filter dropdown
+            const allCategoriesL2 = await categoryModel.getAllForFilter(); 
+            const allInstructors = await instructorModel.getAllInstructorsSimple(); // Dùng hàm mới
+            
+            // Gọi hàm model để lấy danh sách khóa học với filter
+            const courses = await courseModel.findAllAdmin(categoryFilter, instructorFilter);
             
             res.render('vwAdmin/courses', {
                 layout: 'admin',
-                courses: courses // Gửi dữ liệu sang view
+                courses: courses, // Gửi dữ liệu khóa học
+                allCategories: allCategoriesL2, // Gửi danh sách Category L2
+                allInstructors: allInstructors, // Gửi danh sách Instructor
+                currentCategory: categoryFilter, // Gửi filter Category hiện tại
+                currentInstructor: instructorFilter // Gửi filter Instructor hiện tại
             });
         } catch (error) {
             console.error("Lỗi khi xem danh sách khóa học:", error);
-            res.redirect('/admin'); // Chuyển về dashboard nếu lỗi
+            res.redirect('/admin'); 
         }
     },
 
