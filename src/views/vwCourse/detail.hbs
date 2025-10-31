@@ -45,12 +45,17 @@
                 <div class="course-description">
                     <h5 class="mb-3">Nội dung chi tiết khóa học</h5>
                         {{#if course.full_description}}
-                            <div class="content-from-editor">
-                                {{{course.full_description}}} {{!-- SỬA Ở ĐÂY: Dùng 3 dấu ngoặc nhọn --}}
-                            </div>
-                        {{else}}
-                            <p class="text-muted fst-italic">Nội dung chi tiết chưa được cập nhật.</p>
-                        {{/if}}
+                    <div class="mb-4">
+                        <p></p>
+                        <h5>📘 Tổng quan</h5>
+                        <p>{{course.full_description.overview}}</p>
+                        <p>Độ khó: {{course.level}}</p>
+                        <p>Số giờ: {{course.total_hours}}</p>
+                        <p>Số lớp: {{course.total_lectures}}</p>
+                    </div>
+                    {{else}}
+                    <p class="text-muted fst-italic">Nội dung chi tiết chưa được cập nhật.</p>
+                    {{/if}}
 
                     {{#if course.full_description.what_you_will_learn}}
                     <div class="mb-4">
