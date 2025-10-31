@@ -22,7 +22,15 @@ const courseController = {
                     message: 'Không tìm thấy khóa học'
                 });
             }
-
+            // Parse JSON file into displayable txt    
+            if (course.full_description && typeof course.full_description === 'string') {
+                try {
+                    course.full_description = JSON.parse(course.full_description);
+                } catch (e) {
+                    console.error('Invalid full_description JSON', e);
+                    course.full_description = {};
+                }
+            }
             // Ensure course image URL is consistent
             if (!course.image_url || course.image_url === '' || course.image_url === '/upload/images/default-course.jpg') {
                 course.image_url = '/upload/images/default-course.jpg';
