@@ -88,15 +88,16 @@ const instructorController = {
                 });
             });
 
-            const createFullDescriptionJSON = (text) => {
-                if (!text || text.trim() === '') {
+            const createFullDescriptionJSON = (content) => {
+                if (!content || content.trim() === '') {
                     return null;
                 }
                 
                 return JSON.stringify({
-                    content: text.trim(),
+                    content: content.trim(),
                     sections: [],
-                    created_at: new Date().toISOString()
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
                 });
             };
 
@@ -194,7 +195,7 @@ const instructorController = {
                 total_hours: 0,
                 total_lectures: 0,
                 total_enrollment: 0,
-                full_description: full_description || null,
+                full_description: full_description ? createFullDescriptionJSON(full_description) : null,
                 latest_update: new Date()
             };
 
@@ -463,7 +464,7 @@ const instructorController = {
                 current_price: currentPrice,
                 is_complete: finalIsComplete,
                 is_onsale: isOnSale,
-                full_description: full_description || null,
+                full_description: full_description ? createFullDescriptionJSON(full_description) : null,
                 latest_update: new Date()
             };
 
