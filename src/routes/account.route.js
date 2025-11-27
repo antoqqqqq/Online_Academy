@@ -1,6 +1,7 @@
 import express from "express";
 import accountModel from "../models/accout.model.js";
 import bcrypt from "bcrypt";
+import crypto from "node:crypto";
 import mailer from "../utils/mailer.js";
 import passport from "../config/passport.js";
 const router = express.Router();
@@ -13,7 +14,7 @@ router.post("/signup", async (req, res) => {
     const name = req.body.name;
     const hash = await bcrypt.hash(password, 10);
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = String(crypto.randomInt(100000, 1000000));
     const result = {
         email: email,
         password: hash,
@@ -32,8 +33,11 @@ router.post("/signup", async (req, res) => {
     }
 });
 router.post("/resend-otp", async (req, res) => {
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = String(crypto.randomInt(100000, 1000000));
     const email = req.body.email;
+    if (!req.session.otpStore) {
+        return res.json({ success: false, message: "No OTP session found. Please sign up first." });
+    }
     req.session.otpStore.otp = otp;
     req.session.otpStore.otpCreatedAt = Date.now();
     const sendotp = await mailer.sendOTP(email, otp);
@@ -85,7 +89,7 @@ router.get("/signup/is-available", async (req, res) => {
     const email = req.query.email;
     await accountModel.isEmailAvailable(email).then((isAvailable) => {
         res.json({ isAvailable });
-    });
+    }); 
 });
 
 router.post("/signin", async (req, res) => {
@@ -98,8 +102,8 @@ router.post("/signin", async (req, res) => {
             err_message: "Invalid email or password.",
         });
     }
-    const rs = await bcrypt.compareSync(password, user.password);
-    if (rs === false) {
+    const rs = await bcrypt.compare(password, user.password);
+    if (!rs) {
         return res.render("vwaccount/signin", {
             layout: "account",
             err_message: "Invalid email or password.",
@@ -116,29 +120,6 @@ router.post("/signin", async (req, res) => {
     const url = "/";
     res.redirect(url);
 });
-// router.post('/signin', (req, res, next) => {
-//   passport.authenticate('local', (err, user, info) => {
-//     if (err) {
-//       console.error('❌ Lỗi khi authenticate:', err);
-//       return next(err);
-//     }
-//     if (!user) {
-//       console.warn('⚠️ Login thất bại:', info);
-//       return res.render('vwaccount/signin', {
-//         layout: 'account',
-//         err_message: info?.message || 'Sai thông tin đăng nhập.',
-//       });
-//     }
-//     req.logIn(user, (err) => {
-//       if (err) {
-//         console.error('❌ Lỗi khi logIn:', err);
-//         return next(err);
-//       }
-//       console.log('✅ Đăng nhập thành công:', user);
-//       return res.redirect('/');
-//     });
-//   })(req, res, next);
-// });
 router.get('/google',
     passport.authenticate('google', { scope: ['profile', 'email'] })
 );
@@ -180,12 +161,7 @@ router.get("/profile", (req, res) => {
     } else { res.render("vwaccount/profile", { layout: "account" }); }
 
 });
-// router.post("/profile", async (req, res) => {
-//     const message = req.body.err_message;
-//     console.log(message);
-//     // Handle avatar update logic here
-//     res.render("vwaccount/profile", { layout: "account", err_message: message });
-// });
+
 router.post("/profile/changeprofile", async (req, res) => {
     const userId = req.session.authUser.id;
     const name = req.body.name;
@@ -214,7 +190,7 @@ router.post("/profile/changepassword", async (req, res) => {
     const currentPassword = req.body.currentPassword;
     const newPassword = req.body.newPassword;
     const user = await accountModel.findUserById(userId);
-    const isMatch = await bcrypt.compareSync(currentPassword, user.password);
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
         return res.json({ success: false, err_message: "Current password is incorrect." });
     }

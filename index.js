@@ -13,7 +13,6 @@ import dotenv from "dotenv";
 import { loadCategories } from "./src/middlewares/category.mdw.js";
 import passport from "passport";
 import "./src/config/passport.js"; // Import passport config
-import db from "./src/utils/db.js";
 import helpers from "./src/helper/curency.helper.js";
 import { Handlebars } from "./src/helper/curency.helper.js"; // import the instance
 import homeRoute from "./src/routes/home.route.js";
@@ -32,7 +31,7 @@ import instructorRoute from "./src/routes/instructor.route.js";
 // ==========================
 dotenv.config();
 const app = express();
-
+app.disable('x-powered-by');
 // Lấy đường dẫn tuyệt đối hiện tại (dùng nếu cần path chính xác)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -127,17 +126,6 @@ app.listen(PORT, () => {
 // ==========================
 // 🧠 DATABASE CONNECTION TEST (dev only)
 // ==========================
-async function testConnection() {
-  try {
-    const result = await db.raw("SELECT 1+1 AS solution");
-    console.log("DB connected. Test result:", result.rows ? result.rows[0].solution : 2);
-  } catch (err) {
-    console.error("DB connection error:", err);
-  }
-}
 
-if (process.env.NODE_ENV === 'development') {
-  testConnection();
-}
 
 export default app;

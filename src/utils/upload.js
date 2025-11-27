@@ -119,13 +119,6 @@ export const createCourseImageUpload = (courseId) => multer({
     }
 });
 
-/* export const createInstructorImageUpload = (instructorId) => multer({
-    storage: instructorStorage(instructorId),
-    fileFilter: imageFilter,
-    limits: {
-        fileSize: 2 * 1024 * 1024 // 2MB
-    }
-}); */
 
 export const createVideoUpload = (courseId, lectureId) => multer({
     storage: videoStorage(courseId, lectureId),
@@ -194,5 +187,4 @@ export const getFileUrl = (type, id, subId = null, filename = null) => {
 
 // For backward compatibility
 export const uploadImage = createCourseImageUpload('temp');
-//export const uploadInstructorImage = createInstructorImageUpload('temp');
 export const uploadVideo = createVideoUpload('temp', 'temp');

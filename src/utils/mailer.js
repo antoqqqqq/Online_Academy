@@ -5,7 +5,11 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: process.env.EMAIL_USER, // Email của bạn
         pass: process.env.EMAIL_PASSWORD // App password
-    }
+    },
+    secure: true,
+    requireTLS: true,
+    port: 465,
+    secured: true
 });
 // Hàm gửi OTP
 export default {
